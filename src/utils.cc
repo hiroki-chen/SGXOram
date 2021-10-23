@@ -1,0 +1,54 @@
+/*
+ Copyright (c) 2021 Haobin Chen
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+#include <utils.hh>
+
+#include <algorithm>
+#include <random>
+
+namespace sgx_oram {
+std::vector<std::string> generate_random_strings(const uint32_t& number, const uint32_t& length)
+{
+    std::vector<std::string> ans;
+
+    std::random_device rd;
+    std::mt19937 engine(rd());
+    std::uniform_int_distribution<> dist(0, sizeof(candidate) - 1);
+
+    for (uint32_t i = 0; i < number; i++) {
+        std::string s;
+        for (uint32_t j = 0; j < length; j++) {
+            const uint32_t pos = dist(engine);
+            s.push_back(candidate[pos]);
+        }
+        ans.push_back(s);
+    }
+
+    return ans;
+}
+
+std::vector<Block> convert_to_blocks(const std::vector<std::string>& data)
+{
+    std::vector<Block> ans;
+    
+    uint32_t i = 0;
+    std::transform(data.begin(), data.end(), std::back_inserter(ans), [&i](const std::string& s) {
+        return Block(false, s, i++);
+    });
+
+    return ans;
+}
+} // namespace sgx_oram

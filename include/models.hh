@@ -17,11 +17,14 @@
 #ifndef MODELS_HH
 #define MODELS_HH
 
+#include <cxxopts.hh>
+
 #include <cstdint>
-#include <vector>
+#include <fstream>
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 namespace sgx_oram {
 
@@ -49,6 +52,7 @@ typedef class Slot {
 protected:
     // Stores the block.
     std::vector<Block> storage;
+
 public:
     void add_block(const Block& block);
 
@@ -77,8 +81,17 @@ private:
     // The number of the blocks
     const uint32_t block_number;
 
+    // The input file path.
+    std::ifstream* data_file;
+
+    /* ============ Functions ============= */
+    void init_position_map(void);
+
+    void init_oram(const std::vector<Block>& blocks);
 public:
-    Oram(const uint32_t& p, const uint32_t& block_number);
+    Oram() = delete;
+
+    Oram(const cxxopts::ParseResult& result);
 
     /**
      * @brief Access the SGXOram.
@@ -89,6 +102,37 @@ public:
      */
     void oram_access(const bool& op, const uint32_t& address, std::string& data);
 } Oram;
+
+/**
+ * @brief Class for the command line parser.
+ * 
+ */
+typedef class Parser {
+private:
+    cxxopts::ParseResult result;
+
+    cxxopts::Options* options;
+
+    const int argc;
+
+    const char** argv;
+
+public:
+    Parser() = delete;
+
+    /**
+     * @brief Construct a new Parser object
+     * 
+     * @param argc 
+     * @param argv 
+     * @note        argc and argv are captured from main function.
+     */
+    Parser(const int& argc, const char** argv);
+
+    void parse(void);
+
+    cxxopts::ParseResult get_result(void) { return result; }
+} Parser;
 
 } // namespace sgx_oram
 
