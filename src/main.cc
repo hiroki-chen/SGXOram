@@ -14,6 +14,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <plog/Log.h>
 #include <models.hh>
 using sgx_oram::Oram;
 using sgx_oram::Parser;
@@ -25,7 +26,7 @@ int main(int argc, const char** argv)
         parser->parse();
         Oram* const oram_controller = new Oram(parser->get_result());
     } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        PLOG(plog::error) << e.what();
         exit(1);
     }
 

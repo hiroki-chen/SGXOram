@@ -28,6 +28,26 @@
 
 namespace sgx_oram {
 
+typedef struct Position {
+    uint32_t level_cur;
+
+    uint32_t offset;
+
+    uint32_t bid_cur;
+
+    uint32_t bid_dst;
+
+    /**
+     * @brief Construct a new Position object
+     * 
+     * @param level_cur 
+     * @param offset 
+     * @param bid_cur 
+     * @param bid_dst  By default this should be 0xffffffff.
+     */
+    Position(const uint32_t& level_cur, const uint32_t& offset, const uint32_t& bid_cur, const uint32_t& bid_dst = 0xffffffff);
+} Position;
+
 /**
  * @brief This is the implementation of each block in the ORAM.
  * 
@@ -47,6 +67,12 @@ typedef struct Block {
 /**
  * @brief This is the implementation of the ORAM slot
  * 
+ * @note Storage layout:
+ *                                      O                   L
+ *                                  O  O  O  O              L-1
+ *                                O O O O O O O O O         L-2
+ *                                      ....                ...
+ *                                      O O OO              1               <----- At this level we could store buckets.
  */
 typedef class Slot {
 protected:
@@ -69,8 +95,11 @@ private:
     // This is the storage type of the oram. Usage: [level_num][bid_range]
     std::vector<std::vector<Slot>> slots;
 
-    // The position map. Usage: position[address] = (level, id).
-    std::map<uint32_t, std::pair<uint32_t, uint32_t>> position_map;
+    // The position map. Usage: position[address] = (level, x, bid_cur, bid_dst)
+    std::map<uint32_t, Position> position_map;
+
+    // Constant
+    const uint32_t constant;
 
     // The way of the tree.
     const uint32_t p;
@@ -81,6 +110,8 @@ private:
     // The number of the blocks
     const uint32_t block_number;
 
+    const bool verbose;
+
     // The input file path.
     std::ifstream* data_file;
 
@@ -88,6 +119,8 @@ private:
     void init_position_map(void);
 
     void init_oram(const std::vector<Block>& blocks);
+
+    Position get_position(const uint32_t& permutated_pos, const std::vector<uint32_t>& level_size_information);
 public:
     Oram() = delete;
 
