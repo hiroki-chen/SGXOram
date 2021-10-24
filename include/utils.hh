@@ -17,6 +17,7 @@
 #ifndef UTILS_HH
 #define UTILS_HH
 
+#include <plog/Record.h>
 #include <models.hh>
 
 #include <string>
@@ -30,7 +31,11 @@ namespace sgx_oram {
 
     std::vector<std::string> generate_random_strings(const uint32_t& number, const uint32_t& length = 32);
 
+    std::vector<std::string> get_data_from_file(std::ifstream* const file);
+
     std::vector<Block> convert_to_blocks(const std::vector<std::string>& data);
+
+    plog::Record& operator << (plog::Record& record, const Position& position);
 } // sgx_oram
 
 #endif

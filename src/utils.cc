@@ -14,9 +14,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <plog/Log.h>
 #include <utils.hh>
 
 #include <algorithm>
+#include <iostream>
 #include <random>
 
 namespace sgx_oram {
@@ -43,12 +45,34 @@ std::vector<std::string> generate_random_strings(const uint32_t& number, const u
 std::vector<Block> convert_to_blocks(const std::vector<std::string>& data)
 {
     std::vector<Block> ans;
-    
+
     uint32_t i = 0;
     std::transform(data.begin(), data.end(), std::back_inserter(ans), [&i](const std::string& s) {
         return Block(false, s, i++);
     });
 
     return ans;
+}
+
+std::vector<std::string> get_data_from_file(std::ifstream* const file)
+{
+    LOG(plog::debug) << "Reading data from file is started!";
+    std::vector<std::string> ans;
+    while (!(*file).eof()) {
+        std::string s;
+        std::getline(*file, s);
+        ans.push_back(s);
+    }
+    LOG(plog::debug) << "Reading data from file is finished!";
+
+    return ans;
+}
+
+plog::Record& operator<<(plog::Record& record, const Position& position)
+{
+    record << "level: " << position.level_cur << ", offset: "
+           << position.offset << ", bid_cur: " << position.offset << ", bid_dst: " << position.bid_dst;
+
+    return record;
 }
 } // namespace sgx_oram
