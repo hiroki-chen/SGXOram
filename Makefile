@@ -6,9 +6,9 @@ OBJ_FILE = $(patsubst $(SRC_DIR)/%.cc, $(OBJ_DIR)/%.o, $(SRC_FILE))
 TARGET = $(OBJ_DIR)/Simulator
 
 CXX = g++-11
-CXXFLAGS = -Wextra -Werror -O2 -fPIE -std=c++11 -I$(INCLUDE_DIR)
+CXXFLAGS = -Wextra -Werror -O0 -fPIE -std=c++17 -I$(INCLUDE_DIR)
 
-.phony: all mk
+.phony: all mk clean
 
 mk:
 	mkdir -p $(OBJ_DIR)
@@ -18,3 +18,6 @@ all: mk $(OBJ_FILE)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+clean:
+	rm -rf ./obj

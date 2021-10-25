@@ -42,19 +42,9 @@ sgx_oram::Position::Position(
 
 sgx_oram::Block::Block(const bool& is_dummy, const std::string& data, const uint32_t& bid)
     : is_dummy(is_dummy)
-    , data(data)
+    , data(data.begin(), data.end())
     , bid(bid)
 {
-}
-
-sgx_oram::Block::Block(const bool& is_dummy)
-    : is_dummy(is_dummy)
-{
-}
-
-sgx_oram::Slot::Slot(const uint32_t& size)
-{
-    storage.reserve(size);
 }
 
 sgx_oram::Oram::Oram(const cxxopts::ParseResult& result)
@@ -85,28 +75,23 @@ sgx_oram::Oram::Oram(const cxxopts::ParseResult& result)
         data = generate_random_strings(block_number, 32);
     }
 
-    // PLOG(plog::debug) << level;
-
     // Convert to the block vector and initialize the oram controller.
     const std::vector<Block> blocks = convert_to_blocks(data);
 
     // Initialize the position map.
     init_position_map();
 
+    // Initilize the slot level by level.
+    init_slot();
+
+    init_sgx(blocks);
+
     // If there is no input file, we generate random data.
     PLOG(plog::info) << "The ORAM controller is initialized!";
-}
 
-sgx_oram::Parser::Parser(const int& argc, const char** argv)
-    : argc(argc)
-    , argv(argv)
-{
-    options = new cxxopts::Options("Simulator",
-        " ------ The SGX-Based ORAM Created by Data Security Lab at Nankai University -----\n"
-        " Authored by Haobin Chen and Siyi Lv\n"
-        " Copyright ©️ Nankai University");
-
-    options->add_options()("c,constant", "The constant multiplicated with the slot size.", cxxopts::value<uint32_t>()->default_value("1"))("f,file", "The file path of the data you want to load into the SGX.", cxxopts::value<std::string>()->default_value("./input.data"))("n,number", "The number of the total blocks.", cxxopts::value<uint32_t>()->default_value("100000"))("v,verbose", "Enable verbose mode", cxxopts::value<bool>()->default_value("false"))("w,way", "The number of ways in the SGX tree.", cxxopts::value<uint32_t>()->default_value("8"))("h,help", "Print usage information.");
+    if (verbose) {
+        print_sgx();
+    }
 }
 
 /*
@@ -118,7 +103,7 @@ void sgx_oram::Oram::init_position_map(void)
     uint32_t cur_size = 1;
 
     // This vector is used to look up the size of each level (in blocks).
-    std::vector<uint32_t> level_size_information;
+
     // We traverse from the root to the leaf.
     for (uint32_t i = 0; i < level; i++) {
         const uint32_t cur_slot_num = (uint32_t)(std::pow(p, i));
@@ -143,11 +128,13 @@ void sgx_oram::Oram::init_position_map(void)
     // This is an inverted vector where index is the position.
     for (uint32_t i = 0; i < permutation_vec.size(); i++) {
         // 0xfffffff denotes a piece of dummy permutation information.
-        if (permutation_vec[i] != 0xffffffff) {
-            const Position position = get_position(i, level_size_information);
+        const uint32_t address = permutation_vec[i];
+        if (address != 0xffffffff) {
+            Position position = get_position(i, level_size_information);
             if (verbose) {
-                PLOG(plog::debug) << "The position for item " << permutation_vec[i] << " is " << position; 
+                PLOG(plog::debug) << "The position for item " << address << " is " << position << " raw: " << i;
             }
+            position_map[address] = position;
         }
     }
 }
@@ -158,23 +145,84 @@ sgx_oram::Oram::get_position(const uint32_t& permutated_pos, const std::vector<u
     uint32_t cur = permutated_pos;
     uint32_t i = 0;
     uint32_t level_size = level_size_information[i] * (uint32_t)(std::pow(p, i));
-    while (cur + 1 >= level_size) {
+    while (cur >= level_size) {
         cur -= level_size;
         i++;
         level_size = level_size_information[i] * (uint32_t)(std::pow(p, i));
     }
-    const uint32_t level_cur = level - i;
-    
+    const uint32_t level_cur = i;
     // TODO: We now get the current level, and the value "cur" can be used to locate the bid_cur.
-    return Position(level_cur, 0xffffffff, 0xffffffff, 0xffffffff);
+    const uint32_t slot_pos = std::floor(cur * 1.0 / level_size_information[i]);
+    const uint32_t offset = cur - slot_pos * level_size_information[i];
+
+    Position position = Position(level_cur, offset, 0xffffffff, 0xffffffff);
+    position.slot_num = slot_pos;
+    return position;
 }
 
-void sgx_oram::Parser::parse(void)
+void sgx_oram::Oram::init_slot(void)
 {
-    result = options->parse(argc, argv);
+    LOG(plog::info) << "The ORAM controller is initializing the SGX storage tree level by level...";
 
-    if (result.count("help")) {
-        std::cout << options->help() << std::endl;
-        exit(0);
+    // Although we mark the leaf level as 1, for computational convernience, we still
+    // traverse from 0 to L - 1, i.e., from root to leaf.
+    for (uint32_t i = 0; i < level; i++) {
+        const uint32_t slot_num_cur = (uint32_t)std::pow(p, i);
+        std::vector<Slot> slot_vec;
+        for (uint32_t j = 0; j < slot_num_cur; j++) {
+            // Set basic information for the slot.
+            // Note that the range is bigger when the node is closer to the root!
+            const uint32_t level_size = (uint32_t)(std::pow(p, level - 1 - i));
+            const uint32_t begin = j * level_size;
+            const uint32_t end = begin + level_size - 1; // Starts at 0.
+            Slot slot(level_size_information[i]);
+            slot.set_level(i);
+            slot.set_range(begin, end);
+            slot_vec.push_back(slot);
+        }
+        slots.push_back(slot_vec);
+        // LOG(plog::debug) << i << ": " << slots[i][0].size();
     }
+
+    LOG(plog::info) << "The ORAM has initialized the SGX storage tree.";
+}
+
+void sgx_oram::Oram::init_sgx(const std::vector<Block>& blocks)
+{
+    LOG(plog::info) << "The ORAM controller is loading the SGX data...";
+    // Fill each slot with given blocks.
+    for (uint32_t i = 0; i < blocks.size(); i++) {
+        // Read the position from the position map.
+        const Position& position = position_map[i];
+        const uint32_t level = position.level_cur;
+        const uint32_t slot_num = position.slot_num;
+        const uint32_t offset = position.offset;
+        // PLOG(plog::info) << "reading " << i << " position " << position;
+        slots[level][slot_num].add_block(blocks[i], offset);
+    }
+
+    LOG(plog::info) << "The ORAM controller has initialized the SGX data.";
+}
+
+void sgx_oram::Oram::print_sgx(void)
+{
+    for (uint32_t i = 0; i < slots.size(); i++) {
+        LOG(plog::debug) << "LEVEL " << i << ": ";
+        for (uint32_t j = 0; j < slots[i].size(); j++) {
+            LOG(plog::debug) << slots[i][j];
+        }
+    }
+}
+
+namespace sgx_oram {
+plog::Record& operator<<(plog::Record& record, const sgx_oram::Slot& slot)
+{
+    const auto storage = slot.storage;
+    record << "Slot range: [" << slot.range.first << ", " << slot.range.second << "]";
+    for (auto item : storage) {
+        record << std::endl << "is_dummy: " << item.is_dummy << " data: " << item.data << std::endl;
+    }
+
+    return record;
+}
 }

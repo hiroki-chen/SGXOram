@@ -18,12 +18,14 @@
 #define MODELS_HH
 
 #include <cxxopts.hh>
+#include <plog/Record.h>
 
 #include <cstdint>
 #include <fstream>
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace sgx_oram {
@@ -31,11 +33,17 @@ namespace sgx_oram {
 typedef struct Position {
     uint32_t level_cur;
 
+    // Offset starts at 0. :))
     uint32_t offset;
 
     uint32_t bid_cur;
 
     uint32_t bid_dst;
+
+    // Offset levelwise.
+    uint32_t slot_num;
+
+    Position() = default;
 
     /**
      * @brief Construct a new Position object
@@ -62,6 +70,8 @@ typedef struct Block {
     Block(const bool& is_dummy, const std::string& data, const uint32_t& bid);
 
     Block(const bool& is_dummy);
+
+    Block() = default;
 } Block;
 
 /**
@@ -75,12 +85,27 @@ typedef struct Block {
  *                                      O O OO              1               <----- At this level we could store buckets.
  */
 typedef class Slot {
-protected:
+private:
     // Stores the block.
     std::vector<Block> storage;
 
+    // The bid range that the current slot can handle.
+    std::pair<uint32_t, uint32_t> range;
+
+    uint32_t level;
+
 public:
-    void add_block(const Block& block);
+    void add_block(const Block& block, const uint32_t& pos);
+
+    void set_range(const uint32_t& begin, const uint32_t& end);
+
+    void set_level(const uint32_t& level);
+
+    bool in(const uint32_t& bid);
+
+    friend plog::Record& operator<<(plog::Record& record, const Slot& slot);
+
+    uint32_t size(void) { return storage.size(); };
 
     Slot(const uint32_t& size);
 } Slot;
@@ -108,9 +133,13 @@ private:
     const uint32_t level;
 
     // The number of the blocks
-    const uint32_t block_number;
+    uint32_t block_number;
 
+    // Should be verbosely output the information
     const bool verbose;
+
+    // For initialization.
+    std::vector<uint32_t> level_size_information;
 
     // The input file path.
     std::ifstream* data_file;
@@ -120,7 +149,14 @@ private:
 
     void init_oram(const std::vector<Block>& blocks);
 
+    void init_slot(void);
+
+    void init_sgx(const std::vector<Block>& blocks);
+
     Position get_position(const uint32_t& permutated_pos, const std::vector<uint32_t>& level_size_information);
+
+    void print_sgx(void);
+
 public:
     Oram() = delete;
 

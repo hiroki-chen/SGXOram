@@ -28,11 +28,11 @@ std::vector<std::string> generate_random_strings(const uint32_t& number, const u
 
     std::random_device rd;
     std::mt19937 engine(rd());
-    std::uniform_int_distribution<> dist(0, sizeof(candidate) - 1);
+    std::uniform_int_distribution<uint32_t> dist(0, candidate.size() - 1);
 
     for (uint32_t i = 0; i < number; i++) {
         std::string s;
-        for (uint32_t j = 0; j < length; j++) {
+        for (uint32_t j = 0; j < 32; j++) {
             const uint32_t pos = dist(engine);
             s.push_back(candidate[pos]);
         }
@@ -70,8 +70,9 @@ std::vector<std::string> get_data_from_file(std::ifstream* const file)
 
 plog::Record& operator<<(plog::Record& record, const Position& position)
 {
-    record << "level: " << position.level_cur << ", offset: "
-           << position.offset << ", bid_cur: " << position.offset << ", bid_dst: " << position.bid_dst;
+    record << "level: " << position.level_cur << ", offset: " << position.offset
+           << ", bid_cur: " << position.bid_cur << ", bid_dst: " << position.bid_dst
+           << ", slot_num: " << position.slot_num;
 
     return record;
 }
