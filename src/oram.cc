@@ -175,7 +175,8 @@ void sgx_oram::Oram::init_slot(void)
             const uint32_t level_size = (uint32_t)(std::pow(p, level - 1 - i));
             const uint32_t begin = j * level_size;
             const uint32_t end = begin + level_size - 1; // Starts at 0.
-            Slot slot(level_size_information[i]);
+            const uint32_t slot_size = (uint32_t)(std::floor(constant * level_size_information[i]));
+            Slot slot(slot_size);
             slot.set_level(i);
             slot.set_range(begin, end);
             slot_vec.push_back(slot);
