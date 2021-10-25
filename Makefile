@@ -11,7 +11,9 @@ CXXFLAGS = -Wextra -Werror -O0 -fPIE -std=c++17 -I$(INCLUDE_DIR)
 .phony: all mk clean
 
 mk:
+ifeq ("$(wildcard $(OBJ_DIR))", "")
 	mkdir -p $(OBJ_DIR)
+endif
 
 all: mk $(OBJ_FILE)
 	$(CXX) -o $(TARGET) $(OBJ_FILE)
