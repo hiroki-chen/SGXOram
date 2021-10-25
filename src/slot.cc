@@ -14,26 +14,36 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef UTILS_HH
-#define UTILS_HH
-
-#include <plog/Record.h>
 #include <models.hh>
 
-#include <string>
-#include <vector>
+void sgx_oram::Slot::add_block(const Block& block, const uint32_t& pos)
+{
+    // LOG(plog::debug) << pos << ", " << storage.size() << "\n";
+    storage[pos] = block;
+}
 
-namespace sgx_oram {
-    static const std::string candidate =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+void sgx_oram::Slot::set_range(const uint32_t& begin, const uint32_t& end)
+{
+    range.first = begin;
+    range.second = end;
+}
 
-    std::vector<std::string> generate_random_strings(const uint32_t& number, const uint32_t& length = 32);
+void sgx_oram::Slot::set_level(const uint32_t& level)
+{
+    this->level = level;
+}
 
-    std::vector<std::string> get_data_from_file(std::ifstream* const file);
+bool sgx_oram::Slot::in(const uint32_t& bid)
+{
+    return range.first <= bid && bid <= range.second;
+}
 
-    std::vector<Block> convert_to_blocks(const std::vector<std::string>& data);
+sgx_oram::Block::Block(const bool& is_dummy)
+    : is_dummy(is_dummy)
+{
+}
 
-    plog::Record& operator << (plog::Record& record, const Position& position);
-} // sgx_oram
-
-#endif
+sgx_oram::Slot::Slot(const uint32_t& size)
+{
+    storage = std::vector<Block>(size, Block(true));
+}
