@@ -6,14 +6,17 @@ OBJ_FILE = $(patsubst $(SRC_DIR)/%.cc, $(OBJ_DIR)/%.o, $(SRC_FILE))
 TARGET = $(OBJ_DIR)/Simulator
 
 CXX = g++-11
-CXXFLAGS = -Wextra -Werror -O0 -fPIE -std=c++17 -I$(INCLUDE_DIR)
+CXXFLAGS = -Wextra -Werror -Wno-sign-compare -O0 -fPIE -std=c++17 -I$(INCLUDE_DIR)
 
-.phony: all mk clean
+.phony: all mk clean test
 
 mk:
 ifeq ("$(wildcard $(OBJ_DIR))", "")
 	mkdir -p $(OBJ_DIR)
 endif
+
+test: all
+	$(TARGET) -w 3 -n 9 -r 5 -c 2
 
 all: mk $(OBJ_FILE)
 	$(CXX) -o $(TARGET) $(OBJ_FILE)

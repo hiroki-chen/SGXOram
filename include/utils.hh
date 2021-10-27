@@ -32,8 +32,8 @@ namespace sgx_oram {
     std::vector<std::string> get_data_from_file(std::ifstream* const file);
 
     std::vector<Block> convert_to_blocks(const std::vector<std::string>& data);
-
-    plog::Record& operator << (plog::Record& record, const Position& position);
+    
+    uint32_t uniform_random(const uint32_t& lower, const uint32_t& upper);
 } // sgx_oram
 
 #endif
