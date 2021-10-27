@@ -20,6 +20,7 @@
 #include <cxxopts.hh>
 #include <plog/Record.h>
 
+#include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <map>
@@ -27,6 +28,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#define MAXIMUM_LOG_SIZE 65535
 
 namespace sgx_oram {
 
@@ -67,9 +70,13 @@ typedef struct Block {
 
     uint32_t bid;
 
-    Block(const bool& is_dummy, const std::string& data, const uint32_t& bid);
+    uint32_t address; // unique id.
+
+    Block(const bool& is_dummy, const std::string& data, const uint32_t& bid, const uint32_t& address = 0xffffffff);
 
     Block(const bool& is_dummy);
+
+    // Block(const Block& block);
 
     Block() = default;
 } Block;
@@ -94,12 +101,19 @@ private:
 
     uint32_t level;
 
+    // This is used to generate a random position for receiving a data from S1.
+    uint32_t dummy_number;
+
+    friend class Oram;
+
 public:
     void add_block(const Block& block, const uint32_t& pos);
 
     void set_range(const uint32_t& begin, const uint32_t& end);
 
     void set_level(const uint32_t& level);
+
+    std::pair<uint32_t, uint32_t> get_range(void) { return range; }
 
     bool in(const uint32_t& bid);
 
@@ -124,7 +138,7 @@ private:
     std::map<uint32_t, Position> position_map;
 
     // Constant
-    const uint32_t constant;
+    const double constant;
 
     // The way of the tree.
     const uint32_t p;
@@ -138,6 +152,9 @@ private:
     // Should be verbosely output the information
     const bool verbose;
 
+    // Test round.
+    const uint32_t round;
+
     // For initialization.
     std::vector<uint32_t> level_size_information;
 
@@ -147,15 +164,83 @@ private:
     /* ============ Functions ============= */
     void init_position_map(void);
 
-    void init_oram(const std::vector<Block>& blocks);
+    void init_oram(std::vector<Block>& blocks);
 
     void init_slot(void);
 
-    void init_sgx(const std::vector<Block>& blocks);
+    void init_sgx(std::vector<Block>& blocks);
 
     Position get_position(const uint32_t& permutated_pos, const std::vector<uint32_t>& level_size_information);
 
     void print_sgx(void);
+
+    Slot& get_slot(const uint32_t& bid, const uint32_t& level);
+
+    void set_slot(const uint32_t& bid, const uint32_t& level, const Slot& slot);
+
+    /**
+     * @brief Obliviously access Slot S1.
+     * 
+     * @param op 
+     * @param flag 
+     * @param slot
+     * @param data 
+     * @param level 
+     * @param address 
+     * 
+     * @return Block
+     */
+    Block
+    obli_access_s1(
+        const bool& op,
+        const bool& flag,
+        Slot& slot,
+        std::string& data,
+        const uint32_t& level,
+        const Position& position);
+
+    // FIXME: ObliviousAccessSx will accidentally overwrite the data, check what is happening.
+
+    /**
+     * @brief Obliviously access Slot S2.
+     * 
+     * @param op 
+     * @param flag 
+     * @param slot 
+     * @param next_slot
+     * @param data1 
+     * @param data 
+     * @param level 
+     * @param address 
+     * @return Block 
+     */
+    Block
+    obli_access_s2(
+        const bool& op,
+        const bool& flag,
+        Slot& slot,
+        Slot& next_slot,
+        const Block& data1,
+        std::string& data,
+        const uint32_t& level,
+        const Position& position);
+
+    /**
+     * @brief Obliviously access Slot S3.
+     * 
+     * @param rbid 
+     * @param data2 
+     * @param slot 
+     * @param level 
+     * @param address 
+     */
+    void
+    obli_access_s3(
+        const uint32_t& rbid,
+        const Block& data2,
+        Slot& slot,
+        const uint32_t& level,
+        const Position& position);
 
 public:
     Oram() = delete;
@@ -170,6 +255,8 @@ public:
      * @param data      op == 0, data = \perp. Otherwise we write data to the position of address.
      */
     void oram_access(const bool& op, const uint32_t& address, std::string& data);
+
+    void run_test(void);
 } Oram;
 
 /**
@@ -203,6 +290,7 @@ public:
     cxxopts::ParseResult get_result(void) { return result; }
 } Parser;
 
+plog::Record& operator<<(plog::Record& record, const Position& position);
 } // namespace sgx_oram
 
 #endif

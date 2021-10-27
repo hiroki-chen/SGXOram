@@ -16,7 +16,6 @@
  */
 #include <models.hh>
 
-
 sgx_oram::Parser::Parser(const int& argc, const char** argv)
     : argc(argc)
     , argv(argv)
@@ -26,7 +25,22 @@ sgx_oram::Parser::Parser(const int& argc, const char** argv)
         " Authored by Haobin Chen and Siyi Lv\n"
         " Copyright ©️ Nankai University");
 
-    options->add_options()("c,constant", "The constant multiplicated with the slot size.", cxxopts::value<uint32_t>()->default_value("1"))("f,file", "The file path of the data you want to load into the SGX.", cxxopts::value<std::string>()->default_value("./input.data"))("n,number", "The number of the total blocks.", cxxopts::value<uint32_t>()->default_value("100000"))("v,verbose", "Enable verbose mode", cxxopts::value<bool>()->default_value("false"))("w,way", "The number of ways in the SGX tree.", cxxopts::value<uint32_t>()->default_value("8"))("h,help", "Print usage information.");
+    options->add_options()
+        ("c,constant", "The constant multiplicated with the slot size.", cxxopts::value<double>()->default_value("1"))
+        ("f,file", "The file path of the data you want to load into the SGX.", cxxopts::value<std::string>()->default_value("./input.data"))
+        ("n,number", "The number of the total blocks.", cxxopts::value<uint32_t>()->default_value("100000"))
+        ("r,round", "The round of test", cxxopts::value<uint32_t>()->default_value("4"))
+        ("v,verbose", "Enable verbose mode", cxxopts::value<bool>()->default_value("false"))
+        ("w,way", "The number of ways in the SGX tree.", cxxopts::value<uint32_t>()->default_value("8"))
+        ("h,help", "Print usage information.")
+    ;
+    
+    std::fstream log_file("./log/log.out");
+    if (log_file.tellg() >= MAXIMUM_LOG_SIZE) {
+        log_file.close();
+        log_file.open(".log/log.out", std::ios::out | std::ios::trunc);
+        log_file.close();
+    }
 }
 
 void sgx_oram::Parser::parse(void)
