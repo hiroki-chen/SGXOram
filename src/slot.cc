@@ -20,6 +20,10 @@ void sgx_oram::Slot::add_block(const Block& block, const uint32_t& pos)
 {
     // LOG(plog::debug) << pos << ", " << storage.size() << "\n";
     storage[pos] = block;
+    // If this is a real block then we need the decrease the value of dummy_num.
+    if (block.is_dummy == false) {
+        dummy_number --;
+    }
 }
 
 void sgx_oram::Slot::set_range(const uint32_t& begin, const uint32_t& end)
@@ -46,4 +50,5 @@ sgx_oram::Block::Block(const bool& is_dummy)
 sgx_oram::Slot::Slot(const uint32_t& size)
 {
     storage = std::vector<Block>(size, Block(true));
+    dummy_number = size;
 }
