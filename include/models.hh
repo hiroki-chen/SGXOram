@@ -20,6 +20,7 @@
 #include <cxxopts.hh>
 #include <plog/Record.h>
 
+#include <cmath>
 #include <cstdint>
 #include <fstream>
 #include <map>
@@ -27,6 +28,8 @@
 #include <string>
 #include <utility>
 #include <vector>
+
+#define MAXIMUM_LOG_SIZE 65535
 
 namespace sgx_oram {
 
@@ -73,6 +76,8 @@ typedef struct Block {
 
     Block(const bool& is_dummy);
 
+    // Block(const Block& block);
+
     Block() = default;
 } Block;
 
@@ -100,6 +105,7 @@ private:
     uint32_t dummy_number;
 
     friend class Oram;
+
 public:
     void add_block(const Block& block, const uint32_t& pos);
 
@@ -168,7 +174,7 @@ private:
 
     void print_sgx(void);
 
-    Slot get_slot(const uint32_t& bid, const uint32_t& level);
+    Slot& get_slot(const uint32_t& bid, const uint32_t& level);
 
     void set_slot(const uint32_t& bid, const uint32_t& level, const Slot& slot);
 
@@ -194,7 +200,7 @@ private:
         const Position& position);
 
     // FIXME: ObliviousAccessSx will accidentally overwrite the data, check what is happening.
-    
+
     /**
      * @brief Obliviously access Slot S2.
      * 

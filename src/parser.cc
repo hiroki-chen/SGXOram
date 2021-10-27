@@ -16,7 +16,6 @@
  */
 #include <models.hh>
 
-
 sgx_oram::Parser::Parser(const int& argc, const char** argv)
     : argc(argc)
     , argv(argv)
@@ -35,6 +34,13 @@ sgx_oram::Parser::Parser(const int& argc, const char** argv)
         ("w,way", "The number of ways in the SGX tree.", cxxopts::value<uint32_t>()->default_value("8"))
         ("h,help", "Print usage information.")
     ;
+    
+    std::fstream log_file("./log/log.out");
+    if (log_file.tellg() >= MAXIMUM_LOG_SIZE) {
+        log_file.close();
+        log_file.open(".log/log.out", std::ios::out | std::ios::trunc);
+        log_file.close();
+    }
 }
 
 void sgx_oram::Parser::parse(void)

@@ -69,7 +69,7 @@ uint32_t uniform_random(const uint32_t& lower, const uint32_t& upper)
     if (lower == upper) {
         return lower;
     }
-    
+
     std::random_device rd;
     std::mt19937 engine(rd());
     std::uniform_int_distribution<uint32_t> dist(lower, upper);
@@ -80,7 +80,9 @@ uint32_t uniform_random(const uint32_t& lower, const uint32_t& upper)
 plog::Record& operator<<(plog::Record& record, const Slot& slot)
 {
     const auto storage = slot.storage;
-    record << "Slot range: [" << slot.range.first << ", " << slot.range.second << "]";
+    record << "Slot range: [" << slot.range.first << ", " << slot.range.second << "] "
+           << "Slot size: " << slot.storage.size()
+           << " dummy number: " << slot.dummy_number;
     for (auto item : storage) {
         if (!item.is_dummy) {
             record << std::endl
