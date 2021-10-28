@@ -47,7 +47,10 @@ std::vector<Block> convert_to_blocks(const std::vector<std::string>& data)
         return Block(false, s, i, i++);
     });
 
-
+    const uint32_t size = ans.size();
+    for (uint32_t i = 0; i < size; i++) {
+        ans.push_back(Block(true));
+    }
 
     return ans;
 }
