@@ -1,5 +1,3 @@
-
-   
 /*
  Copyright (c) 2021 Haobin Chen
  This program is free software: you can redistribute it and/or modify
@@ -37,7 +35,7 @@ sgx_oram::Parser::Parser(const int& argc, const char** argv)
     std::fstream log_file("./log/oram.log");
     if (log_file.tellg() >= MAXIMUM_LOG_SIZE) {
         log_file.close();
-        log_file.open(".log/oram.log", std::ios::out | std::ios::trunc);
+        log_file.open("./log/oram.log", std::ios::out | std::ios::trunc);
         log_file.close();
     }
 }

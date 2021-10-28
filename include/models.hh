@@ -161,7 +161,7 @@ private:
     /* ============ Functions ============= */
     void init_slot(void);
 
-    void init_sgx(const std::vector<Block>& blocks);
+    void init_sgx(std::vector<Block>& blocks);
 
     void print_sgx(void);
 
