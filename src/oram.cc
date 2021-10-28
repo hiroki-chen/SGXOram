@@ -118,7 +118,7 @@ void sgx_oram::Oram::init_position_map(void)
         // How many slots are there at the current level.
         const uint32_t cur_slot_num = (uint32_t)(std::pow(p, i));
         // Cumulative size of the slot size.
-        cur_size *= p;
+        cur_size *= std::min(p, level + 1);
         // Calculate the total size at current level.
         sgx_size += cur_size * cur_slot_num;
         level_size_information.push_back(cur_size);
