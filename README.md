@@ -1,6 +1,8 @@
 # SGXOram by Nankai University
 SGX ORAM implementation and evaluation
 
+目前的这个版本是采用了将所有的块装进叶节点的方式来初始化的，而且是1,2,6,...这种类型的大小设置。
+
 ## Usage
 * GCC >= v5.0.
 * Make sure that your compiler supports C++11 standards.
