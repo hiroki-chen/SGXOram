@@ -35,10 +35,10 @@ sgx_oram::Parser::Parser(const int& argc, const char** argv)
         ("h,help", "Print usage information.")
     ;
     
-    std::fstream log_file("./log/log.out");
+    std::fstream log_file("./log/oram.log");
     if (log_file.tellg() >= MAXIMUM_LOG_SIZE) {
         log_file.close();
-        log_file.open(".log/log.out", std::ios::out | std::ios::trunc);
+        log_file.open(".log/oram.log", std::ios::out | std::ios::trunc);
         log_file.close();
     }
 }
