@@ -25,6 +25,7 @@ int main(int argc, const char** argv)
         Parser* const parser = new Parser(argc, argv);
         parser->parse();
         Oram* const oram_controller = new Oram(parser->get_result());
+        oram_controller->run_test();
     } catch (const std::exception& e) {
         PLOG(plog::error) << e.what();
         exit(1);
