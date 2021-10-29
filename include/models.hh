@@ -146,11 +146,18 @@ private:
     // The number of the blocks
     uint32_t block_number;
 
+    const uint32_t real_block_num;
+
     // Should be verbosely output the information
     const bool verbose;
 
     // Test round.
     const uint32_t round;
+
+    // How the slot size is initialized.
+    // Type 1: 1 : 2 : 6.... with constant
+    // Type 2: p : p : p : p...
+    const uint32_t type;
 
     // For initialization.
     std::vector<uint32_t> level_size_information;

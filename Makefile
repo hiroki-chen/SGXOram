@@ -16,7 +16,7 @@ ifeq ("$(wildcard $(OBJ_DIR))", "")
 endif
 
 test: all
-	$(TARGET) -w 8 -n 128 -r 100
+	$(TARGET) -w 3 -n 100 -r 100 -t 0 -c 1.7
 
 all: mk $(OBJ_FILE)
 	$(CXX) -o $(TARGET) $(OBJ_FILE)

@@ -56,8 +56,10 @@ sgx_oram::Oram::Oram(const cxxopts::ParseResult& result)
     , p(result["way"].as<uint32_t>())
     , level(1 + std::ceil(std::log(result["number"].as<uint32_t>()) / std::log(p))) // \log_{p}{N} = \log_{N} / \log_{p}
     , block_number((uint32_t)(std::pow(p, level - 1)))
+    , real_block_num(result["number"].as<uint32_t>())
     , verbose(result["verbose"].as<bool>())
     , round(result["round"].as<uint32_t>())
+    , type(result["type"].as<uint32_t>())
 {
     // Create a logger.
     plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
@@ -109,7 +111,12 @@ void sgx_oram::Oram::init_slot(void)
         // How many slots are there at the current level.
         const uint32_t cur_slot_num = (uint32_t)(std::pow(p, i));
         // Cumulative size of the slot size.
-        cur_size = 1 + p;
+        // TODO: Set the size of cur_size *= p;
+        if (type == 0) {
+            cur_size *= (uint32_t)(std::ceil(std::min(p, i + 1) * constant));
+        } else {
+            cur_size = p;
+        }
         // Calculate the total size at current level.
         sgx_size += cur_size * cur_slot_num;
         level_size_information.push_back(cur_size);
@@ -162,9 +169,11 @@ void sgx_oram::Oram::init_sgx(std::vector<Block>& blocks)
         i++;
         j++;
     }
-    print_sgx();
+
     LOG(plog::info) << "The ORAM controller has initialized the SGX data.";
-    print_sgx();
+    if (verbose) {
+        print_sgx();
+    }
 }
 
 void sgx_oram::Oram::print_sgx(void)
@@ -409,22 +418,23 @@ void sgx_oram::Oram::obli_access_s3(
 void sgx_oram::Oram::run_test(void)
 {
     auto begin = std::chrono::high_resolution_clock::now();
-    for (uint32_t i = 0; i < round * block_number; i++) {
+    for (uint32_t i = 0; i < round * real_block_num; i++) {
         std::string data;
 
         try {
-            oram_access(0, i % block_number, data);
+            oram_access(0, i % real_block_num, data);
         } catch (const std::runtime_error& e) {
             LOG(plog::error) << e.what();
+            LOG(plog::info) << "Error happened at round: " << round;
             break;
         }
 
         if (data.size() != 0) {
-            LOG(plog::warning) << "\033[4;90;107m" << i % block_number << ": " << data << "\033[0m";
+            LOG(plog::warning) << "\033[4;90;107m" << i % real_block_num << ": " << data << "\033[0m";
         } else {
             LOG(plog::error) << "\033[4;31;40m"
                              << "NOT FOUND FOR "
-                             << i % block_number
+                             << i % real_block_num
                              << "\033[0m";
             break;
         }
