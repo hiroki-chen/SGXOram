@@ -14,6 +14,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+
+// FIXED: When the size of each slot is sufficient, the data stored in the slot will disappear?...
+// FIXME: When the size of each slot is insufiicient, S2 will be full...
+
 #include <chrono>
 #include <cmath> // WARNING: FOR CLANG ON MACOS CATALINA OR HIGHER, CMATH IS CORRUPTED...
 #include <random>
@@ -117,6 +121,7 @@ void sgx_oram::Oram::init_slot(void)
         } else {
             cur_size = p;
         }
+
         // Calculate the total size at current level.
         sgx_size += cur_size * cur_slot_num;
         level_size_information.push_back(cur_size);
@@ -197,7 +202,6 @@ void sgx_oram::Oram::oram_access(const bool& op, const uint32_t& address, std::s
         // ObliAccessS1.
         Slot& s1 = get_slot(bid_cur, i + 1);
         const Block data1 = obli_access_s1(op, (level_cur == i + 1), s1, data, i + 1, position);
-
         // ObliAccessS2.
         Slot& s2 = get_slot(bid_cur, i);
         const Block data2 = obli_access_s2(op, (level_cur == i), s2, data1, data, i, position);
@@ -361,6 +365,7 @@ void sgx_oram::Oram::obli_access_s3(
     if (verbose) {
         LOG(plog::debug) << "\033[1;97;40mInvoking ObliAccessS3...\033[0m";
     }
+  
     //LOG(plog::debug) << "after: dummy_num: " << slot.dummy_number << " for range " << slot.range.first << ", " << slot.range.second;
     if (slot.dummy_number == 0 && data2.is_dummy == false) {
         throw std::runtime_error("The slot is full in S3!");
@@ -393,7 +398,6 @@ void sgx_oram::Oram::obli_access_s3(
         // ObliAccessS1.
         Slot& s1 = get_slot(rbid1, i + 1);
         const Block ndata1 = obli_access_s1(0, 0, s1, dummy, i + 1, position);
-
         // ObliAccessS2.
         Slot& s2 = get_slot(rbid1, i);
         const Block ndata2 = obli_access_s2(0, 0, s2, ndata1, dummy, i, position);
@@ -436,12 +440,12 @@ void sgx_oram::Oram::run_test(void)
                              << "NOT FOUND FOR "
                              << i % real_block_num
                              << "\033[0m";
+            LOG(plog::debug) << position_map[i % block_number];
             break;
         }
     }
     auto end = std::chrono::high_resolution_clock::now();
-
-    //print_sgx();
+  
     // Print time.
     LOG(plog::info) << "Access finished, time elapsed: "
                     << std::chrono::duration<double>(end - begin).count() << " s";
