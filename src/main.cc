@@ -16,6 +16,7 @@
  */
 #include <plog/Log.h>
 #include <models.hh>
+
 using sgx_oram::Oram;
 using sgx_oram::Parser;
 

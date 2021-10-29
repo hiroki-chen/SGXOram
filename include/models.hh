@@ -198,7 +198,6 @@ private:
      * @param op 
      * @param flag 
      * @param slot 
-     * @param next_slot
      * @param data1 
      * @param data 
      * @param level 
@@ -210,7 +209,6 @@ private:
         const bool& op,
         const bool& flag,
         Slot& slot,
-        Slot& next_slot,
         const Block& data1,
         std::string& data,
         const uint32_t& level,

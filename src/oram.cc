@@ -61,6 +61,7 @@ sgx_oram::Oram::Oram(const cxxopts::ParseResult& result)
 {
     // Create a logger.
     plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
+    LOG(plog::info) << "blocknum: " << block_number;
 
     std::vector<std::string> data;
 
@@ -108,7 +109,7 @@ void sgx_oram::Oram::init_slot(void)
         // How many slots are there at the current level.
         const uint32_t cur_slot_num = (uint32_t)(std::pow(p, i));
         // Cumulative size of the slot size.
-        cur_size *= (uint32_t)(constant * std::min(p, i + 1));
+        cur_size = 1 + p;
         // Calculate the total size at current level.
         sgx_size += cur_size * cur_slot_num;
         level_size_information.push_back(cur_size);
@@ -148,16 +149,16 @@ void sgx_oram::Oram::init_sgx(std::vector<Block>& blocks)
     uint32_t i = 0, j = 0;
 
     while (i != blocks.size()) {
-        const Block block = blocks[i];
-        LOG(plog::debug) << block.address;
+        Block block = blocks[i];
         const uint32_t offset = (uint32_t)(std::floor(j * 1.0 / leaf_num));
         const auto range = slots[level - 1][j % leaf_num].range;
-        slots[level - 1][j % leaf_num].add_block(block, offset);
 
         // Initialize the position map.
         position_map[block.address].level_cur = level - 1;
         position_map[block.address].offset = offset;
-        position_map[block.address].bid_cur = uniform_random(range.first, range.second);
+        block.bid = position_map[block.address].bid_cur = uniform_random(range.first, range.second);
+
+        slots[level - 1][j % leaf_num].add_block(block, offset);
         i++;
         j++;
     }
@@ -187,23 +188,22 @@ void sgx_oram::Oram::oram_access(const bool& op, const uint32_t& address, std::s
         // ObliAccessS1.
         Slot& s1 = get_slot(bid_cur, i + 1);
         const Block data1 = obli_access_s1(op, (level_cur == i + 1), s1, data, i + 1, position);
-        //set_slot(bid_cur, i + 1, s1);
-        //print_sgx();
 
         // ObliAccessS2.
         Slot& s2 = get_slot(bid_cur, i);
-        // Generate a random bid for ObliAccessS3.
-        const uint32_t rbid = uniform_random(s2.range.first, s2.range.second);
-        Slot& s3 = get_slot(rbid, i + 1);
-        const Block data2 = obli_access_s2(op, (level_cur == i), s2, s3, data1, data, i, position);
-        //set_slot(bid_cur, i, s2);
-        //print_sgx();
+        const Block data2 = obli_access_s2(op, (level_cur == i), s2, data1, data, i, position);
 
         // ObliAccessS3.
-        s3 = get_slot(rbid, i + 1);
+        uint32_t rbid;
+        if (data2.is_dummy == true) {
+            rbid = uniform_random(s2.range.first, s2.range.second);
+        } else {
+            rbid = data2.bid;
+        }
+        // LOG(plog::info) << "rbid:" << rbid;
+        Slot& s3 = get_slot(rbid, i + 1);
+        // LOG(plog::debug) << "before: dummy_num: " << s3.dummy_number << " for range " << s3.range.first << ", " << s3.range.second;
         obli_access_s3(rbid, data2, s3, i + 1, position);
-        //set_slot(rbid, i + 1, s3);
-        //print_sgx();
     }
 }
 
@@ -241,6 +241,7 @@ sgx_oram::Oram::obli_access_s1(
     for (uint32_t i = 0; i < slot.storage.size(); i++) {
         if (flag == true && i == offset && slot.storage[i].is_dummy == false /* Necessary condition */) {
             const uint32_t nbid = uniform_random(0, block_number - 1);
+            // LOG(plog::info) << "nbid: " << nbid;
             data1 = slot.storage[i];
             data1.bid = nbid;
             data = data1.data;
@@ -273,7 +274,6 @@ sgx_oram::Oram::obli_access_s2(
     const bool& op,
     const bool& flag,
     Slot& slot,
-    Slot& next_slot,
     const Block& data1,
     std::string& data,
     const uint32_t& level_cur,
@@ -300,13 +300,13 @@ sgx_oram::Oram::obli_access_s2(
         }
     }
 
+    // Step 2 (modified): Randomly choose a block.
+    uint32_t pos_data2 = uniform_random(0, slot.storage.size() - 1);
     for (uint32_t i = 0; i < slot.storage.size(); i++) {
-        // Step 2: check if a block belongs to this level.
-        if (slot.storage[i].is_dummy == false && next_slot.in(slot.storage[i].bid) && !find) {
+        if (i == pos_data2 && slot.storage[i].is_dummy == false) {
             data2 = slot.storage[i];
             slot.storage[i].is_dummy = true;
-            slot.dummy_number++;
-            find = true;
+            slot.dummy_number ++;
         }
     }
 
@@ -352,14 +352,13 @@ void sgx_oram::Oram::obli_access_s3(
     if (verbose) {
         LOG(plog::debug) << "\033[1;97;40mInvoking ObliAccessS3...\033[0m";
     }
-
-    if (slot.dummy_number == 0) {
+    //LOG(plog::debug) << "after: dummy_num: " << slot.dummy_number << " for range " << slot.range.first << ", " << slot.range.second;
+    if (slot.dummy_number == 0 && data2.is_dummy == false) {
         throw std::runtime_error("The slot is full in S3!");
     }
 
-    // Genereate two bid
+    // Genereate a bid for ORAM dummy read.
     const uint32_t rbid1 = uniform_random(slot.range.first, slot.range.second);
-    const uint32_t rbid2 = uniform_random(slot.range.first, slot.range.second);
 
     uint32_t pos_for_data2 = uniform_random(1, slot.dummy_number);
     for (uint32_t i = 0; i < slot.storage.size(); i++) {
@@ -385,18 +384,21 @@ void sgx_oram::Oram::obli_access_s3(
         // ObliAccessS1.
         Slot& s1 = get_slot(rbid1, i + 1);
         const Block ndata1 = obli_access_s1(0, 0, s1, dummy, i + 1, position);
-        //set_slot(rbid1, i + 1, s1);
 
         // ObliAccessS2.
         Slot& s2 = get_slot(rbid1, i);
-        Slot& s3 = get_slot(rbid2, i + 1);
-        const Block ndata2 = obli_access_s2(0, 0, s2, s3, ndata1, dummy, i, position);
-        //set_slot(rbid1, i, s2);
+        const Block ndata2 = obli_access_s2(0, 0, s2, ndata1, dummy, i, position);
 
         // ObliAccessS3.
-        s3 = get_slot(rbid2, i + 1);
+        uint32_t rbid2;
+        if (ndata2.is_dummy == true) {
+            rbid2 = uniform_random(s2.range.first, s2.range.second);
+        } else {
+            rbid2 = ndata2.bid;
+        }
+        
+        Slot& s3 = get_slot(rbid2, i + 1);
         obli_access_s3(rbid2, ndata2, s3, i + 1, position);
-        //set_slot(rbid2, i + 1, s3);
     }
 
     if (verbose) {
@@ -411,7 +413,6 @@ void sgx_oram::Oram::run_test(void)
         std::string data;
 
         try {
-            LOG(plog::debug) << position_map[i % block_number];
             oram_access(0, i % block_number, data);
         } catch (const std::runtime_error& e) {
             LOG(plog::error) << e.what();
@@ -430,7 +431,7 @@ void sgx_oram::Oram::run_test(void)
     }
     auto end = std::chrono::high_resolution_clock::now();
 
-    print_sgx();
+    //print_sgx();
     // Print time.
     LOG(plog::info) << "Access finished, time elapsed: "
                     << std::chrono::duration<double>(end - begin).count() << " s";
