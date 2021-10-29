@@ -1,16 +1,13 @@
 /*
  Copyright (c) 2021 Haobin Chen
-
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation, either version 3 of the License, or
  (at your option) any later version.
-
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
-
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
@@ -149,11 +146,18 @@ private:
     // The number of the blocks
     uint32_t block_number;
 
+    const uint32_t real_block_num;
+
     // Should be verbosely output the information
     const bool verbose;
 
     // Test round.
     const uint32_t round;
+
+    // How the slot size is initialized.
+    // Type 1: 1 : 2 : 6.... with constant
+    // Type 2: p : p : p : p...
+    const uint32_t type;
 
     // For initialization.
     std::vector<uint32_t> level_size_information;
@@ -162,15 +166,9 @@ private:
     std::ifstream* data_file;
 
     /* ============ Functions ============= */
-    void init_position_map(void);
-
-    void init_oram(std::vector<Block>& blocks);
-
     void init_slot(void);
 
     void init_sgx(std::vector<Block>& blocks);
-
-    Position get_position(const uint32_t& permutated_pos, const std::vector<uint32_t>& level_size_information);
 
     void print_sgx(void);
 
@@ -207,7 +205,6 @@ private:
      * @param op 
      * @param flag 
      * @param slot 
-     * @param next_slot
      * @param data1 
      * @param data 
      * @param level 
@@ -219,7 +216,6 @@ private:
         const bool& op,
         const bool& flag,
         Slot& slot,
-        Slot& next_slot,
         const Block& data1,
         std::string& data,
         const uint32_t& level,
