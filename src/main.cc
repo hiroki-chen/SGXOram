@@ -15,13 +15,22 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <plog/Log.h>
+#include <plog/Appenders/ColorConsoleAppender.h>
+#include <plog/Formatters/TxtFormatter.h>
+#include <plog/Initializers/RollingFileInitializer.h>
+#include <plog/Log.h>
 #include <models.hh>
 
 using sgx_oram::Oram;
 using sgx_oram::Parser;
 
+static plog::RollingFileAppender<plog::TxtFormatter> file_appender("./log/oram.log"); // Create the 1st appender.
+static plog::ColorConsoleAppender<plog::TxtFormatter> consoler_appender; // Create the 2nd appender.
+
 int main(int argc, const char** argv)
 {
+    // Create a logger.
+    plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
     try {
         Parser* const parser = new Parser(argc, argv);
         parser->parse();

@@ -30,9 +30,6 @@
 #include <plog/Logger.h>
 #include <utils.hh>
 
-static plog::RollingFileAppender<plog::TxtFormatter> file_appender("./log/oram.log"); // Create the 1st appender.
-static plog::ColorConsoleAppender<plog::TxtFormatter> consoler_appender; // Create the 2nd appender.
-
 // https://stackoverflow.com/a/45300654/14875612 <- C++ console color.
 
 sgx_oram::Position::Position(
@@ -55,6 +52,19 @@ sgx_oram::Block::Block(const bool& is_dummy, const std::string& data, const uint
 {
 }
 
+sgx_oram::Oram::Oram(const Config& config)
+    : constant(config.constant)
+    , p(config.p)
+    , level(1 + std::ceil(std::log(config.real_block_num) / std::log(p)))
+    , block_number((uint32_t)(std::pow(p, level - 1)))
+    , real_block_num(config.real_block_num)
+    , verbose(config.verbose)
+    , round(config.round)
+    , type(config.type)
+{
+    init_oram();
+}
+
 sgx_oram::Oram::Oram(const cxxopts::ParseResult& result)
     : constant(result["constant"].as<double>())
     , p(result["way"].as<uint32_t>())
@@ -64,43 +74,9 @@ sgx_oram::Oram::Oram(const cxxopts::ParseResult& result)
     , verbose(result["verbose"].as<bool>())
     , round(result["round"].as<uint32_t>())
     , type(result["type"].as<uint32_t>())
+    , data_file(new std::ifstream(result["file"].as<std::string>(), std::ios::in))
 {
-    // Create a logger.
-    plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
-    LOG(plog::info) << "blocknum: " << block_number;
-
-    std::vector<std::string> data;
-
-    if (result.count("file") != 0) {
-        const std::string file_path = result["file"].as<std::string>();
-        data_file = new std::ifstream(file_path, std::ios::in);
-
-        if (data_file->good()) {
-            PLOG(plog::info) << "Detected input file.";
-            data = get_data_from_file(data_file);
-        } else {
-            PLOG(plog::warning) << "Cannot open the input file on the disk. Try to generate random strings.";
-            data = generate_random_strings(block_number, 32);
-        }
-    } else {
-        PLOG(plog::info) << "Generating random strings as input data";
-        data = generate_random_strings(block_number, 32);
-    }
-
-    // Convert to the block vector and initialize the oram controller.
-    std::vector<Block> blocks = convert_to_blocks(data);
-
-    // Initilize the slot level by level.
-    init_slot();
-
-    init_sgx(blocks);
-
-    // If there is no input file, we generate random data.
-    PLOG(plog::info) << "The ORAM controller is initialized!";
-
-    if (verbose) {
-        print_sgx();
-    }
+    init_oram();
 }
 
 void sgx_oram::Oram::init_slot(void)
@@ -115,7 +91,6 @@ void sgx_oram::Oram::init_slot(void)
         // How many slots are there at the current level.
         const uint32_t cur_slot_num = (uint32_t)(std::pow(p, i));
         // Cumulative size of the slot size.
-        // TODO: Set the size of cur_size *= p;
         if (type == 0) {
             cur_size *= (uint32_t)(std::ceil(std::min(p, i + 1) * constant));
         } else {
@@ -125,6 +100,10 @@ void sgx_oram::Oram::init_slot(void)
         // Calculate the total size at current level.
         sgx_size += cur_size * cur_slot_num;
         level_size_information.push_back(cur_size);
+    }
+
+    if (sgx_size >= 100000000ul) {
+        throw std::runtime_error("TOO BIG!");
     }
 
     LOG(plog::debug) << "The size of the SGX tree is " << sgx_size;
@@ -319,7 +298,7 @@ sgx_oram::Oram::obli_access_s2(
         if (i == pos_data2 && slot.storage[i].is_dummy == false) {
             data2 = slot.storage[i];
             slot.storage[i].is_dummy = true;
-            slot.dummy_number ++;
+            slot.dummy_number++;
         }
     }
 
@@ -365,7 +344,7 @@ void sgx_oram::Oram::obli_access_s3(
     if (verbose) {
         LOG(plog::debug) << "\033[1;97;40mInvoking ObliAccessS3...\033[0m";
     }
-  
+
     //LOG(plog::debug) << "after: dummy_num: " << slot.dummy_number << " for range " << slot.range.first << ", " << slot.range.second;
     if (slot.dummy_number == 0 && data2.is_dummy == false) {
         throw std::runtime_error("The slot is full in S3!");
@@ -409,7 +388,7 @@ void sgx_oram::Oram::obli_access_s3(
         } else {
             rbid2 = ndata2.bid;
         }
-        
+
         Slot& s3 = get_slot(rbid2, i + 1);
         obli_access_s3(rbid2, ndata2, s3, i + 1, position);
     }
@@ -421,7 +400,13 @@ void sgx_oram::Oram::obli_access_s3(
 
 void sgx_oram::Oram::run_test(void)
 {
+    if (block_number >= (uint32_t)(1e9)) {
+        LOG(plog::error) << "TOO MANY BLOCKS, ABORT.";
+        return;
+    }
+
     auto begin = std::chrono::high_resolution_clock::now();
+    LOG(plog::warning) << "Experiment started!";
     for (uint32_t i = 0; i < round * real_block_num; i++) {
         std::string data;
 
@@ -429,24 +414,61 @@ void sgx_oram::Oram::run_test(void)
             oram_access(0, i % real_block_num, data);
         } catch (const std::runtime_error& e) {
             LOG(plog::error) << e.what();
-            LOG(plog::info) << "Error happened at round: " << round;
+            LOG(plog::info) << "Error happened at round: " << (uint32_t)(std::ceil(i * 1.0 / real_block_num));
             break;
         }
 
-        if (data.size() != 0) {
-            LOG(plog::warning) << "\033[4;90;107m" << i % real_block_num << ": " << data << "\033[0m";
-        } else {
-            LOG(plog::error) << "\033[4;31;40m"
-                             << "NOT FOUND FOR "
-                             << i % real_block_num
-                             << "\033[0m";
-            LOG(plog::debug) << position_map[i % block_number];
-            break;
+        if (verbose) {
+            if (data.size() != 0) {
+                LOG(plog::warning) << "\033[4;90;107m" << i % real_block_num << ": " << data << "\033[0m";
+            } else {
+                LOG(plog::error) << "\033[4;31;40m"
+                                 << "NOT FOUND FOR "
+                                 << i % real_block_num
+                                 << "\033[0m";
+                LOG(plog::debug) << position_map[i % block_number];
+                break;
+            }
         }
     }
     auto end = std::chrono::high_resolution_clock::now();
-  
+
     // Print time.
-    LOG(plog::info) << "Access finished, time elapsed: "
+    LOG(plog::warning) << "Access finished, time elapsed: "
                     << std::chrono::duration<double>(end - begin).count() << " s";
+}
+
+void sgx_oram::Oram::init_oram(void)
+{
+    LOG(plog::info) << "\033[1;36;97m ORAM information: "
+                    << "p: " << p
+                    << " real_num: " << real_block_num
+                    << " constant: " << constant
+                    << " level: " << level << "\033[0m"
+                    << std::endl;
+
+    std::vector<std::string> data;
+
+    if (data_file != nullptr && data_file->good()) {
+        PLOG(plog::info) << "Detected input file.";
+        data = get_data_from_file(data_file);
+    } else {
+        PLOG(plog::info) << "Generating random strings as input data";
+        data = generate_random_strings(block_number, 32);
+    }
+
+    // Convert to the block vector and initialize the oram controller.
+    std::vector<Block> blocks = convert_to_blocks(data);
+
+    // Initilize the slot level by level.
+    init_slot();
+
+    init_sgx(blocks);
+
+    // If there is no input file, we generate random data.
+    PLOG(plog::info) << "The ORAM controller is initialized!";
+
+    if (verbose) {
+        print_sgx();
+    }
 }

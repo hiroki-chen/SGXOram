@@ -121,6 +121,20 @@ public:
     Slot(const uint32_t& size);
 } Slot;
 
+typedef struct Config {
+    double constant;
+
+    uint32_t p;
+
+    uint32_t real_block_num;
+
+    bool verbose;
+
+    uint32_t round;
+
+    uint32_t type;
+} Config;
+
 /**
  * @brief This is the main body of the ORAM.
  * 
@@ -163,9 +177,11 @@ private:
     std::vector<uint32_t> level_size_information;
 
     // The input file path.
-    std::ifstream* data_file;
+    std::ifstream* data_file = nullptr;
 
     /* ============ Functions ============= */
+    void init_oram(void);
+
     void init_slot(void);
 
     void init_sgx(std::vector<Block>& blocks);
@@ -196,8 +212,6 @@ private:
         std::string& data,
         const uint32_t& level,
         const Position& position);
-
-    // FIXME: ObliviousAccessSx will accidentally overwrite the data, check what is happening.
 
     /**
      * @brief Obliviously access Slot S2.
@@ -242,6 +256,8 @@ public:
     Oram() = delete;
 
     Oram(const cxxopts::ParseResult& result);
+
+    Oram(const Config& config);
 
     /**
      * @brief Access the SGXOram.
