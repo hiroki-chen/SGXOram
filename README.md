@@ -1,9 +1,9 @@
 # SGXOram by Nankai University
-SGX ORAM implementation and evaluation
+SGX ORAM simulation and evaluation
 
 目前的这个版本是采用了将所有的块装进叶节点的方式来初始化的，而且是1,2,6,...这种类型的大小设置。
 
-## Usage
+## Usage of the SIMULATOR
 * GCC >= v5.0.
 * Make sure that your compiler supports C++11 standards.
 ```shell
@@ -33,3 +33,40 @@ Usage:
   -w, --way arg       The number of ways in the SGX tree. (default: 8)
   -h, --help          Print usage information.
   ```
+
+## NOTES ON THE SGX-VERSION ORAM -- How to install Intel (R) Software Guard eXtensions on Linux machines 
+Take Ubuntu 18.04LTS as an example.
+
+1. Clone the git repository to a path:
+```sh
+$ mkdir -p ~/sgx_toolkit && cd ~/sgx_toolkit
+$ git clone https://github.com/intel/linux-sgx.git
+```
+
+2. Install dependencies by:
+```shell
+  $ sudo apt-get install libssl-dev libcurl4-openssl-dev protobuf-compiler libprotobuf-dev debhelper cmake reprepro unzip
+  $ cd ./linux-sgx
+  $ export https_proxy=http://<your proxy address>:<port> # This is necessary or wget cannot receive anything :(
+  $ make preparation
+  $ make sdk
+```
+
+3. Install the binary file and the headers to the path `/usr/local`:
+```shell
+  $ cd ./linux/installer/bin
+  $ sudo -s
+  $ ./sgx_linux_x64_sdk_2.15.100.3.bin
+  $ Input the directory which you want to install in: /usr/local
+  $ cp -r /usr/local/sgxsdk/include/** /usr/local/include
+```
+
+4. Before compiling the source files, make sure that the envirenment variables are set correctly by:
+```
+  $ source /usr/local/sgxsdk/environment
+```
+
+5. Then you could write Makefiles and invoke compilation:
+```
+  $ make SGX_MODE=SIM
+```

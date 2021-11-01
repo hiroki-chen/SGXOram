@@ -9,8 +9,10 @@ EOBJ_FILE = $(filter-out $(BUILD_DIR)/main.o, $(OBJ_FILE)) # For experiment
 TARGET = $(BUILD_DIR)/Simulator
 EXPERIMENT = $(BUILD_DIR)/Experimenter
 
-CXX = g++-11
-CXXFLAGS = -Wextra -Werror -Wno-sign-compare -O2 -fPIE -std=c++17 -I$(INCLUDE_DIR) -g
+CXX = g++
+CXXFLAGS = -Wextra -Werror -O2 -fPIE -std=c++17 -I$(INCLUDE_DIR) -g \
+			-Wno-sign-compare \
+			-Wno-unused-parameter
 
 .phony: all mk clean test experiment push
 
@@ -21,7 +23,7 @@ endif
 
 test: mk $(TEST_FILE)
 	$(CXX) -o $(TARGET) $(TEST_FILE)
-	$(TARGET) -w 256 -n 10000 -r 100 -t 0 -c 1.2
+	$(TARGET) -w 128 -n 1000 -r 100 -t 0 -c 2.0
 
 experiment: mk $(EOBJ_FILE)
 	$(CXX) -o $(EXPERIMENT) $(EOBJ_FILE)
@@ -43,5 +45,5 @@ else
 	@read line; git commit -m "$$line";
 	@echo "Are you sure you want to push to the branch mark? [Y/n]"
 	@read line; if [ $$line == "n" ]; then echo "Aborting..."; exit 1; fi;
-	@git push origin mark
+	@git push origin alpha
 endif
