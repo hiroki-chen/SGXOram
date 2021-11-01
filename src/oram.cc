@@ -84,7 +84,7 @@ void sgx_oram::Oram::init_slot(void)
     LOG(plog::info) << "The ORAM controller is initializing the SGX storage tree level by level...";
 
     uint32_t sgx_size = 0;
-    uint32_t cur_size = 1;
+    uint32_t cur_size = 2;
 
     // We traverse from the root to the leaf.
     for (uint32_t i = 0; i < level; i++) {
