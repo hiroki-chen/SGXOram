@@ -41,7 +41,9 @@ endif
 SGX_COMMON_FLAGS += -Wall -Wextra -Winit-self -Wpointer-arith -Wreturn-type \
                     -Waddress -Wsequence-point -Wformat-security \
                     -Wmissing-include-dirs -Wfloat-equal -Wundef -Wshadow \
-                    -Wcast-align -Wcast-qual -Wconversion -Wredundant-decls
+                    -Wcast-align -Wcast-qual -Wconversion -Wredundant-decls \
+					-Wno-unused-parameter \
+					-I$(INCLUDE_PATH)
 SGX_COMMON_CFLAGS := $(SGX_COMMON_FLAGS) -Wjump-misses-init -Wstrict-prototypes -Wunsuffixed-float-constants
 SGX_COMMON_CXXFLAGS := $(SGX_COMMON_FLAGS) -Wnon-virtual-dtor -std=c++14
 
@@ -56,7 +58,7 @@ App_C_Flags := -fPIC -Wno-attributes -I$(INCLUDE_PATH)
 
 ifeq ($(SGX_DEBUG), 1)
     App_C_Flags += -DDEBUG -UNDEBUG -UEDEBUG
-endif 
+endif
 
 App_Cpp_Files := $(wildcard $(SRC_PATH)/app/*.cc)
 App_Cpp_Flags := $(App_C_Flags)
@@ -74,7 +76,7 @@ Crypto_Library_Name := sgx_tcrypto
 Enclave_Cpp_Files := $(wildcard $(SRC_PATH)/enclave/*.cc)
 Enclave_Cpp_Objects := $(patsubst $(SRC_PATH)/enclave/%.cc, $(BUILD_PATH)/enclave/%.o, $(Enclave_Cpp_Files))
 
-Enclave_Include_Paths := -I$(INCLUDE_PATH)/enclave -I$(SGX_SDK)/include \
+Enclave_Include_Paths := -I$(INCLUDE_PATH) -I$(INCLUDE_PATH)/enclave -I$(SGX_SDK)/include \
 						 -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/libcxx
 
 Enclave_C_Flags := $(Enclave_Include_Paths) -nostdinc \
@@ -101,6 +103,7 @@ Enclave_Config_File := ./config.xml
 # Configure the untrusted application
 App_Cpp_Files := $(wildcard $(SRC_PATH)/app/*.cc)
 App_Cpp_Objects := $(patsubst $(SRC_PATH)/app/%.cc, $(BUILD_PATH)/app/%.o, $(App_Cpp_Files))
+App_Cpp_Objects += $(Common_Object_Files)
 
 App_Include_Paths := -I$(INCLUDE_PATH) -I$(SGX_SDK)/include
 App_C_Flags := -fPIC -Wno-attributes $(App_Include_Paths)
@@ -118,7 +121,7 @@ else
 endif
 
 App_Cpp_Flags := $(App_C_Flags)
-App_Link_Flags := -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread 
+App_Link_Flags := -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lsgx_uae_service_sim -lpthread 
 App_Name := $(BUILD_PATH)/app/app.bin
 
 ifeq ($(SGX_MODE), SIM)
@@ -127,15 +130,18 @@ ifeq ($(SGX_DEBUG), 1)
 endif
 endif
 
-.PHONY: all enclave mk create_proxy create_key sign clean
+.PHONY: all enclave mk create_proxy create_key sign clean test_sgx
 mk:
 ifeq ("$(wildcard $(BUILD_PATH))", "")
-	@mkdir -p $(BUILD_PATH)/enclave $(BUILD_PATH)/app
+	@mkdir -p $(BUILD_PATH)/enclave $(BUILD_PATH)/app $(BUILD_PATH)/common
 	@printf "\033[1;93;49mMAKE DIRECTORY => $(BUILD_PATH)\033[0m\n"
 endif
 ifeq ("$(wildcard $(KEY_PATH))", "")
 	@mkdir -p $(KEY_PATH)
 	@printf "\033[1;93;49mMAKE DIRECTORY => $(KEY_PATH)"
+endif
+ifeq ("$(wildcard $(BUILD_PATH)/test_sgx)", "")
+	@mkdir -p $(BUILD_PATH)/test_sgx
 endif
 
 # Generate proxy interfaces.
@@ -145,6 +151,8 @@ create_proxy: $(SRC_PATH)/enclave/enclave.edl
 # Move the generated headers to the include path.
 	@mv $(SRC_PATH)/enclave/*.h $(INCLUDE_PATH)/enclave
 	@printf "\033[1;93;49mMoved headers to $(INCLUDE_PATH).\033[0m\n"
+
+# Compile common files.
 
 # Compile proxy functions.
 $(BUILD_PATH)/enclave/enclave_t.o: $(SRC_PATH)/enclave/enclave_t.c
@@ -167,11 +175,11 @@ $(Enclave_Name): $(BUILD_PATH)/enclave/enclave_t.o $(Enclave_Cpp_Objects)
 
 $(BUILD_PATH)/app/%.o: $(SRC_PATH)/app/%.cc
 	@$(CXX) $(SGX_COMMON_CXXFLAGS) $(App_Cpp_Flags) -c $< -o $@
-	@echo "CXX  <=  $<"
+	@printf "\033[1;93;49mCXX  <=  $<\033[0m\n"
 
 $(App_Name): $(BUILD_PATH)/enclave/enclave_u.o $(App_Cpp_Objects)
-	$(CXX) $^ -o $@ $(App_Link_Flags)
-	@echo "LINK =>  $@"
+	@$(CXX) $^ -o $@ $(App_Link_Flags)
+	@printf "\033[1;93;49mLINK =>  $@\033[0m\n"
 
 # Create a RSA private key.
 # !The exponential must be 3 for the enclave.
@@ -189,6 +197,18 @@ enclave: mk create_proxy $(Signed_Enclave_Name)
 
 all: enclave $(App_Name)
 	@printf "\033[1;93;49mBuilding the application and the enclave...\033[0m\n"
+
+$(SRC_PATH)/test_sgx/main.c: mk
+
+$(BUILD_PATH)/test_sgx/main.o: $(SRC_PATH)/test_sgx/main.c
+	@$(CC) -Werror -Wextra -Wno-uninitialized -O2 -c $< -o $@
+	@printf "\033[1;93;49mCC =>  $<\033[0m\n"
+
+# Test if the CPU supports SGX features.
+test_sgx: $(BUILD_PATH)/test_sgx/main.o
+	@$(CC)	-o $(BUILD_PATH)/test_sgx/test.bin $<
+	@printf "\033[1;93;49mGEN =>  $(BUILD_PATH)/test_sgx/test.bin\033[0m\n"
+	@./$(BUILD_PATH)/test_sgx/test.bin
 
 clean:
 	@rm -r $(BUILD_PATH) $(KEY_PATH)

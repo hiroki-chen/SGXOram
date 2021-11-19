@@ -30,6 +30,7 @@ sgx_oram::Parser::Parser(const int& argc, const char** argv)
         ("t,type", "How the size of each slot is determined", cxxopts::value<uint32_t>()->default_value("0"))
         ("v,verbose", "Enable verbose mode", cxxopts::value<bool>()->default_value("false"))
         ("w,way", "The number of ways in the SGX tree.", cxxopts::value<uint32_t>()->default_value("8"))
+        ("b,bucket-size", "The size of each bucket in the leaf level", cxxopts::value<uint32_t>()->default_value("4"))
         ("h,help", "Print usage information.")
     ;
     

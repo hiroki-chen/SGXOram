@@ -16,11 +16,34 @@
  */
 
 enclave {
+    /* std::xxx should be avoided because enclave's interfaces are written in C language. */
+    /* C++ style classes and structs can only be passed after serialization. */
+    /* To pass C++ style classes and structs to the enclave,
+       the untrusted application must first create a buffer and then specify its length. */
+
     trusted {
-        public void print_something(void);
-    };
-    
-    untrusted {
-        void ocall_print_something(void);
+        public void obli_access_s1(uint16_t op, uint16_t flag,
+                                   [in, out, size = slot_len] char* slot, size_t slot_len,
+                                   [in, out, string] char* data, uint32_t level,
+                                   [in, out, size = position_len] char* position, size_t position_len,
+                                   [out, size = block_len] char* block, size_t block_len,
+                                   uint32_t block_number);
+
+        public void obli_access_S2(uint16_t op, uint16_t flag,
+                                   [in, out, size = slot_len] char* slot, size_t slot_len,
+                                   [in, out, size = block_len] char* data1, size_t block_len,
+                                   [in, out, string] char* data, uint32_t level,
+                                   [in, out, size = position_len] char* position, size_t position_len);
+
+        public void obli_access_s3(uint32_t rbid,
+                                   [in, out, size = block_len] char* data2, size_t block_len,
+                                   [in, out, size = slot_len] char* slot, size_t slot_len,
+                                   uint32_t level,
+                                   [in, out, size = position_len] char* position, size_t position_len);
+
+        public uint32_t uniform_random(uint32_t lower, uint32_t upper);
+
+        // This is a test function for pointers.
+        public void test_pointer([in, out] char* data);
     };
 };

@@ -16,12 +16,12 @@
 extern "C" {
 #endif
 
-#ifndef OCALL_PRINT_SOMETHING_DEFINED__
-#define OCALL_PRINT_SOMETHING_DEFINED__
-void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_print_something, (void));
-#endif
 
-sgx_status_t print_something(sgx_enclave_id_t eid);
+sgx_status_t obli_access_s1(sgx_enclave_id_t eid, uint16_t op, uint16_t flag, char* slot, size_t slot_len, char* data, uint32_t level, char* position, size_t position_len, char* block, size_t block_len, uint32_t block_number);
+sgx_status_t obli_access_S2(sgx_enclave_id_t eid, uint16_t op, uint16_t flag, char* slot, size_t slot_len, char* data1, size_t block_len, char* data, uint32_t level, char* position, size_t position_len);
+sgx_status_t obli_access_s3(sgx_enclave_id_t eid, uint32_t rbid, char* data2, size_t block_len, char* slot, size_t slot_len, uint32_t level, char* position, size_t position_len);
+sgx_status_t uniform_random(sgx_enclave_id_t eid, uint32_t* retval, uint32_t lower, uint32_t upper);
+sgx_status_t test_pointer(sgx_enclave_id_t eid, char* data);
 
 #ifdef __cplusplus
 }

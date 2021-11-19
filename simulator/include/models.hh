@@ -63,6 +63,8 @@ typedef struct Position {
 typedef struct Block {
     bool is_dummy;
 
+    bool view_only = false;
+
     std::string data;
 
     uint32_t bid;
@@ -73,7 +75,7 @@ typedef struct Block {
 
     Block(const bool& is_dummy);
 
-    // Block(const Block& block);
+    bool operator=(const Block& block);
 
     Block() = default;
 } Block;
@@ -148,25 +150,29 @@ private:
     // The position map. Usage: position[address] = (level, x, bid_cur, bid_dst)
     std::map<uint32_t, Position> position_map;
 
+    std::map<uint32_t, uint32_t> bucket_fullness;
+
     // Constant
-    const double constant;
+    double constant;
 
     // The way of the tree.
-    const uint32_t p;
+    uint32_t p;
 
     // The total level of the tree.
-    const uint32_t level;
+    uint32_t level;
 
     // The number of the blocks
     uint32_t block_number;
 
-    const uint32_t real_block_num;
+    uint32_t real_block_num;
+
+    uint32_t bucket_size;
 
     // Should be verbosely output the information
-    const bool verbose;
+    bool verbose;
 
     // Test round.
-    const uint32_t round;
+    uint32_t round;
 
     // How the slot size is initialized.
     // Type 1: 1 : 2 : 6.... with constant
@@ -267,6 +273,17 @@ public:
      * @param data      op == 0, data = \perp. Otherwise we write data to the position of address.
      */
     void oram_access(const bool& op, const uint32_t& address, std::string& data);
+
+    /**
+     * @brief Another way. For experiment.
+     * 
+     * @param op 
+     * @param address   if address == 0, then it means that this is a dummy read / write.
+     * @param block 
+     * @param level 
+     * @param bid
+     */
+    Block oram_access(const bool& op, const uint32_t& address, Block& block, const uint32_t& level, const uint32_t& bid);
 
     void run_test(void);
 } Oram;

@@ -23,12 +23,11 @@ endif
 
 test: mk $(TEST_FILE)
 	$(CXX) -o $(TARGET) $(TEST_FILE)
-	$(TARGET) -w 128 -n 1000 -r 100 -t 0 -c 2.0
+	$(TARGET) -w 128 -n 10000 -r 100 -t 0 -c 2.0 -b 8
 
 experiment: mk $(EOBJ_FILE)
 	$(CXX) -o $(EXPERIMENT) $(EOBJ_FILE)
 	$(EXPERIMENT)
-
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<

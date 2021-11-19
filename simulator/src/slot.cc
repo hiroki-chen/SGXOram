@@ -13,6 +13,8 @@
  */
 #include <models.hh>
 
+#include <climits>
+
 void sgx_oram::Slot::add_block(const Block& block, const uint32_t& pos)
 {
     // LOG(plog::debug) << pos << ", " << storage.size() << "\n";
@@ -41,7 +43,17 @@ bool sgx_oram::Slot::in(const uint32_t& bid)
 
 sgx_oram::Block::Block(const bool& is_dummy)
     : is_dummy(is_dummy)
+    , address(UINT_MAX)
 {
+}
+
+bool sgx_oram::Block::operator=(const Block& block)
+{
+    is_dummy = block.is_dummy;
+    address = block.address;
+    bid = block.bid;
+    view_only = block.view_only;
+    data = block.data;
 }
 
 sgx_oram::Slot::Slot(const uint32_t& size)

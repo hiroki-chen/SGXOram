@@ -15,3 +15,9 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <sgx_urts.h>
+#include <string>
+
+static const std::string candidate =
+        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+uint32_t uniform_random_helper(const uint32_t& lower, const uint32_t& upper);
