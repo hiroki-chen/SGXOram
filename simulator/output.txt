@@ -1,0 +1,177 @@
+[Experiment setting] way: 4, number: 1000, bucket_size: 4
+Access finished, time elapsed: 40.3068 s
+[Experiment setting] way: 4, number: 10000, bucket_size: 4
+Access finished, time elapsed: 717.884 s
+[Experiment setting] way: 4, number: 100000, bucket_size: 4
+Access finished, time elapsed: 9143.14 s
+[Experiment setting] way: 4, number: 1000, bucket_size: 6
+Access finished, time elapsed: 40.4572 s
+[Experiment setting] way: 4, number: 10000, bucket_size: 6
+Access finished, time elapsed: 550.137 s
+[Experiment setting] way: 4, number: 100000, bucket_size: 6
+Access finished, time elapsed: 9139.05 s
+[Experiment setting] way: 4, number: 1000, bucket_size: 7
+Access finished, time elapsed: 40.865 s
+[Experiment setting] way: 4, number: 10000, bucket_size: 7
+Access finished, time elapsed: 551.673 s
+[Experiment setting] way: 4, number: 100000, bucket_size: 7
+Access finished, time elapsed: 9150.42 s
+[Experiment setting] way: 4, number: 1000, bucket_size: 8
+Access finished, time elapsed: 28.1924 s
+[Experiment setting] way: 4, number: 10000, bucket_size: 8
+Access finished, time elapsed: 549.942 s
+[Experiment setting] way: 4, number: 100000, bucket_size: 8
+Access finished, time elapsed: 9136.91 s
+[Experiment setting] way: 8, number: 1000, bucket_size: 4
+[Experiment setting] way: 8, number: 10000, bucket_size: 4
+Access finished, time elapsed: 408.687 s
+[Experiment setting] way: 8, number: 100000, bucket_size: 4
+Access finished, time elapsed: 5564.42 s
+[Experiment setting] way: 8, number: 1000, bucket_size: 6
+Access finished, time elapsed: 18.0354 s
+[Experiment setting] way: 8, number: 10000, bucket_size: 6
+Access finished, time elapsed: 282.589 s
+[Experiment setting] way: 8, number: 100000, bucket_size: 6
+Access finished, time elapsed: 5556.44 s
+[Experiment setting] way: 8, number: 1000, bucket_size: 7
+Access finished, time elapsed: 17.9034 s
+[Experiment setting] way: 8, number: 10000, bucket_size: 7
+Access finished, time elapsed: 280.659 s
+[Experiment setting] way: 8, number: 100000, bucket_size: 7
+Access finished, time elapsed: 4050.91 s
+[Experiment setting] way: 8, number: 1000, bucket_size: 8
+Access finished, time elapsed: 17.9092 s
+[Experiment setting] way: 8, number: 10000, bucket_size: 8
+Access finished, time elapsed: 280.41 s
+[Experiment setting] way: 8, number: 100000, bucket_size: 8
+Access finished, time elapsed: 4056.99 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 4
+Access finished, time elapsed: 17.9847 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 4
+Access finished, time elapsed: 282.156 s
+[Experiment setting] way: 16, number: 100000, bucket_size: 4
+[Experiment setting] way: 16, number: 1000, bucket_size: 6
+Access finished, time elapsed: 17.9778 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 6
+Access finished, time elapsed: 179.501 s
+[Experiment setting] way: 16, number: 100000, bucket_size: 6
+Access finished, time elapsed: 2831.22 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 7
+Access finished, time elapsed: 18.729 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 7
+Access finished, time elapsed: 179.836 s
+[Experiment setting] way: 16, number: 100000, bucket_size: 7
+Access finished, time elapsed: 2832.59 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 8
+[Experiment setting] way: 16, number: 10000, bucket_size: 8
+Access finished, time elapsed: 181.392 s
+[Experiment setting] way: 16, number: 100000, bucket_size: 8
+Access finished, time elapsed: 2833.34 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 4
+[Experiment setting] way: 32, number: 10000, bucket_size: 4
+Access finished, time elapsed: 181.323 s
+[Experiment setting] way: 32, number: 100000, bucket_size: 4
+Access finished, time elapsed: 2867.01 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 6
+[Experiment setting] way: 32, number: 10000, bucket_size: 6
+Access finished, time elapsed: 181.443 s
+[Experiment setting] way: 32, number: 100000, bucket_size: 6
+Access finished, time elapsed: 2867.84 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 7
+[Experiment setting] way: 32, number: 10000, bucket_size: 7
+Access finished, time elapsed: 181.649 s
+[Experiment setting] way: 32, number: 100000, bucket_size: 7
+Access finished, time elapsed: 1817.76 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 8
+Access finished, time elapsed: 12.2516 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 8
+Access finished, time elapsed: 181.201 s
+[Experiment setting] way: 32, number: 100000, bucket_size: 8
+Access finished, time elapsed: 1812.12 s
+[Experiment setting] way: 64, number: 1000, bucket_size: 4
+[Experiment setting] way: 64, number: 10000, bucket_size: 4
+Access finished, time elapsed: 183.955 s
+[Experiment setting] way: 64, number: 100000, bucket_size: 4
+Access finished, time elapsed: 1836.52 s
+[Experiment setting] way: 64, number: 1000, bucket_size: 6
+Access finished, time elapsed: 12.5883 s
+[Experiment setting] way: 64, number: 10000, bucket_size: 6
+[Experiment setting] way: 64, number: 100000, bucket_size: 6
+Access finished, time elapsed: 1840.89 s
+[Experiment setting] way: 64, number: 1000, bucket_size: 7
+Access finished, time elapsed: 12.5916 s
+[Experiment setting] way: 64, number: 10000, bucket_size: 7
+[Experiment setting] way: 64, number: 100000, bucket_size: 7
+Access finished, time elapsed: 1842.09 s
+[Experiment setting] way: 64, number: 1000, bucket_size: 8
+Access finished, time elapsed: 13.2186 s
+[Experiment setting] way: 64, number: 10000, bucket_size: 8
+[Experiment setting] way: 64, number: 100000, bucket_size: 8
+Access finished, time elapsed: 1836.45 s
+[Experiment setting] way: 128, number: 1000, bucket_size: 4
+Access finished, time elapsed: 12.8714 s
+[Experiment setting] way: 128, number: 10000, bucket_size: 4
+[Experiment setting] way: 128, number: 100000, bucket_size: 4
+Access finished, time elapsed: 1876.3 s
+[Experiment setting] way: 128, number: 1000, bucket_size: 6
+Access finished, time elapsed: 12.913 s
+[Experiment setting] way: 128, number: 10000, bucket_size: 6
+[Experiment setting] way: 128, number: 100000, bucket_size: 6
+Access finished, time elapsed: 1870.38 s
+[Experiment setting] way: 128, number: 1000, bucket_size: 7
+Access finished, time elapsed: 12.8566 s
+[Experiment setting] way: 128, number: 10000, bucket_size: 7
+Access finished, time elapsed: 126.507 s
+[Experiment setting] way: 128, number: 100000, bucket_size: 7
+Access finished, time elapsed: 1866.5 s
+[Experiment setting] way: 128, number: 1000, bucket_size: 8, level: 3
+Access finished, time elapsed: 13.0216 s
+[Experiment setting] way: 128, number: 10000, bucket_size: 8, level: 3
+Access finished, time elapsed: 127.513 s
+[Experiment setting] way: 128, number: 100000, bucket_size: 8, level: 4
+Access finished, time elapsed: 1889.6 s
+[Experiment setting] way: 128, number: 10000, bucket_size: 8, level: 3
+[Experiment setting] way: 3, number: 9, bucket_size: 8, level: 2
+Access finished, time elapsed: 0.0782172 s
+[Experiment setting] way: 128, number: 10000, bucket_size: 8, level: 3
+[Experiment setting] way: 128, number: 10000, bucket_size: 8, level: 3
+[Experiment setting] way: 128, number: 10000, bucket_size: 8, level: 3
+[Experiment setting] way: 3, number: 9, bucket_size: 8, level: 2
+Access finished, time elapsed: 0.522185 s
+[Experiment setting] way: 3, number: 27, bucket_size: 4, level: 4
+[Experiment setting] way: 3, number: 27, bucket_size: 6, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 4, level: 4
+[Experiment setting] way: 3, number: 27, bucket_size: 4, level: 4
+[Experiment setting] way: 3, number: 27, bucket_size: 4, level: 4
+[Experiment setting] way: 3, number: 27, bucket_size: 4, level: 4
+[Experiment setting] way: 3, number: 27, bucket_size: 4, level: 4
+[Experiment setting] way: 3, number: 27, bucket_size: 4, level: 4
+[Experiment setting] way: 3, number: 27, bucket_size: 8, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 16, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 128, level: 1
+Access finished, time elapsed: 0.00150891 s
+[Experiment setting] way: 3, number: 27, bucket_size: 128, level: 1
+Access finished, time elapsed: 0.00295395 s
+[Experiment setting] way: 3, number: 27, bucket_size: 4, level: 4
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 4, level: 4
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
+[Experiment setting] way: 3, number: 27, bucket_size: 10, level: 3
