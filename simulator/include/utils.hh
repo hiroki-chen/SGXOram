@@ -15,22 +15,38 @@
 #define UTILS_HH
 
 #include <plog/Record.h>
-#include <models.hh>
 
+#include <models.hh>
 #include <string>
 #include <vector>
 
 namespace sgx_oram {
-    static const std::string candidate =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+std::ostream& operator<<(std::ostream& os, const std::vector<uint32_t>& vec);
 
-    std::vector<std::string> generate_random_strings(const uint32_t& number, const uint32_t& length = 32);
+static const std::string candidate =
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-    std::vector<std::string> get_data_from_file(std::ifstream* const file);
+std::vector<std::string> generate_random_strings(const uint32_t& number,
+                                                 const uint32_t& length = 32);
 
-    std::vector<Block> convert_to_blocks(const std::vector<std::string>& data);
-    
-    uint32_t uniform_random(const uint32_t& lower, const uint32_t& upper);
-} // sgx_oram
+std::vector<std::string> get_data_from_file(std::ifstream* const file);
+
+std::vector<Block> convert_to_blocks(const std::vector<std::string>& data);
+
+uint32_t uniform_random(const uint32_t& lower, const uint32_t& upper);
+
+/**
+ * @brief Convert a number to p-nary representation.
+ * @note We do not take into consideration the signed bit.
+ *
+ * @param number
+ * @param base
+ * @param pad          In order to prevent that the number is truncated, we MUST
+ *                     ensure that the number is correctly padded to the desired length.
+ * @return std::vector<uint32_t>  The p-nary number represented as a number
+ * array.
+ */
+std::vector<uint32_t> to_p_nary(uint32_t number, uint32_t base, uint32_t pad);
+}  // namespace sgx_oram
 
 #endif

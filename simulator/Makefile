@@ -10,7 +10,7 @@ TARGET = $(BUILD_DIR)/Simulator
 EXPERIMENT = $(BUILD_DIR)/Experimenter
 
 CXX = g++
-CXXFLAGS = -Wextra -Werror -O2 -fPIE -std=c++17 -I$(INCLUDE_DIR) -g \
+CXXFLAGS = -Wextra -Werror -O0 -fPIE -std=c++17 -I$(INCLUDE_DIR) -g \
 			-Wno-sign-compare \
 			-Wno-unused-parameter
 
@@ -23,7 +23,7 @@ endif
 
 test: mk $(TEST_FILE)
 	$(CXX) -o $(TARGET) $(TEST_FILE)
-	$(TARGET) -w 128 -n 10000 -r 100 -t 0 -c 2.0 -b 8
+# $(TARGET) -w 3 -n 27 -r 1 -t 0 -c 2.0 -b 4
 
 experiment: mk $(EOBJ_FILE)
 	$(CXX) -o $(EXPERIMENT) $(EOBJ_FILE)
