@@ -86,11 +86,13 @@ std::vector<uint32_t> to_p_nary(uint32_t number, uint32_t base, uint32_t pad) {
 
   std::vector<uint32_t> pad_vec;
   size_t i = ans.size();
-  for (; i <= pad; i++) {
+  for (; i < pad; i++) {
     pad_vec.push_back(0);
   }
 
   pad_vec.insert(pad_vec.end(), ans.begin(), ans.end());
+
+  std::reverse(pad_vec.begin(), pad_vec.end());
 
   return pad_vec;
 }

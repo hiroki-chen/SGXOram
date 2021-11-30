@@ -124,7 +124,7 @@ void sgx_oram::Oram::init_slot(void) {
       const uint32_t end = begin + level_size - 1;  // Starts at 0.
       const uint32_t slot_size =
           (i == level - 1 ? bucket_size : level_size_information[i]);
-      Slot slot(slot_size);
+      Slot slot(slot_size + 1);
       slot.set_level(i);
       slot.set_range(begin, end);
       slot_vec.push_back(slot);
@@ -414,12 +414,11 @@ void sgx_oram::Oram::run_test(void) {
       try {
         Block b(true);
         // Generate lexicongraphic order for the root slot.
-        Slot& root = get_slot(2, 0);
+        Slot& root = get_slot(0, 0);
         const uint32_t order = root.last_eviction_order;
+        std::vector<uint32_t> lexicon_order = to_p_nary(order, p, level);
         root.last_eviction_order =
-            (root.last_eviction_order + 1) % (uint32_t)(std::pow(p, level - 1));
-        std::vector<uint32_t> lexicon_order = to_p_nary(order, p, level - 1);
-
+            (root.last_eviction_order + 1) % (uint32_t)(std::pow(p, level));
         auto res =
             oram_access(0, i, b, 0, position_map[i].bid_cur, lexicon_order);
         LOG(plog::info) << position_map[i];
@@ -432,7 +431,7 @@ void sgx_oram::Oram::run_test(void) {
             << (uint32_t)(std::ceil(i * 1.0 / block_number));
         exit(1);
       }
-      // print_sgx();
+      //print_sgx();
     }
   }
 
@@ -449,7 +448,7 @@ void sgx_oram::Oram::run_test(void) {
 
 void sgx_oram::Oram::init_oram(void) {
   LOG(plog::info) << "\033[1;36;97m ORAM information: "
-                  << "p: " << p << " real_num: " << real_block_num
+                  << "p: " << p << " real_num: " << block_number
                   << " constant: " << constant << " level: " << level
                   << "\033[0m" << std::endl;
 
@@ -507,11 +506,9 @@ sgx_oram::Block sgx_oram::Oram::oram_access(
   uint32_t nbid = uniform_random(0, (uint32_t)std::pow(p, level - 1) - 1);
   // Generate a new lexicongraphic order. (In p-nary number:))
   std::vector<uint32_t> lexicon_order_cur =
-      std::move(to_p_nary(slot.last_eviction_order, p, level - level_cur - 1));
-  slot.last_eviction_order = (slot.last_eviction_order + 1) %
-                             (uint32_t)std::pow(p, level - level_cur - 1);
-  // DEBUG
-  std::cout << lexicon_order << std::endl;
+      std::move(to_p_nary(slot.last_eviction_order, p, level - level_cur));
+
+  // LOG(plog::error) << slot.last_eviction_order;
 
   // Prevent bucket overflow.
   if (u != UINT_MAX) {
@@ -553,11 +550,12 @@ sgx_oram::Block sgx_oram::Oram::oram_access(
         // position is dummy and the data is not a dummy block. Once the data is
         // in the leaf slot, then view_only should be false.
         if (block.is_dummy == true && data.is_dummy == false && op == 1) {
+          std::cout << bid << " Receiving data " << data.address << std::endl;
           block = data;
           block.view_only = false;
           bucket_fullness[slot.range.first]++;
           slot.dummy_number--;
-          position_map[u].bid_cur = slot.range.first;
+          position_map[data.address].bid_cur = slot.range.first;
           break;
         }
       }
@@ -577,7 +575,8 @@ sgx_oram::Block sgx_oram::Oram::oram_access(
       // Case 1: The target block is in the slot.
       if (b.address == u && b.is_dummy == false) {
         Block none(true);
-        oram_access(0, UINT_MAX, none, level_cur + 1, bid, lexicon_order_cur);
+        oram_access(0, UINT_MAX, none, level_cur + 1, bid,
+                    /* lexicon_order_cur */ {});
         in_slot = true;
         block = b;
         b.is_dummy = true;
@@ -588,7 +587,8 @@ sgx_oram::Block sgx_oram::Oram::oram_access(
     // Case 2: The target block is not in the slot, we read it from the next
     // level.
     if (in_slot == false) {
-      block = oram_access(0, u, data, level_cur + 1, bid, lexicon_order_cur);
+      block = oram_access(0, u, data, level_cur + 1, bid,
+                          /* lexicon_order_cur */ {});
     }
     block.bid = nbid;
 
@@ -596,15 +596,16 @@ sgx_oram::Block sgx_oram::Oram::oram_access(
     if (op == 0) {
       data = block;
 
-      LOG(plog::error) << "nbid: " << block.bid;
-      if (slot.in(block.bid) && block.view_only == false) {
+      // LOG(plog::error) << "nbid: " << block.bid;
+      if (slot.in(block.bid) && block.view_only == false &&
+          block.is_dummy == false) {
         // Find a position.
         for (uint32_t i = 0; i < storage.size(); i++) {
           if ((r -= storage[i].is_dummy) == 0) {
             storage[i] = block;
             const uint32_t bid_cur =
                 uniform_random(slot.range.first, slot.range.second);
-            position_map[block.address].bid_cur = bid_cur;
+            position_map[data.address].bid_cur = bid_cur;
             slot.dummy_number--;
 
             // By setting view_only = true, we mark this block as
@@ -618,17 +619,18 @@ sgx_oram::Block sgx_oram::Oram::oram_access(
       // A read write. We read a possibly (dummy) block from the next level.
       if (data.is_dummy == false) {
         auto res = oram_access(0, data.address, block, level_cur + 1, bid,
-                               lexicon_order_cur);
+                               /* lexicon_order_cur */ {});
         res = data;
         // res.bid = nbid;
 
-        // Find a position.
         for (uint32_t i = 0; i < storage.size(); i++) {
           if ((r -= storage[i].is_dummy) == 0) {
             storage[i] = res;
+            storage[i].view_only = false;
+
             const uint32_t bid_cur =
                 uniform_random(slot.range.first, slot.range.second);
-            position_map[res.address].bid_cur = bid_cur;
+            position_map[data.address].bid_cur = bid_cur;
             slot.dummy_number--;
 
             break;
@@ -641,20 +643,30 @@ sgx_oram::Block sgx_oram::Oram::oram_access(
   // Call eviction.
   // Eviction will be based on the lexicongraphic order given by the higher
   // level.
-  const uint32_t next_slot_id = lexicon_order.back();
-  lexicon_order.pop_back();
+  uint32_t next_slot_id = 0;
+  const bool free_order = lexicon_order.empty();
+  if (!free_order) {
+    next_slot_id = lexicon_order.back();
+    lexicon_order.pop_back();
+  } else {
+    // Use its own.
+    slot.last_eviction_order = (slot.last_eviction_order + 1) %
+                               (uint32_t)std::pow(p, level - level_cur);
+    next_slot_id = lexicon_order_cur.back();
+    lexicon_order_cur.pop_back();
+  }
   // Find the next slot.
   //      S
   // /  / | \ \
   // S S S S S S
   // Calculate the range of the next selected slot.
   const uint32_t next_slot_begin =
-      slot.range.first + std::pow(p, level - level_cur - 1) * next_slot_id;
+      slot.range.first + std::pow(p, level - level_cur - 2) * next_slot_id;
   const uint32_t next_slot_end =
-      next_slot_begin + std::pow(p, level - level_cur - 1);
-  const uint32_t random_evict = uniform_random(next_slot_begin, next_slot_end);
+      next_slot_begin + std::pow(p, level - level_cur - 2) - 1;
 
-  LOG(plog::debug) << "range is " << next_slot_begin << ", " << next_slot_end;
+  // std::cout << next_slot_begin << ", " << next_slot_end << std::endl;
+  const uint32_t random_evict = uniform_random(next_slot_begin, next_slot_end);
 
   // Pick a block whose bid is in the range of the next slot.
   bool found = false;
@@ -664,13 +676,14 @@ sgx_oram::Block sgx_oram::Oram::oram_access(
       Block block = storage[i];
 
       found = true;
+
       LOG(plog::debug) << "At level " << level_cur << ", evicting "
                        << block.address;
 
       storage[i].is_dummy = true;
       slot.dummy_number++;
       oram_access(1, block.address, block, level_cur + 1, block.bid,
-                  lexicon_order);
+                  free_order ? lexicon_order_cur : lexicon_order);
       break;
     }
   }
@@ -678,9 +691,9 @@ sgx_oram::Block sgx_oram::Oram::oram_access(
   // If there is no such block in current slot, we should evict a dummy block to
   // the next level.
   if (!found) {
-    Block block;
-    oram_access(1, block.address, block, level_cur + 1, random_evict,
-                lexicon_order);
+    Block block(true);
+    oram_access(1, UINT_MAX, block, level_cur + 1, random_evict,
+                free_order ? lexicon_order_cur : lexicon_order);
   }
 
   /*uint32_t to_evict = uniform_random(1, storage.size());
