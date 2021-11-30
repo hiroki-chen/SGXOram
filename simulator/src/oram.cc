@@ -91,18 +91,18 @@ void sgx_oram::Oram::init_slot(void) {
                      "level by level...";
 
   uint32_t sgx_size = 0;
-  uint32_t cur_size = p;
+  uint32_t cur_size = 1;
 
   // We traverse from the root to the leaf.
   for (uint32_t i = 0; i < level; i++) {
     // How many slots are there at the current level.
     const uint32_t cur_slot_num = (uint32_t)(std::pow(p, i));
     // Cumulative size of the slot size.
-    /*if (type == 0) {
+    if (type == 0) {
         cur_size *= (uint32_t)(std::ceil(std::min(p, i + 1) * constant));
     } else {
         cur_size = p;
-    }*/
+    }
 
     // Calculate the total size at current level.
     sgx_size += cur_size * cur_slot_num;

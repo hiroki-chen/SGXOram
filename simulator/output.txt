@@ -456,3 +456,28 @@ Access finished, time elapsed: 0.0556891 s
 Access finished, time elapsed: 0.0612839 s
 [Experiment setting] way: 3, number: 9, bucket_size: 8, level: 2
 Access finished, time elapsed: 0.0055148 s
+[Experiment setting] way: 3, number: 9, bucket_size: 8, level: 2
+Access finished, time elapsed: 0.00631561 s
+[Experiment setting] way: 3, number: 9, bucket_size: 3, level: 3
+Access finished, time elapsed: 0.0113387 s
+[Experiment setting] way: 3, number: 9, bucket_size: 3, level: 3
+Access finished, time elapsed: 0.010606 s
+[Experiment setting] way: 3, number: 9, bucket_size: 3, level: 3
+Access finished, time elapsed: 0.0933807 s
+[Experiment setting] way: 3, number: 9, bucket_size: 3, level: 3
+Access finished, time elapsed: 0.105228 s
+[Experiment setting] way: 3, number: 9, bucket_size: 3, level: 3
+Access finished, time elapsed: 0.110388 s
+[Experiment setting] way: 3, number: 9, bucket_size: 3, level: 3
+Access finished, time elapsed: 0.0959794 s
+[Experiment setting] way: 3, number: 9, bucket_size: 3, level: 3
+Access finished, time elapsed: 0.0983022 s
+[Experiment setting] way: 3, number: 9, bucket_size: 3, level: 3
+Access finished, time elapsed: 0.102025 s
+[Experiment setting] way: 3, number: 9, bucket_size: 3, level: 3
+[Experiment setting] way: 3, number: 9, bucket_size: 6, level: 2
+Access finished, time elapsed: 0.0513935 s
+[Experiment setting] way: 3, number: 18, bucket_size: 6, level: 3
+Access finished, time elapsed: 2.3923 s
+[Experiment setting] way: 3, number: 18, bucket_size: 6, level: 3
+Access finished, time elapsed: 1.2994 s
