@@ -99,9 +99,11 @@ void sgx_oram::Oram::init_slot(void) {
     const uint32_t cur_slot_num = (uint32_t)(std::pow(p, i));
     // Cumulative size of the slot size.
     if (type == 0) {
-        cur_size *= (uint32_t)(std::ceil(std::min(p, i + 1) * constant));
-    } else {
-        cur_size = p;
+      cur_size *= (uint32_t)(std::ceil(std::min(p, i + 1) * constant));
+    } else if (type == 1) {
+      cur_size = p;
+    } else if (type == 2) {
+      cur_size = (uint32_t)(std::ceil(std::pow(p, level - i) * constant));
     }
 
     // Calculate the total size at current level.
@@ -431,7 +433,7 @@ void sgx_oram::Oram::run_test(void) {
             << (uint32_t)(std::ceil(i * 1.0 / block_number));
         exit(1);
       }
-      //print_sgx();
+      // print_sgx();
     }
   }
 
@@ -477,10 +479,6 @@ void sgx_oram::Oram::init_oram(void) {
 
   // If there is no input file, we generate random data.
   PLOG(plog::info) << "The ORAM controller is initialized!";
-
-  if (verbose) {
-    print_sgx();
-  }
 }
 
 // FIXME: Reverse lexicongrahic eviction makes write operation fail... Find out
@@ -550,7 +548,6 @@ sgx_oram::Block sgx_oram::Oram::oram_access(
         // position is dummy and the data is not a dummy block. Once the data is
         // in the leaf slot, then view_only should be false.
         if (block.is_dummy == true && data.is_dummy == false && op == 1) {
-          std::cout << bid << " Receiving data " << data.address << std::endl;
           block = data;
           block.view_only = false;
           bucket_fullness[slot.range.first]++;

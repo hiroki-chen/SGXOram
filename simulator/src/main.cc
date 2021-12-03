@@ -29,8 +29,6 @@ static plog::ColorConsoleAppender<plog::TxtFormatter> consoler_appender; // Crea
 
 int main(int argc, const char** argv)
 {
-    // Create a logger.
-    plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
     try {
         Parser* const parser = new Parser(argc, argv);
         parser->parse();

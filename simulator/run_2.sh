@@ -14,30 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# set -x # Set echo on.
-declare -a ways=("4" "8" "16" "32" "64" "128")
-declare -a bucket_sizes=("4" "6" "7" "8")
-declare -a block_nums=("10000" "100000" "1000000" "10000000")
-if [ -e ./output.txt ]
+if [ -e ./output.txt ];
 then
   rm ./output.txt
 fi
 
-declare -i i=1
-for way in "${ways[@]}"
-do
-  for bucket_size in "${bucket_sizes[@]}"
-  do
-    for block_num in "${block_nums[@]}"
-    do
-      # -w 64 -n 200000 -r 100 -t 0 -c 2.0 -b 6
-      echo "Batch ${i} starts."
-      echo "./build/Simulator -w "${way}" -n "${block_num}" -b "${bucket_size}" -c 1.5 -r 10 -t 0"
-      ./build/Simulator -w "${way}" -n "${block_num}" -b "${bucket_size}" -c 1.5 -r 10 -t 0
-      echo "Experiment ${i} ends."
-      i+=1
-    done
-  done
-done
+set -x
 
-echo "Experiment done."
+./build/Simulator -r 100 -t 2 -c 1.0 -n 1280 -w 32 -b 64
+./build/Simulator -r 10 -t 2 -c 1.0 -n 34095632 -w 32 -b 64
+./build/Simulator -r 10 -t 2 -c 1.0 -n 67650064 -w 32 -b 128
+./build/Simulator -r 10 -t 2 -c 1.0 -n 2147483648 -w 64 -b 128
+./build/Simulator -r 10 -t 2 -c 1.0 -n 4294967296 -w 64 -b 256
+
+echo "Experiment done!"
