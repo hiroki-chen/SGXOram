@@ -94,7 +94,7 @@ void sgx_oram::Oram::init_slot(void) {
   uint32_t cur_size = 1;
 
   // We traverse from the root to the leaf.
-  for (uint32_t i = 0; i < level; i++) {
+  for (uint32_t i = 0; i <= level; i++) {
     // How many slots are there at the current level.
     const uint32_t cur_slot_num = (uint32_t)(std::pow(p, i));
     // Cumulative size of the slot size.
@@ -111,7 +111,7 @@ void sgx_oram::Oram::init_slot(void) {
     level_size_information.push_back(cur_size);
   }
 
-  LOG(plog::debug) << "The size of the SGX tree is " << sgx_size;
+  // std::cout << "The size of the SGX tree is " << sgx_size;
 
   // Although we mark the leaf level as 1, for computational convernience, we
   // still traverse from 0 to L - 1, i.e., from root to leaf.
@@ -129,9 +129,9 @@ void sgx_oram::Oram::init_slot(void) {
       Slot slot(slot_size + 1);
       slot.set_level(i);
       slot.set_range(begin, end);
-      slot_vec.push_back(slot);
+      slot_vec.emplace_back(std::move(slot));
     }
-    slots.push_back(slot_vec);
+    slots.emplace_back(std::move(slot_vec));
     // LOG(plog::debug) << i << ": " << slots[i][0].size();
   }
 
@@ -403,16 +403,14 @@ void sgx_oram::Oram::run_test(void) {
   std::ofstream out("./output.txt", std::ios::app);
   out << "[Experiment setting] "
       << "way: " << p << ", number: " << block_number
-      << ", bucket_size: " << bucket_size << ", level: " << level << std::endl;
+      << ", bucket_size: " << bucket_size << ", level: " << level
+      << "round: " << round << std::endl;
 
   auto begin = std::chrono::high_resolution_clock::now();
   LOG(plog::warning) << "Experiment started!";
 
   for (uint32_t r = 0; r < round; r++) {
     for (uint32_t i = 0; i < block_number; i++) {
-      // print_sgx();
-      std::string data;
-
       try {
         Block b(true);
         // Generate lexicongraphic order for the root slot.
@@ -421,10 +419,14 @@ void sgx_oram::Oram::run_test(void) {
         std::vector<uint32_t> lexicon_order = to_p_nary(order, p, level);
         root.last_eviction_order =
             (root.last_eviction_order + 1) % (uint32_t)(std::pow(p, level));
-        auto res =
-            oram_access(0, i, b, 0, position_map[i].bid_cur, lexicon_order);
-        LOG(plog::info) << position_map[i];
-        LOG(plog::warning) << i << ": " << res.data;
+        auto res = std::move(
+            oram_access(0, i, b, 0, position_map[i].bid_cur, lexicon_order));
+
+        if (res.data != data[i]) {
+          // std::cout << res.data << ", " << data[i] << std::endl;
+          // std::cout << "data not correct.\n";
+          exit(1);
+        }
       } catch (const std::runtime_error& e) {
         LOG(plog::error) << e.what();
         LOG(plog::info) << "Error happened at round: "
@@ -454,18 +456,16 @@ void sgx_oram::Oram::init_oram(void) {
                   << " constant: " << constant << " level: " << level
                   << "\033[0m" << std::endl;
 
-  std::vector<std::string> data;
-
   if (data_file != nullptr && data_file->good()) {
     PLOG(plog::info) << "Detected input file.";
     data = get_data_from_file(data_file);
   } else {
     PLOG(plog::info) << "Generating random strings as input data";
-    data = generate_random_strings(block_number, 32);
+    data = std::move(generate_random_strings(block_number, 32));
   }
 
   // Convert to the block vector and initialize the oram controller.
-  std::vector<Block> blocks = convert_to_blocks(data);
+  std::vector<Block> blocks = std::move(convert_to_blocks(data));
 
   // Initilize the slot level by level.
   init_slot();

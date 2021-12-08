@@ -14,30 +14,33 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <plog/Log.h>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Initializers/RollingFileInitializer.h>
 #include <plog/Log.h>
+
+#include <memory>
 #include <models.hh>
 
 using sgx_oram::Oram;
 using sgx_oram::Parser;
 
-static plog::RollingFileAppender<plog::TxtFormatter> file_appender("./log/oram.log"); // Create the 1st appender.
-static plog::ColorConsoleAppender<plog::TxtFormatter> consoler_appender; // Create the 2nd appender.
+static plog::RollingFileAppender<plog::TxtFormatter> file_appender(
+    "./log/oram.log");  // Create the 1st appender.
+static plog::ColorConsoleAppender<plog::TxtFormatter>
+    consoler_appender;  // Create the 2nd appender.
 
-int main(int argc, const char** argv)
-{
-    try {
-        Parser* const parser = new Parser(argc, argv);
-        parser->parse();
-        Oram* const oram_controller = new Oram(parser->get_result());
-        oram_controller->run_test();
-    } catch (const std::exception& e) {
-        PLOG(plog::error) << e.what();
-        exit(1);
-    }
+int main(int argc, const char** argv) {
+  try {
+    const std::unique_ptr<Parser> parser = std::make_unique<Parser>(argc, argv);
+    parser->parse();
+    const std::unique_ptr<Oram> oram_controller =
+        std::make_unique<Oram>(parser->get_result());
+    oram_controller->run_test();
+  } catch (const std::exception& e) {
+    PLOG(plog::error) << e.what();
+    exit(1);
+  }
 
-    return 0;
+  return 0;
 }

@@ -14,15 +14,15 @@
 #include <models.hh>
 
 sgx_oram::Parser::Parser(const int& argc, const char** argv)
-    : argc(argc)
-    , argv(argv)
-{
-    options = new cxxopts::Options("Simulator",
-        " ------ The SGX-Based ORAM Created by Data Security Lab at Nankai University -----\n"
-        " Authored by Haobin Chen and Siyi Lv\n"
-        " Copyright ©️ Nankai University");
+    : argc(argc), argv(argv) {
+  options = std::make_unique<cxxopts::Options>(
+      "Simulator",
+      " ------ The SGX-Based ORAM Created by Data Security Lab at Nankai "
+      "University -----\n"
+      " Authored by Haobin Chen and Siyi Lv\n"
+      " Copyright ©️ Nankai University");
 
-    options->add_options()
+  options->add_options()
         ("c,constant", "The constant multiplicated with the slot size.", cxxopts::value<double>()->default_value("1"))
         ("f,file", "The file path of the data you want to load into the SGX.", cxxopts::value<std::string>()->default_value("./input.data"))
         ("n,number", "The number of the total blocks.", cxxopts::value<uint32_t>()->default_value("100000"))
@@ -33,21 +33,20 @@ sgx_oram::Parser::Parser(const int& argc, const char** argv)
         ("b,bucket-size", "The size of each bucket in the leaf level", cxxopts::value<uint32_t>()->default_value("4"))
         ("h,help", "Print usage information.")
     ;
-    
-    std::fstream log_file("./log/oram.log");
-    if (log_file.tellg() >= MAXIMUM_LOG_SIZE) {
-        log_file.close();
-        log_file.open("./log/oram.log", std::ios::out | std::ios::trunc);
-        log_file.close();
-    }
+
+  std::fstream log_file("./log/oram.log");
+  if (log_file.tellg() >= MAXIMUM_LOG_SIZE) {
+    log_file.close();
+    log_file.open("./log/oram.log", std::ios::out | std::ios::trunc);
+    log_file.close();
+  }
 }
 
-void sgx_oram::Parser::parse(void)
-{
-    result = options->parse(argc, argv);
+void sgx_oram::Parser::parse(void) {
+  result = options->parse(argc, argv);
 
-    if (result.count("help")) {
-        std::cout << options->help() << std::endl;
-        exit(0);
-    }
+  if (result.count("help")) {
+    std::cout << options->help() << std::endl;
+    exit(0);
+  }
 }

@@ -21,10 +21,11 @@ fi
 
 set -x
 
-./build/Simulator -r 100 -t 2 -c 1.0 -n 1280 -w 32 -b 64
-./build/Simulator -r 10 -t 2 -c 1.0 -n 34095632 -w 32 -b 64
-./build/Simulator -r 10 -t 2 -c 1.0 -n 67650064 -w 32 -b 128
-./build/Simulator -r 10 -t 2 -c 1.0 -n 2147483648 -w 64 -b 128
-./build/Simulator -r 10 -t 2 -c 1.0 -n 4294967296 -w 64 -b 256
+./build/Simulator -r 10 -t 2 -c 1.0 -n 1280 -w 32 -b 64
+./build/Simulator -r 10 -t 2 -c 1.0 -n 2145304 -w 32 -b 128
+./build/Simulator -r 10 -t 2 -c 1.0 -n 34095632 -w 64 -b 128
+./build/Simulator -r 10 -t 2 -c 1.0 -n 67650064 -w 64 -b 256
+./build/Simulator -r 10 -t 2 -c 1.0 -n 2147483648 -w 128 -b 256
+./build/Simulator -r 10 -t 2 -c 1.0 -n 4294967296 -w 128 -b 512
 
 echo "Experiment done!"

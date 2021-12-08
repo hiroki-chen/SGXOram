@@ -47,14 +47,14 @@ sgx_oram::Block::Block(const bool& is_dummy)
 {
 }
 
-bool sgx_oram::Block::operator=(const Block& block)
-{
-    is_dummy = block.is_dummy;
-    address = block.address;
-    bid = block.bid;
-    view_only = block.view_only;
-    data = block.data;
-}
+// bool sgx_oram::Block::operator=(const Block& block)
+// {
+//     is_dummy = block.is_dummy;
+//     address = block.address;
+//     bid = block.bid;
+//     view_only = block.view_only;
+//     data = block.data;
+// }
 
 sgx_oram::Slot::Slot(const uint32_t& size)
 {

@@ -55,6 +55,8 @@ typedef struct Position {
    */
   Position(const uint32_t& level_cur, const uint32_t& offset,
            const uint32_t& bid_cur, const uint32_t& bid_dst = 0xffffffff);
+
+  ~Position() = default;
 } Position;
 
 /**
@@ -77,9 +79,11 @@ typedef struct Block {
 
   Block(const bool& is_dummy);
 
-  bool operator=(const Block& block);
+  // bool operator=(const Block& block);
 
   Block() = default;
+
+  ~Block() = default;
 } Block;
 
 /**
@@ -129,6 +133,8 @@ typedef class Slot {
   uint32_t size(void) { return storage.size(); };
 
   Slot(const uint32_t& size);
+
+  ~Slot() = default;
 } Slot;
 
 typedef struct Config {
@@ -186,6 +192,8 @@ typedef class Oram {
   // Type 1: 1 : 2 : 6.... with constant
   // Type 2: p : p : p : p...
   const uint32_t type;
+
+  std::vector<std::string> data;
 
   // For initialization.
   std::vector<uint32_t> level_size_information;
@@ -284,6 +292,8 @@ typedef class Oram {
                     std::vector<uint32_t> lexicon_order);
 
   void run_test(void);
+
+  ~Oram() { delete data_file; }
 } Oram;
 
 /**
@@ -294,7 +304,7 @@ typedef class Parser {
  private:
   cxxopts::ParseResult result;
 
-  cxxopts::Options* options;
+  std::unique_ptr<cxxopts::Options> options;
 
   const int argc;
 

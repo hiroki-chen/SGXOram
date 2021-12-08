@@ -1,2 +1,209 @@
-[Experiment setting] way: 32, number: 1280, bucket_size: 64, level: 3
-Access finished, time elapsed: 120.587 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 32, level: 3round: 10
+Access finished, time elapsed: 0.598215 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 32, level: 3round: 10
+Access finished, time elapsed: 0.667194 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 32, level: 3round: 10
+Access finished, time elapsed: 0.729337 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 32, level: 3round: 100
+Access finished, time elapsed: 5.99339 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 32, level: 3round: 100
+Access finished, time elapsed: 6.74267 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 32, level: 3round: 100
+Access finished, time elapsed: 7.61599 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 32, level: 4round: 10
+[Experiment setting] way: 16, number: 10000, bucket_size: 32, level: 4round: 10
+[Experiment setting] way: 16, number: 10000, bucket_size: 32, level: 4round: 10
+[Experiment setting] way: 16, number: 10000, bucket_size: 32, level: 4round: 100
+[Experiment setting] way: 16, number: 10000, bucket_size: 32, level: 4round: 100
+[Experiment setting] way: 16, number: 10000, bucket_size: 32, level: 4round: 100
+[Experiment setting] way: 16, number: 50000, bucket_size: 32, level: 4round: 10
+[Experiment setting] way: 16, number: 50000, bucket_size: 32, level: 4round: 10
+[Experiment setting] way: 16, number: 50000, bucket_size: 32, level: 4round: 10
+[Experiment setting] way: 16, number: 50000, bucket_size: 32, level: 4round: 100
+[Experiment setting] way: 16, number: 50000, bucket_size: 32, level: 4round: 100
+[Experiment setting] way: 16, number: 50000, bucket_size: 32, level: 4round: 100
+[Experiment setting] way: 16, number: 1000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 0.583685 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 0.652708 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 0.745458 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 5.83399 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 6.72184 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 7.49144 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 64, level: 4round: 10
+[Experiment setting] way: 16, number: 10000, bucket_size: 64, level: 4round: 10
+[Experiment setting] way: 16, number: 10000, bucket_size: 64, level: 4round: 10
+[Experiment setting] way: 16, number: 10000, bucket_size: 64, level: 4round: 100
+[Experiment setting] way: 16, number: 10000, bucket_size: 64, level: 4round: 100
+[Experiment setting] way: 16, number: 10000, bucket_size: 64, level: 4round: 100
+[Experiment setting] way: 16, number: 50000, bucket_size: 64, level: 4round: 10
+[Experiment setting] way: 16, number: 50000, bucket_size: 64, level: 4round: 10
+[Experiment setting] way: 16, number: 50000, bucket_size: 64, level: 4round: 10
+[Experiment setting] way: 16, number: 50000, bucket_size: 64, level: 4round: 100
+[Experiment setting] way: 16, number: 50000, bucket_size: 64, level: 4round: 100
+[Experiment setting] way: 16, number: 50000, bucket_size: 64, level: 4round: 100
+[Experiment setting] way: 16, number: 1000, bucket_size: 128, level: 2round: 10
+Access finished, time elapsed: 0.170145 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 128, level: 2round: 10
+Access finished, time elapsed: 0.174962 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 128, level: 2round: 10
+Access finished, time elapsed: 0.179667 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 128, level: 2round: 100
+Access finished, time elapsed: 1.74143 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 128, level: 2round: 100
+Access finished, time elapsed: 1.81117 s
+[Experiment setting] way: 16, number: 1000, bucket_size: 128, level: 2round: 100
+Access finished, time elapsed: 1.79174 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 128, level: 3round: 10
+Access finished, time elapsed: 6.02814 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 128, level: 3round: 10
+Access finished, time elapsed: 6.82564 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 128, level: 3round: 10
+Access finished, time elapsed: 7.72429 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 128, level: 3round: 100
+Access finished, time elapsed: 60.3713 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 128, level: 3round: 100
+Access finished, time elapsed: 68.6779 s
+[Experiment setting] way: 16, number: 10000, bucket_size: 128, level: 3round: 100
+Access finished, time elapsed: 77.2812 s
+[Experiment setting] way: 16, number: 50000, bucket_size: 128, level: 4round: 10
+[Experiment setting] way: 16, number: 50000, bucket_size: 128, level: 4round: 10
+[Experiment setting] way: 16, number: 50000, bucket_size: 128, level: 4round: 10
+[Experiment setting] way: 16, number: 50000, bucket_size: 128, level: 4round: 100
+[Experiment setting] way: 16, number: 50000, bucket_size: 128, level: 4round: 100
+[Experiment setting] way: 16, number: 50000, bucket_size: 128, level: 4round: 100
+[Experiment setting] way: 32, number: 1000, bucket_size: 32, level: 3round: 10
+Access finished, time elapsed: 1.79482 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 32, level: 3round: 10
+Access finished, time elapsed: 2.73518 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 32, level: 3round: 10
+Access finished, time elapsed: 3.58855 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 32, level: 3round: 100
+Access finished, time elapsed: 20.9627 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 32, level: 3round: 100
+Access finished, time elapsed: 30.3109 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 32, level: 3round: 100
+Access finished, time elapsed: 40.9141 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 32, level: 3round: 10
+Access finished, time elapsed: 21.159 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 32, level: 3round: 10
+Access finished, time elapsed: 31.4537 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 32, level: 3round: 10
+Access finished, time elapsed: 41.6277 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 32, level: 3round: 100
+Access finished, time elapsed: 201.435 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 32, level: 3round: 100
+Access finished, time elapsed: 300.348 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 32, level: 3round: 100
+Access finished, time elapsed: 408.821 s
+[Experiment setting] way: 32, number: 50000, bucket_size: 32, level: 4round: 10
+[Experiment setting] way: 32, number: 50000, bucket_size: 32, level: 4round: 10
+[Experiment setting] way: 32, number: 50000, bucket_size: 32, level: 4round: 10
+[Experiment setting] way: 32, number: 50000, bucket_size: 32, level: 4round: 100
+[Experiment setting] way: 32, number: 50000, bucket_size: 32, level: 4round: 100
+[Experiment setting] way: 32, number: 50000, bucket_size: 32, level: 4round: 100
+[Experiment setting] way: 32, number: 1000, bucket_size: 64, level: 2round: 10
+Access finished, time elapsed: 0.198971 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 64, level: 2round: 10
+Access finished, time elapsed: 0.217701 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 64, level: 2round: 10
+Access finished, time elapsed: 0.233762 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 64, level: 2round: 100
+Access finished, time elapsed: 1.92717 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 64, level: 2round: 100
+Access finished, time elapsed: 2.07176 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 64, level: 2round: 100
+Access finished, time elapsed: 2.2337 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 20.4414 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 30.2707 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 39.2272 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 202.188 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 300.23 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 399.252 s
+[Experiment setting] way: 32, number: 50000, bucket_size: 64, level: 4round: 10
+[Experiment setting] way: 32, number: 50000, bucket_size: 64, level: 4round: 10
+[Experiment setting] way: 32, number: 50000, bucket_size: 64, level: 4round: 10
+[Experiment setting] way: 32, number: 50000, bucket_size: 64, level: 4round: 100
+[Experiment setting] way: 32, number: 50000, bucket_size: 64, level: 4round: 100
+[Experiment setting] way: 32, number: 50000, bucket_size: 64, level: 4round: 100
+[Experiment setting] way: 32, number: 1000, bucket_size: 128, level: 2round: 10
+Access finished, time elapsed: 0.196256 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 128, level: 2round: 10
+Access finished, time elapsed: 0.212663 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 128, level: 2round: 10
+Access finished, time elapsed: 0.229572 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 128, level: 2round: 100
+Access finished, time elapsed: 1.94077 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 128, level: 2round: 100
+Access finished, time elapsed: 2.11985 s
+[Experiment setting] way: 32, number: 1000, bucket_size: 128, level: 2round: 100
+Access finished, time elapsed: 2.25466 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 128, level: 3round: 10
+Access finished, time elapsed: 20.2976 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 128, level: 3round: 10
+Access finished, time elapsed: 30.1008 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 128, level: 3round: 10
+Access finished, time elapsed: 38.9876 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 128, level: 3round: 100
+Access finished, time elapsed: 202.752 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 128, level: 3round: 100
+Access finished, time elapsed: 303.116 s
+[Experiment setting] way: 32, number: 10000, bucket_size: 128, level: 3round: 100
+Access finished, time elapsed: 397.227 s
+[Experiment setting] way: 32, number: 50000, bucket_size: 128, level: 3round: 10
+Access finished, time elapsed: 101.198 s
+[Experiment setting] way: 32, number: 50000, bucket_size: 128, level: 3round: 10
+Access finished, time elapsed: 150.99 s
+[Experiment setting] way: 32, number: 50000, bucket_size: 128, level: 3round: 10
+Access finished, time elapsed: 197.573 s
+[Experiment setting] way: 32, number: 50000, bucket_size: 128, level: 3round: 100
+Access finished, time elapsed: 1003.1 s
+[Experiment setting] way: 32, number: 50000, bucket_size: 128, level: 3round: 100
+Access finished, time elapsed: 1512.51 s
+[Experiment setting] way: 32, number: 50000, bucket_size: 128, level: 3round: 100
+Access finished, time elapsed: 1976.23 s
+[Experiment setting] way: 64, number: 1000, bucket_size: 64, level: 2round: 10
+Access finished, time elapsed: 0.291343 s
+[Experiment setting] way: 64, number: 1000, bucket_size: 64, level: 2round: 10
+Access finished, time elapsed: 0.34165 s
+[Experiment setting] way: 64, number: 1000, bucket_size: 64, level: 2round: 10
+Access finished, time elapsed: 0.416441 s
+[Experiment setting] way: 64, number: 1000, bucket_size: 64, level: 2round: 100
+Access finished, time elapsed: 2.88898 s
+[Experiment setting] way: 64, number: 1000, bucket_size: 64, level: 2round: 100
+Access finished, time elapsed: 3.51876 s
+[Experiment setting] way: 64, number: 1000, bucket_size: 64, level: 2round: 100
+Access finished, time elapsed: 4.16372 s
+[Experiment setting] way: 64, number: 10000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 145.106 s
+[Experiment setting] way: 64, number: 10000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 235.33 s
+[Experiment setting] way: 64, number: 10000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 327.151 s
+[Experiment setting] way: 64, number: 10000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 1655.8 s
+[Experiment setting] way: 64, number: 10000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 2703.5 s
+[Experiment setting] way: 64, number: 10000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 3749.79 s
+[Experiment setting] way: 64, number: 50000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 815.347 s
+[Experiment setting] way: 64, number: 50000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 1341.31 s
+[Experiment setting] way: 64, number: 50000, bucket_size: 64, level: 3round: 10
+Access finished, time elapsed: 1769.83 s
+[Experiment setting] way: 64, number: 50000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 8278.6 s
+[Experiment setting] way: 64, number: 50000, bucket_size: 64, level: 3round: 100
+Access finished, time elapsed: 13400.1 s
+[Experiment setting] way: 64, number: 50000, bucket_size: 64, level: 3round: 100

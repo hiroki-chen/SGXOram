@@ -8,11 +8,19 @@ TEST_FILE = $(filter-out $(BUILD_DIR)/experiment.o, $(OBJ_FILE))
 EOBJ_FILE = $(filter-out $(BUILD_DIR)/main.o, $(OBJ_FILE)) # For experiment
 TARGET = $(BUILD_DIR)/Simulator
 EXPERIMENT = $(BUILD_DIR)/Experimenter
+MODE ?= DEBUG
+# OR MODE ?= RELEASE
 
-CXX = g++
-CXXFLAGS = -Wextra -Werror -O0 -fPIE -std=c++17 -I$(INCLUDE_DIR) -g \
+CXX = clang++
+CXXFLAGS = -Wextra -std=c++17 -I$(INCLUDE_DIR) \
 			-Wno-sign-compare \
 			-Wno-unused-parameter
+
+ifeq ($(MODE), DEBUG)
+	CXXFLAGS += -O0 -g
+else
+	CXXFLAGS += -O2
+endif 
 
 .phony: all mk clean test experiment push
 
