@@ -17,7 +17,8 @@
 #include <sgx_urts.h>
 #include <string>
 
-static const std::string candidate =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+#include <enclave/enclave_crypto_manager.hh>
 
-uint32_t uniform_random_helper(const uint32_t& lower, const uint32_t& upper);
+EnclaveCryptoManager* crypto_manager = nullptr;
+
+std::string enclave_aes_256(const std::string& plaintext);

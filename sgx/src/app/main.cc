@@ -29,30 +29,26 @@ using sgx_oram::Parser;
 
 static sgx_enclave_id_t global_eid = 0;
 
-static plog::RollingFileAppender<plog::TxtFormatter> file_appender("./log/oram.log"); // Create the 1st appender.
-static plog::ColorConsoleAppender<plog::TxtFormatter> consoler_appender; // Create the 2nd appender.
+static plog::RollingFileAppender<plog::TxtFormatter> file_appender(
+    "./log/oram.log");  // Create the 1st appender.
+static plog::ColorConsoleAppender<plog::TxtFormatter>
+    consoler_appender;  // Create the 2nd appender.
 
-int main(int argc, const char** argv)
-{
-    // Create a logger.
-    plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
-    /* try {
-        Parser* const parser = new Parser(argc, argv);
-        parser->parse();
-        Oram* const oram_controller = new Oram(parser->get_result());
-        oram_controller->run_test();
-    } catch (const std::exception& e) {
-        PLOG(plog::error) << e.what();
-        exit(1);
-    }*/
-    if (sgx_oram::init_enclave(&global_eid) != 0) {
-        LOG(plog::error) << "Cannot initialize the enclave!";
-    }
+int SGX_CDECL main(int argc, const char** argv) {
+  // Nullify the input arguments.
+  (void)(argc);
+  (void)(argv);
+  // Create a logger.
+  plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
 
-    char data[sizeof(sgx_oram::Block)];
-    memset(data, 0, sizeof(sgx_oram::Block));
-    test_pointer(global_eid, data);
-    
-    LOG(plog::info) << "Content: " << data;
-    return 0;
+  // Initialize the enclave by loading into the signed shared object into the
+  // main memory.
+  if (sgx_oram::init_enclave(&global_eid) != 0) {
+    LOG(plog::error) << "Cannot initialize the enclave!";
+  }
+
+  int ret = SGX_ERROR_UNEXPECTED;
+  ecall_init_oram_controller(global_eid, &ret);
+
+  return 0;
 }

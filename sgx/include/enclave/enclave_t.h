@@ -15,12 +15,11 @@
 extern "C" {
 #endif
 
-void obli_access_s1(uint16_t op, uint16_t flag, char* slot, size_t slot_len, char* data, uint32_t level, char* position, size_t position_len, char* block, size_t block_len, uint32_t block_number);
-void obli_access_S2(uint16_t op, uint16_t flag, char* slot, size_t slot_len, char* data1, size_t block_len, char* data, uint32_t level, char* position, size_t position_len);
-void obli_access_s3(uint32_t rbid, char* data2, size_t block_len, char* slot, size_t slot_len, uint32_t level, char* position, size_t position_len);
-uint32_t uniform_random(uint32_t lower, uint32_t upper);
-void test_pointer(char* data);
+int ecall_init_oram_controller(void);
 
+sgx_status_t SGX_CDECL ocall_printf(const char* str);
+sgx_status_t SGX_CDECL ocall_get_slot(const char* slot_fingerprint);
+sgx_status_t SGX_CDECL ocall_exception_handler(const char* err_msg);
 
 #ifdef __cplusplus
 }

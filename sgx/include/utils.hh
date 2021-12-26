@@ -22,27 +22,33 @@
 #include <string>
 #include <vector>
 
-// This file contains wrapper functions and some utility functions 
+void ocall_printf(const char* fmt);
+
+void ocall_get_slot(const char* fingerprint);
+
+// This file contains wrapper functions and some utility functions
 // for the untrusted application and the enclave.
 namespace sgx_oram {
-    static const std::string candidate =
-        "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+static const std::string candidate =
+    "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-    std::vector<std::string> generate_random_strings(const uint32_t& number, const uint32_t& length = 32);
+std::vector<std::string> generate_random_strings(const uint32_t& number,
+                                                 const uint32_t& length = 32);
 
-    std::vector<std::string> get_data_from_file(std::ifstream* const file);
+std::vector<std::string> get_data_from_file(std::ifstream* const file);
 
-    std::vector<Block> convert_to_blocks(const std::vector<std::string>& data);
-    
-    uint32_t ecall_uniform_random(sgx_enclave_id_t* const id, const uint32_t& lower, const uint32_t& upper);
+std::vector<Block> convert_to_blocks(const std::vector<std::string>& data);
 
-    uint32_t untrusted_uniform_random(const uint32_t& lower, const uint32_t& upper);
+uint32_t ecall_uniform_random(sgx_enclave_id_t* const id, const uint32_t& lower,
+                              const uint32_t& upper);
 
-    int init_enclave(sgx_enclave_id_t* const id);
+uint32_t untrusted_uniform_random(const uint32_t& lower, const uint32_t& upper);
 
-    int destroy_enclave(sgx_enclave_id_t* const id);
+int init_enclave(sgx_enclave_id_t* const id);
 
-    plog::Record& operator<<(plog::Record& record, const Position& position);
-} // sgx_oram
+int destroy_enclave(sgx_enclave_id_t* const id);
+
+plog::Record& operator<<(plog::Record& record, const Position& position);
+}  // namespace sgx_oram
 
 #endif
