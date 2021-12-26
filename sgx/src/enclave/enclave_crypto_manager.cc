@@ -28,10 +28,10 @@ EnclaveCryptoManager::EnclaveCryptoManager() {
   memset(aes_key, 0, SGX_AESGCM_KEY_SIZE);
   // Randomly generate an AES key.
   sgx_read_rand(aes_key, SGX_AESGCM_KEY_SIZE);
-  printf("AES KEY: %s", hex_to_string(aes_key, SGX_AESGCM_KEY_SIZE).data());
+  sprintf(std::string((char*)aes_key, SGX_AESCTR_KEY_SIZE), true);
 }
 
-std::string EnclaveCryptoManager::enclave_sha256(const std::string& message) {
+std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
   const uint8_t* bytes = reinterpret_cast<const uint8_t*>(message.data());
   sgx_sha256_hash_t ans = {0};
   sgx_status_t ret = SGX_ERROR_UNEXPECTED;
@@ -77,7 +77,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
   sgx_status_t ret = sgx_rijndael128GCM_decrypt(
       &aes_key, ciphertext + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,
       message_len, plaintext, ciphertext + SGX_AESGCM_MAC_SIZE,
-      SGX_AESGCM_IV_SIZE, NULL, 0, (sgx_aes_gcm_128bit_tag_t*)ciphertext);
+      SGX_AESGCM_IV_SIZE, NULL, 0, (const sgx_aes_gcm_128bit_tag_t*)ciphertext);
 
   // If the message is possibly forged, we abort and throw an exception to
   // indicate that the malicious party may be interfering with the enclave.

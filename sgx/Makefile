@@ -45,7 +45,7 @@ SGX_COMMON_FLAGS += -Wall -Wextra -Winit-self -Wpointer-arith -Wreturn-type \
 					-Wno-unused-parameter \
 					-I$(INCLUDE_PATH)
 SGX_COMMON_CFLAGS := $(SGX_COMMON_FLAGS) -Wjump-misses-init -Wstrict-prototypes -Wunsuffixed-float-constants
-SGX_COMMON_CXXFLAGS := $(SGX_COMMON_FLAGS) -Wnon-virtual-dtor -std=c++14
+SGX_COMMON_CXXFLAGS := $(SGX_COMMON_FLAGS) -Wnon-virtual-dtor -std=c++1z
 
 # App settings
 ifneq ($(SGX_MODE), HW)
@@ -184,13 +184,13 @@ $(App_Name): $(BUILD_PATH)/enclave/enclave_u.o $(App_Cpp_Objects)
 # Create a RSA private key.
 # !The exponential must be 3 for the enclave.
 $(KEY_PATH)/key.pem:
-	@openssl genrsa -3 -out $(KEY_PATH)/key.pem 3072
+	@openssl genrsa -3 -out $(KEY_PATH)/key.pem 3072 &> /dev/null
 	@printf "\033[1;93;49mKEYGEN =>  $@\033[0m\n"
 
 $(Signed_Enclave_Name): $(Enclave_Name) $(KEY_PATH)/key.pem
 	@$(SGX_SIGN) sign -key $(KEY_PATH)/key.pem \
 					  -enclave $(Enclave_Name) -out $@ \
-					  -config $(Enclave_Config_File)
+					  -config $(Enclave_Config_File) &> /dev/null
 
 enclave: mk create_proxy $(Signed_Enclave_Name)
 	@printf "\033[1;93;49mEnclave created!\033[0m\n"

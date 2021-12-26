@@ -1,6 +1,6 @@
 {
     "C_Cpp.default.compilerArgs": [
-        "-std=c++14",
+        "-std=c++17",
         "-I./include",
         "-I/usr/local/sgxsdk/include",
         "-nostdlib"

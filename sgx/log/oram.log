@@ -317,3 +317,56 @@
 2021-12-26 15:11:52.408 DEBUG [1478] [ocall_printf@25] In enclave: AES KEY: 9e22a8ff506b3cb46e59f98a7425351e
 2021-12-26 15:11:52.408 DEBUG [1478] [ocall_printf@25] In enclave: dc793509fde6541ac99641d1bbe75c5f2eae1e51b4072204581d779430fb53aed075b87ab8f5c6657f3c3d9843fe534fdbad67987c1309eaedb6814de905ff3497b23ce19cf7
 2021-12-26 15:11:52.408 DEBUG [1478] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 15:25:30.591 DEBUG [5405] [ocall_printf@25] In enclave: e5ffbd52cc4cd1931073bfe4eee5aef3
+2021-12-26 15:25:30.591 DEBUG [5405] [ocall_printf@25] In enclave: 78686f1e74ea344ec46c0ec6eb974788f92e1b25da48e9dcf880d6fc388564eecec92b562f3b7d1efbe5bb268a6f25d7fa98345d2ab9a13f17c840955882a0d0da040be42571
+2021-12-26 15:25:30.591 DEBUG [5405] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 15:32:58.824 DEBUG [5653] [ocall_printf@25] In enclave: e8992ae1da68fe504e5bb91f03b09747
+2021-12-26 15:32:58.824 DEBUG [5653] [ocall_printf@25] In enclave: 80be2c407a62b2a9f4e7de34ccc50890215fb5a74fb1bc584e13152582cb7c89b386582b2f0df516168997d125e017add1e9320691f200a12892d97458670b3b841438ed8b3d
+2021-12-26 15:32:58.824 DEBUG [5653] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 19:35:12.991 DEBUG [6998] [ocall_printf@25] In enclave: 071c5861b0dbb53b9f87edf1764f1e9c
+2021-12-26 19:35:12.991 DEBUG [6998] [ocall_printf@25] In enclave: 5024983c1f37462c91b29ac4c5dfcca0890c80cb6e775a61822eb455ee2bd41291da8cd238a07c5deb4d0fef86540fd916239a25579f2ef8982214a09fe0a4a0e6c15322a729
+2021-12-26 19:35:12.991 DEBUG [6998] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 19:50:00.752 DEBUG [11236] [ocall_printf@25] In enclave: bbdda94edfbf57e6963b0cebc2280d51
+2021-12-26 19:50:00.752 DEBUG [11236] [ocall_printf@25] In enclave: 63a01f9b78737c8d6b1ac8e192260798425220d79547dd86678a431657edf257499d8d6ec1bd904e60a8145c2945f4763b657ae60a58ad25aa1412475b54ca94dd36f24056eb
+2021-12-26 19:50:00.752 DEBUG [11236] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 19:59:31.089 DEBUG [14145] [ocall_printf@25] In enclave: dd2e8ad4b294c042cd58b84310175567
+2021-12-26 19:59:31.089 DEBUG [14145] [ocall_printf@25] In enclave: 81427cd42316d79d71bc756d187d25b4ddcd52782c7e70799a8cda3f23c7270e19356bc242f5899e1700a0ed48c200a5cb1c06bc4d161ba45a2fe094525e9cbcc923ae8c9b65
+2021-12-26 19:59:31.089 DEBUG [14145] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:02:54.064 DEBUG [15711] [ocall_printf@25] In enclave: 3342c848371dd13d45449440a589f1ce
+2021-12-26 20:02:54.064 DEBUG [15711] [ocall_printf@25] In enclave: a0527bef30bd23ca0d7ffa5e14f59cec42be9f53439cdb308fe096987a9d9d76253d032de35bb1edf0335efb070efac28e979ba00e088326ac8e7a2a42965521b7808d6241ad
+2021-12-26 20:02:54.064 DEBUG [15711] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:06:16.837 DEBUG [16728] [ocall_printf@25] In enclave: 1234
+2021-12-26 20:06:16.837 DEBUG [16728] [ocall_printf@25] In enclave: 98dcea8f6df1a24132c6345654dcf9b5
+2021-12-26 20:06:16.837 DEBUG [16728] [ocall_printf@25] In enclave: 9d26b268faea0e0c0846c9f845d5914138f5b8f0376512e6117a25695e223fd22d8b80077a7bb1c0d25ccb4d7a0a58dc262fcbf5613c46f8227fb278af3c3dcd38cdb46f42ce
+2021-12-26 20:06:16.837 DEBUG [16728] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:06:28.457 DEBUG [17021] [ocall_printf@25] In enclave: 123fuck4sdd
+2021-12-26 20:06:28.458 DEBUG [17021] [ocall_printf@25] In enclave: 062eda74f6b73582c19e26460502264e
+2021-12-26 20:06:28.458 DEBUG [17021] [ocall_printf@25] In enclave: 77d05250622f618ce6f793f8af8dc28b7b49e99452ac60b520e0f89ba4e910a80397ca0792165e5189182265fb03103c34481b3f6597ace5e2c7328b2472be1c56e0693d1a6c
+2021-12-26 20:06:28.458 DEBUG [17021] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:11:02.786 DEBUG [18174] [ocall_printf@25] In enclave: b4378b1d060d1f5f88e894582e01708e
+2021-12-26 20:11:02.786 DEBUG [18174] [ocall_printf@25] In enclave: 7dc46557cdd6861d05c844671da7517de3dbe41af2062c49afc4a93b661300e2688697d6c9704efa7a9b602f2a2a9f7393181a29df3b4cf93acec36f79e83ef2771af035ba45
+2021-12-26 20:11:02.786 DEBUG [18174] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:11:36.189 DEBUG [18389] [ocall_printf@25] In enclave: 58114c4c949512f84b6206013d750bad
+2021-12-26 20:11:36.189 DEBUG [18389] [ocall_printf@25] In enclave: 6439db5f904f477efebb7888775829626a29d38b4c1fddb7b0eb386187b753d910ed3a06ee7c83adfe2c0885a843d059df70f20e9991c56d384c5e854197edbfa59ed8b56825
+2021-12-26 20:11:36.189 DEBUG [18389] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:11:37.622 DEBUG [18432] [ocall_printf@25] In enclave: 4b1af2186266f7123b118552f4185632
+2021-12-26 20:11:37.623 DEBUG [18432] [ocall_printf@25] In enclave: 643f8e3a08a12303bab21dd2ac00055a111d037513d438abf9009e48aa5e7db359ff771b4d7f70453a860ab5fb513167792140734132725b2a43489b4f8ffa462bfd62b169df
+2021-12-26 20:11:37.623 DEBUG [18432] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:11:38.581 DEBUG [18472] [ocall_printf@25] In enclave: ba2ea7aa12283c6899cbd22ea19dc225
+2021-12-26 20:11:38.582 DEBUG [18472] [ocall_printf@25] In enclave: 2a83ae2c525fdab918f8b4287242427036570ddeecf357fecf5b1e369bf023b9c2b1b0f2adfacaa8dc2553b7fcbda505848926f192f48dd007d099e10a2eab0bf71b2cf339d4
+2021-12-26 20:11:38.582 DEBUG [18472] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:11:39.447 DEBUG [18509] [ocall_printf@25] In enclave: f35b9fedc0c661fda5c8d3b4a80ac1d9
+2021-12-26 20:11:39.447 DEBUG [18509] [ocall_printf@25] In enclave: bcdb629f294c1aba06d1f4033725ff4066e1d67653f5ed3664b82a0d196ec0a090c3d6d1be5d76b078121f4378e46dba20baf2b3712a92ccc49dc06e4ed947bd01eaf5d6834b
+2021-12-26 20:11:39.447 DEBUG [18509] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:11:40.139 DEBUG [18546] [ocall_printf@25] In enclave: d8b3bcdd677103cee66d8fefde6849e7
+2021-12-26 20:11:40.139 DEBUG [18546] [ocall_printf@25] In enclave: 6dcf5e9a94add2c9f4729c42a1783eadd511e600f40c570ed2690e96b6d6858fa1c74dbca2713a1f4bc938e240d2df622ec245eaefd4ce8815e102681ae467b51fee76bd62f6
+2021-12-26 20:11:40.139 DEBUG [18546] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:11:41.108 DEBUG [18586] [ocall_printf@25] In enclave: fb04f728c0214d1566ae5e8abce0b426
+2021-12-26 20:11:41.108 DEBUG [18586] [ocall_printf@25] In enclave: 50e1e6b3fbaafca7c0dfc2ed347ea39f46e3c845cb21383a62d8291a2c48cf2638d5fbddbecb26ff3d8c638ef1cbcf51bba0f47669b500a5014eef20bfb585cb31ca032987a6
+2021-12-26 20:11:41.108 DEBUG [18586] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:11:42.097 DEBUG [18635] [ocall_printf@25] In enclave: ad056828f9705d4795a16f6da177b475
+2021-12-26 20:11:42.098 DEBUG [18635] [ocall_printf@25] In enclave: 5a428369ca19fe3b4e689afb4ebe769fa3dd4cbc07cadcddf5ef4a8d00769fcba0d5105e1a6ae03ed971c3ea6a9f14297d3fa7d88659bb3509ea943caf51143f0992e920e9ca
+2021-12-26 20:11:42.098 DEBUG [18635] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay
+2021-12-26 20:11:43.701 DEBUG [18706] [ocall_printf@25] In enclave: 64cbc278d180275459cae4d7552c7252
+2021-12-26 20:11:43.702 DEBUG [18706] [ocall_printf@25] In enclave: 98507bf6832a11019c4bb00200b52b4d1bd82215a6dc8a4ef00d809441658b36ea4d53346bbae4d8416d18084cbf38a3dc81252973ee0c235d56fab320ab1a46ac8ac5c15db4
+2021-12-26 20:11:43.702 DEBUG [18706] [ocall_printf@25] In enclave: some long message!!!!fjdsiajfiasjiand okay

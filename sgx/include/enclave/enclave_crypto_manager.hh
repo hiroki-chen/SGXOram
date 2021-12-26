@@ -43,7 +43,7 @@ class EnclaveCryptoManager final {
    * @param message
    * @return std::string
    */
-  std::string enclave_sha256(const std::string& message);
+  std::string enclave_sha_256(const std::string& message);
 
   /**
    * @brief Encrypt the message using AES (rijndael) block cipher in Galois /

@@ -60,7 +60,7 @@ void printf(const char* fmt, ...) {
 
 void sprintf(const std::string& str, bool hex) {
   if (hex) {
-    printf("%s", hex_to_string((uint8_t*)str.data(), str.size()).data());
+    printf("%s", hex_to_string((const uint8_t*)str.data(), str.size()).data());
   } else {
     printf("%s", str.data());
   }
