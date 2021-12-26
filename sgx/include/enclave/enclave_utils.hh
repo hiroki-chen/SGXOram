@@ -17,6 +17,7 @@
 #ifndef ENCLAVE_UTILS_HH
 #define ENCLAVE_UTILS_HH
 
+#include <chrono>
 #include <type_traits>
 #include <string>
 
@@ -83,5 +84,12 @@ void printf(const char* fmt, ...);
  * @param hex
  */
 void sprintf(const std::string& str, bool hex = false);
+
+/**
+ * @brief Get the current timestamp.
+ * 
+ * @return long 
+ */
+long get_current_timestamp(void);
 
 #endif

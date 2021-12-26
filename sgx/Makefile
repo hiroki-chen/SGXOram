@@ -197,6 +197,7 @@ enclave: mk create_proxy $(Signed_Enclave_Name)
 
 all: enclave $(App_Name)
 	@printf "\033[1;93;49mBuilding the application and the enclave...\033[0m\n"
+	@printf "\033[1;93;49mLink => $(word 2,$^)\033[0m\n"
 
 $(SRC_PATH)/test_sgx/main.c: mk
 

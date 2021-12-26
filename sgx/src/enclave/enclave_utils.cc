@@ -14,13 +14,15 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <sgx_tseal.h>
+
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_u.h>
 
 std::string hex_to_string(const uint8_t* array, const size_t& len) {
   std::string ans;
 
-  for (uint8_t i = 0; i < len; i++) {
+  for (size_t i = 0; i < len; i++) {
     // To hex.
     uint8_t num = array[i];
     ans += digits[num & 0xf];
@@ -64,4 +66,8 @@ void sprintf(const std::string& str, bool hex) {
   } else {
     printf("%s", str.data());
   }
+}
+
+long get_current_timestamp(void) {
+ 
 }

@@ -53,11 +53,15 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
   sgx_read_rand(ciphertext + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE);
 
   // Encrypt the data and MAC it.
-  sgx_rijndael128GCM_encrypt(
+  sgx_status_t ret = sgx_rijndael128GCM_encrypt(
       &aes_key, plaintext, message.size(),
       ciphertext + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,
       ciphertext + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE, NULL, 0,
       (sgx_aes_gcm_128bit_tag_t*)(ciphertext));
+
+  if (ret != SGX_SUCCESS) {
+    ocall_exception_handler("Cannot encrypt the data");
+  }
 
   // We could extract the meaningful fields out of the ciphertext buffer and
   // then reconstruct a string from them. The buffer's layout is:

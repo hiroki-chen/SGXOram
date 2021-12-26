@@ -47,8 +47,10 @@ int SGX_CDECL main(int argc, const char** argv) {
     LOG(plog::error) << "Cannot initialize the enclave!";
   }
 
-  int ret = SGX_ERROR_UNEXPECTED;
-  ecall_init_oram_controller(global_eid, &ret);
+  std::string data = "test_seal!";
+
+  sgx_status_t ret = SGX_ERROR_UNEXPECTED;
+  ecall_init_oram_controller(global_eid, (int*)&ret);
 
   return 0;
 }
