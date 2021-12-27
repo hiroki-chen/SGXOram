@@ -14,3 +14,15 @@ This application runs in SGX **SIMULATION** mode, if you need to run it in hardw
 ```shell
 echo "source <SGX_PATH>/sgxsdk/environment" >> $HOME/.zshrc;
 ```
+
+## Remote Attestation
+
+* This version enables the Remote Attestation technology for Intel SGX.
+* To serialize all the messages that are being transported via network, Google Protobuf is a must.
+* Also, to start an encrypted session and make the application easier to use, we deployed the Google RPC (Remote Procedure Call). To install gRPC, run the following command:
+
+```shell
+sudo apt install libgrpc-dev
+```
+
+For more information, interested readers are referred to [this](https://grpc.io).
