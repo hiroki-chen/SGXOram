@@ -19,12 +19,9 @@
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Initializers/RollingFileInitializer.h>
 #include <app/models.hh>
+#include <app/server_runner.hh>
 
-#include <enclave/enclave_u.h>
-#include <utils.hh>
-
-using sgx_oram::Oram;
-using sgx_oram::Parser;
+#include <sgx_urts.h>
 
 static sgx_enclave_id_t global_eid = 0;
 
@@ -40,16 +37,12 @@ int SGX_CDECL main(int argc, const char** argv) {
   // Create a logger.
   plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
 
-  // Initialize the enclave by loading into the signed shared object into the
-  // main memory.
-  if (sgx_oram::init_enclave(&global_eid) != 0) {
-    LOG(plog::error) << "Cannot initialize the enclave!";
+  // Run the server.
+  try {
+    std::unique_ptr<Server> server = std::make_unique<Server>();
+    server->run("localhost:1234", &global_eid);
+  } catch (const std::exception& e) {
+    LOG(plog::fatal) << e.what();
   }
-
-  std::string data = "test_seal!";
-
-  sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-  ecall_init_oram_controller(global_eid, (int*)&ret);
-
   return 0;
 }

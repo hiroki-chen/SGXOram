@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 SRC_PATH := $(CURDIR)
-BUILD_PATH := $(CURDIR)/build
+BUILD_PATH := ../../build/client
 COMMON_INCLUDE_PATH := ../../include
 CLIENT_INCLUDE_PATH := $(COMMON_INCLUDE_PATH)/client
 KEY_PATH := ../../key
@@ -22,8 +22,8 @@ MODE ?= DEBUG
 
 SRC_FILE := $(wildcard $(SRC_PATH)/*.cc)
 OBJ_FILE := $(patsubst $(SRC_PATH)/%.cc, $(BUILD_PATH)/%.o, $(SRC_FILE))
-PROTO_OBJ :=  $(wildcard ../../build/*.o)
-APP_NAME := $(BUILD_PATH)/client.bin
+PROTO_OBJ :=  $(wildcard ../../build/proto/*.o)
+APP_NAME := $(BUILD_PATH)/../bin/client.bin
 
 CXX ?= g++
 CXX_FLAGS ?= -std=c++17 -Wall -Wextra -fPIC -I$(COMMON_INCLUDE_PATH) -I$(CLIENT_INCLUDE_PATH)
@@ -42,17 +42,17 @@ endif
 
 mkdir:
 ifeq ("$(wildcard $(BUILD_PATH))", "")
-	@mkdir $(BUILD_PATH)
+	@mkdir -p $(BUILD_PATH)
 	@printf "\033[1;93;49mMAKE DIRECTORY => $(BUILD_PATH).\033[0m\n"
 endif
 
 all: mkdir $(APP_NAME)
-	@printf "\033[1;93;49mMAKE Client created.\033[0m\n"
+	@printf "\033[1;93;49mClient created.\033[0m\n"
 
 $(APP_NAME): $(OBJ_FILE) $(PROTO_OBJ)
 	@$(CXX) -o $@ $^ $(CXX_LINK_FLAGS)
 	@printf "\033[1;93;49mLINK => $@\033[0m\n"
 
 $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cc
-	$(CXX) -o $@ -c $< $(CXX_FLAGS)
+	@$(CXX) -o $@ -c $< $(CXX_FLAGS)
 	@printf "\033[1;93;49mCXX => $@\033[0m\n"

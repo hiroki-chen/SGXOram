@@ -22,9 +22,9 @@
 #include <messages.grpc.pb.h>
 #include <messages.pb.h>
 
-class Client final : public sgx_oram::Service {
+class Client final : public oram::sgx_oram::Service {
  private:
-  std::unique_ptr<sgx_oram::Stub> stub_;
+  std::unique_ptr<oram::sgx_oram::Stub> stub_;
 
   public:
     Client(const std::string& address, const std::string& port);

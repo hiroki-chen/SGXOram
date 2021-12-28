@@ -15,6 +15,7 @@
 #include <utils.hh>
 #include <plog/Log.h>
 #include <utils.hh>
+#include <configs.hh>
 
 #include <algorithm>
 #include <iostream>

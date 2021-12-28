@@ -21,4 +21,6 @@
 
 static const std::string key_path = "./key";
 
+static const std::string enclave_path = "./build/enclave/enclave_signed.so";
+
 #endif

@@ -28,8 +28,6 @@
 
 #define MAXIMUM_LOG_SIZE 65535
 
-static const std::string enclave_path = "./build/enclave/enclave_signed.so";
-
 namespace sgx_oram {
 typedef struct Config {
     double constant;

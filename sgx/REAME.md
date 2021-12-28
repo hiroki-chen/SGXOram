@@ -12,17 +12,58 @@ This application runs in SGX **SIMULATION** mode, if you need to run it in hardw
 * You could always set the SGX environment arguments by adding one command to your shell's rc:
 
 ```shell
-echo "source <SGX_PATH>/sgxsdk/environment" >> $HOME/.zshrc;
+echo "source $SGX_SDK/environment" >> $HOME/.zshrc; # or .bashrc
 ```
 
 ## Remote Attestation
 
 * This version enables the Remote Attestation technology for Intel SGX.
 * To serialize all the messages that are being transported via network, Google Protobuf is a must.
-* Also, to start an encrypted session and make the application easier to use, we deployed the Google RPC (Remote Procedure Call). To install gRPC, run the following command:
+* Also, to start an encrypted session and make the application easier to use, we deployed the Google RPC (Remote Procedure Call).
+
+## Google Remote Procedure Call
+
+We strongly recommend that you install gRPC library from source since installing from package-manager will cause some problems. A bug-free installation will require CMake:
 
 ```shell
-sudo apt install libgrpc-dev
+sudo apt install -y cmake
+```
+
+Then use git to clone the repository from github:
+
+```shell
+git clone --recurse-submodules -b v1.42.0 https://github.com/grpc/grpc $HOME/grpc
+```
+
+Configure it with cmake and install it on the computer:
+
+```shell
+cd $HOME/grpc
+mkdir -p cmake/build
+pushd cmake/build
+cmake -DgRPC_INSTALL=ON \                
+      -DgRPC_BUILD_TESTS=OFF \
+      -DCMAKE_INSTALL_PREFIX=/usr/local \ # Change it to your own preferred directory.
+      ../..
+make -j$(nproc)
+sudo make install
+popd
 ```
 
 For more information, interested readers are referred to [this](https://grpc.io).
+
+## Build our project
+
+To build our project, you may need to first install Intel SGX SDK for Linux system, and you also need to install gRPC framework for the connection between the client and the server. Finally, we will use the google flag library for command line argument parsing.
+
+* Build the server:
+
+```shell
+make server
+```
+
+* Build the client:
+
+```shell
+make client
+```

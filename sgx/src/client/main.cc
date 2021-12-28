@@ -20,6 +20,8 @@
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Initializers/RollingFileInitializer.h>
 
+#include <gflags/gflags.h>
+
 static plog::RollingFileAppender<plog::TxtFormatter> file_appender(
     "./log/oram.log");  // Create the 1st appender.
 static plog::ColorConsoleAppender<plog::TxtFormatter>
@@ -29,7 +31,12 @@ int main(int argc, const char** argv) {
   // Create a logger.
   plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
 
-  std::unique_ptr<Client> client = std::make_unique<Client>("127.0.0.1", "1234");
+  try {
+    std::unique_ptr<Client> client =
+        std::make_unique<Client>("127.0.0.1", "1234");
+  } catch (const std::exception& e) {
+    LOG(plog::fatal) << e.what();
+  }
 
   return 0;
 }

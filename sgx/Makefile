@@ -33,7 +33,8 @@ endif
 
 mkdir:
 ifeq ("$(wildcard $(BUILD_PATH))", "")
-	@mkdir $(BUILD_PATH)
+	@mkdir -p $(BUILD_PATH)/bin
+	@mkdir -p $(BUILD_PATH)/proto
 	@printf "\033[1;93;49mMAKE DIRECTORY => $(BUILD_PATH)\033[0m\n"
 endif
 
@@ -49,6 +50,7 @@ protobuf: $(PROTO_SRC)
 $(BUILD_PATH)/%.o: $(PROTO_PATH)/%.cc
 	@$(CXX) -o $@ -c $< $(CXX_FLAGS)
 	@printf "\033[1;93;49mCXX => $@\033[0m\n"
+	@mv $@ $(BUILD_PATH)/proto
 
 server: mkdir protobuf $(OBJ_FILE)
 	@$(MAKE) -C $(CURDIR)/src/server -f server.mk all
@@ -57,10 +59,5 @@ client: mkdir protobuf $(OBJ_FILE)
 	@$(MAKE) -C $(CURDIR)/src/client -f client.mk all
 
 clean:
-ifneq ("$(wildcard $(CURDIR)/src/server/build)", "")
-	@rm -r $(CURDIR)/src/server/build
-endif
-ifneq ("$(wildcard $(CURDIR)/src/client/build)", "")
-	@rm -r $(CURDIR)/src/client/build
-endif
+	@rm -r $(CURDIR)/build
 	@printf "\033[1;93;49mBuild folders cleared.\033[0m\n"

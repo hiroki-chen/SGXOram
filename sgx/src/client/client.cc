@@ -41,13 +41,13 @@ Client::Client(const std::string& address, const std::string& port) {
   LOG(plog::info) << "The client is initializaing...";
 
   // Read the certificate of the server.
-  const std::string cacert = read_keycert(key_path + "/" + "server.crt");
+  const std::string cacert = read_keycert(key_path + "/" + "sslcred.crt");
+
   // Create a default SSL ChannelCredentials object.
   grpc::SslCredentialsOptions ssl_opts;
   ssl_opts.pem_root_certs = cacert;
-
   std::shared_ptr<grpc::ChannelCredentials> ssl_creds =
       grpc::SslCredentials(ssl_opts);
-  stub_ = sgx_oram::NewStub(std::shared_ptr<grpc::Channel>(
+  stub_ = oram::sgx_oram::NewStub(std::shared_ptr<grpc::Channel>(
       grpc::CreateChannel(address + ":" + port, ssl_creds)));
 }

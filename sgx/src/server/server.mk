@@ -26,7 +26,7 @@ SGX_LIBRARY_PATH ?= $(SGX_SDK)/lib64
 INCLUDE_PATH := ../../include/server
 COMMON_INCLUDE_PATH := ../../include
 SRC_PATH := $(CURDIR)
-BUILD_PATH := $(CURDIR)/build
+BUILD_PATH := ../../build/server
 KEY_PATH := ../../key
 
 # Include the SGX's official buildenv.mk
@@ -65,11 +65,16 @@ ifeq ($(SGX_DEBUG), 1)
     App_C_Flags += -DDEBUG -UNDEBUG -UEDEBUG
 endif
 
+PROTO_OBJ := $(wildcard ../../build/proto/*.o)
+
 App_Cpp_Files := $(wildcard $(SRC_PATH)/app/*.cc)
 App_Cpp_Flags := $(App_C_Flags)
-App_Link_Flags := -L$(CURDIR)/lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lsgx_ukey_exchange -lservice_provider 
+App_Link_Flags := -L$(CURDIR)/lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lsgx_ukey_exchange -lservice_provider -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
+           				-lpthread\
+           				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
+           				-ldl
 App_Cpp_Objects := $(patsubst $(SRC_PATH)/app/%.cc, $(BUILD_PATH)/app/%.o, $(App_Cpp_Files))
-App_Name := $(BUILD_PATH)/app/app.bin
+App_Name := $(BUILD_PATH)/../bin/server.bin
 
 ifneq ($(SGX_MODE), HW)
 	App_Link_Flags += -lsgx_epid_sim -lsgx_quote_ex_sim
@@ -114,7 +119,7 @@ Enclave_Config_File := $(CURDIR)/config.xml
 # Configure the untrusted application
 App_Cpp_Files := $(wildcard $(SRC_PATH)/app/*.cc)
 App_Cpp_Objects := $(patsubst $(SRC_PATH)/app/%.cc, $(BUILD_PATH)/app/%.o, $(App_Cpp_Files))
-App_Cpp_Objects += $(Common_Object_Files)
+App_Cpp_Objects += $(Common_Object_Files) $(PROTO_OBJ)
 
 App_Include_Paths := -I$(INCLUDE_PATH) -I$(SGX_SDK)/include
 App_C_Flags := -fPIC -Wno-attributes $(App_Include_Paths)

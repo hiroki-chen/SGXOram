@@ -22,9 +22,11 @@
 #include <string>
 #include <vector>
 
+extern "C" {
 void ocall_printf(const char* fmt);
 
 void ocall_get_slot(const char* fingerprint);
+}
 
 // This file contains wrapper functions and some utility functions
 // for the untrusted application and the enclave.

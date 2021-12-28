@@ -5,96 +5,166 @@
 #include "messages.pb.h"
 #include "messages.grpc.pb.h"
 
-#include <grpc++/impl/codegen/async_stream.h>
-#include <grpc++/impl/codegen/async_unary_call.h>
-#include <grpc++/impl/codegen/channel_interface.h>
-#include <grpc++/impl/codegen/client_unary_call.h>
-#include <grpc++/impl/codegen/method_handler_impl.h>
-#include <grpc++/impl/codegen/rpc_service_method.h>
-#include <grpc++/impl/codegen/service_type.h>
-#include <grpc++/impl/codegen/sync_stream.h>
+#include <functional>
+#include <grpcpp/impl/codegen/async_stream.h>
+#include <grpcpp/impl/codegen/async_unary_call.h>
+#include <grpcpp/impl/codegen/channel_interface.h>
+#include <grpcpp/impl/codegen/client_unary_call.h>
+#include <grpcpp/impl/codegen/client_callback.h>
+#include <grpcpp/impl/codegen/message_allocator.h>
+#include <grpcpp/impl/codegen/method_handler.h>
+#include <grpcpp/impl/codegen/rpc_service_method.h>
+#include <grpcpp/impl/codegen/server_callback.h>
+#include <grpcpp/impl/codegen/server_callback_handlers.h>
+#include <grpcpp/impl/codegen/server_context.h>
+#include <grpcpp/impl/codegen/service_type.h>
+#include <grpcpp/impl/codegen/sync_stream.h>
+namespace oram {
 
 static const char* sgx_oram_method_names[] = {
-  "/sgx_oram/init_enclave",
-  "/sgx_oram/read_block",
-  "/sgx_oram/write_block",
+  "/oram.sgx_oram/init_enclave",
+  "/oram.sgx_oram/read_block",
+  "/oram.sgx_oram/write_block",
 };
 
 std::unique_ptr< sgx_oram::Stub> sgx_oram::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
-  std::unique_ptr< sgx_oram::Stub> stub(new sgx_oram::Stub(channel));
+  (void)options;
+  std::unique_ptr< sgx_oram::Stub> stub(new sgx_oram::Stub(channel, options));
   return stub;
 }
 
-sgx_oram::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
-  : channel_(channel), rpcmethod_init_enclave_(sgx_oram_method_names[0], ::grpc::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_read_block_(sgx_oram_method_names[1], ::grpc::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_write_block_(sgx_oram_method_names[2], ::grpc::RpcMethod::NORMAL_RPC, channel)
+sgx_oram::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
+  : channel_(channel), rpcmethod_init_enclave_(sgx_oram_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_read_block_(sgx_oram_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_write_block_(sgx_oram_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
-::grpc::Status sgx_oram::Stub::init_enclave(::grpc::ClientContext* context, const ::InitRequest& request, ::InitReply* response) {
-  return ::grpc::BlockingUnaryCall(channel_.get(), rpcmethod_init_enclave_, context, request, response);
+::grpc::Status sgx_oram::Stub::init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::oram::InitReply* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::oram::InitRequest, ::oram::InitReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_init_enclave_, context, request, response);
 }
 
-::grpc::ClientAsyncResponseReader< ::InitReply>* sgx_oram::Stub::Asyncinit_enclaveRaw(::grpc::ClientContext* context, const ::InitRequest& request, ::grpc::CompletionQueue* cq) {
-  return new ::grpc::ClientAsyncResponseReader< ::InitReply>(channel_.get(), cq, rpcmethod_init_enclave_, context, request);
+void sgx_oram::Stub::async::init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::oram::InitRequest, ::oram::InitReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_init_enclave_, context, request, response, std::move(f));
 }
 
-::grpc::Status sgx_oram::Stub::read_block(::grpc::ClientContext* context, const ::ReadRequest& request, ::ReadReply* response) {
-  return ::grpc::BlockingUnaryCall(channel_.get(), rpcmethod_read_block_, context, request, response);
+void sgx_oram::Stub::async::init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_init_enclave_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::ReadReply>* sgx_oram::Stub::Asyncread_blockRaw(::grpc::ClientContext* context, const ::ReadRequest& request, ::grpc::CompletionQueue* cq) {
-  return new ::grpc::ClientAsyncResponseReader< ::ReadReply>(channel_.get(), cq, rpcmethod_read_block_, context, request);
+::grpc::ClientAsyncResponseReader< ::oram::InitReply>* sgx_oram::Stub::PrepareAsyncinit_enclaveRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::oram::InitReply, ::oram::InitRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_init_enclave_, context, request);
 }
 
-::grpc::Status sgx_oram::Stub::write_block(::grpc::ClientContext* context, const ::WriteRequest& request, ::WriteReply* response) {
-  return ::grpc::BlockingUnaryCall(channel_.get(), rpcmethod_write_block_, context, request, response);
+::grpc::ClientAsyncResponseReader< ::oram::InitReply>* sgx_oram::Stub::Asyncinit_enclaveRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncinit_enclaveRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
-::grpc::ClientAsyncResponseReader< ::WriteReply>* sgx_oram::Stub::Asyncwrite_blockRaw(::grpc::ClientContext* context, const ::WriteRequest& request, ::grpc::CompletionQueue* cq) {
-  return new ::grpc::ClientAsyncResponseReader< ::WriteReply>(channel_.get(), cq, rpcmethod_write_block_, context, request);
+::grpc::Status sgx_oram::Stub::read_block(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::oram::ReadReply* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::oram::ReadRequest, ::oram::ReadReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_read_block_, context, request, response);
+}
+
+void sgx_oram::Stub::async::read_block(::grpc::ClientContext* context, const ::oram::ReadRequest* request, ::oram::ReadReply* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::oram::ReadRequest, ::oram::ReadReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_read_block_, context, request, response, std::move(f));
+}
+
+void sgx_oram::Stub::async::read_block(::grpc::ClientContext* context, const ::oram::ReadRequest* request, ::oram::ReadReply* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_read_block_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::oram::ReadReply>* sgx_oram::Stub::PrepareAsyncread_blockRaw(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::oram::ReadReply, ::oram::ReadRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_read_block_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::oram::ReadReply>* sgx_oram::Stub::Asyncread_blockRaw(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncread_blockRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status sgx_oram::Stub::write_block(::grpc::ClientContext* context, const ::oram::WriteRequest& request, ::oram::WriteReply* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::oram::WriteRequest, ::oram::WriteReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_write_block_, context, request, response);
+}
+
+void sgx_oram::Stub::async::write_block(::grpc::ClientContext* context, const ::oram::WriteRequest* request, ::oram::WriteReply* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::oram::WriteRequest, ::oram::WriteReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_write_block_, context, request, response, std::move(f));
+}
+
+void sgx_oram::Stub::async::write_block(::grpc::ClientContext* context, const ::oram::WriteRequest* request, ::oram::WriteReply* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_write_block_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::oram::WriteReply>* sgx_oram::Stub::PrepareAsyncwrite_blockRaw(::grpc::ClientContext* context, const ::oram::WriteRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::oram::WriteReply, ::oram::WriteRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_write_block_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::oram::WriteReply>* sgx_oram::Stub::Asyncwrite_blockRaw(::grpc::ClientContext* context, const ::oram::WriteRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncwrite_blockRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 sgx_oram::Service::Service() {
-  AddMethod(new ::grpc::RpcServiceMethod(
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
       sgx_oram_method_names[0],
-      ::grpc::RpcMethod::NORMAL_RPC,
-      new ::grpc::RpcMethodHandler< sgx_oram::Service, ::InitRequest, ::InitReply>(
-          std::mem_fn(&sgx_oram::Service::init_enclave), this)));
-  AddMethod(new ::grpc::RpcServiceMethod(
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::InitRequest, ::oram::InitReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](sgx_oram::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::oram::InitRequest* req,
+             ::oram::InitReply* resp) {
+               return service->init_enclave(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
       sgx_oram_method_names[1],
-      ::grpc::RpcMethod::NORMAL_RPC,
-      new ::grpc::RpcMethodHandler< sgx_oram::Service, ::ReadRequest, ::ReadReply>(
-          std::mem_fn(&sgx_oram::Service::read_block), this)));
-  AddMethod(new ::grpc::RpcServiceMethod(
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::ReadRequest, ::oram::ReadReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](sgx_oram::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::oram::ReadRequest* req,
+             ::oram::ReadReply* resp) {
+               return service->read_block(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
       sgx_oram_method_names[2],
-      ::grpc::RpcMethod::NORMAL_RPC,
-      new ::grpc::RpcMethodHandler< sgx_oram::Service, ::WriteRequest, ::WriteReply>(
-          std::mem_fn(&sgx_oram::Service::write_block), this)));
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::WriteRequest, ::oram::WriteReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](sgx_oram::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::oram::WriteRequest* req,
+             ::oram::WriteReply* resp) {
+               return service->write_block(ctx, req, resp);
+             }, this)));
 }
 
 sgx_oram::Service::~Service() {
 }
 
-::grpc::Status sgx_oram::Service::init_enclave(::grpc::ServerContext* context, const ::InitRequest* request, ::InitReply* response) {
+::grpc::Status sgx_oram::Service::init_enclave(::grpc::ServerContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status sgx_oram::Service::read_block(::grpc::ServerContext* context, const ::ReadRequest* request, ::ReadReply* response) {
+::grpc::Status sgx_oram::Service::read_block(::grpc::ServerContext* context, const ::oram::ReadRequest* request, ::oram::ReadReply* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status sgx_oram::Service::write_block(::grpc::ServerContext* context, const ::WriteRequest* request, ::WriteReply* response) {
+::grpc::Status sgx_oram::Service::write_block(::grpc::ServerContext* context, const ::oram::WriteRequest* request, ::oram::WriteReply* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
+
+}  // namespace oram
 
