@@ -12,7 +12,7 @@ openssl x509 -req -passin pass:$mypass -days 365 -in sslcred.csr -signkey sslcre
 echo Remove passphrase from server key:
 openssl rsa -passin pass:$mypass -in sslcred.key -out sslcred.key
 
-rm sslcred.csr
+rm *.csr
 
 # Move them to the key folder.
 mv *.crt *.key $(pwd)/key
