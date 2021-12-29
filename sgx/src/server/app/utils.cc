@@ -134,6 +134,19 @@ int init_enclave(sgx_enclave_id_t* const id) {
   return 0;
 }
 
+std::string hex_to_string(const uint8_t* array, const size_t& len) {
+  std::string ans;
+
+  for (size_t i = 0; i < len; i++) {
+    // To hex.
+    uint8_t num = array[i];
+    ans += digits[num & 0xf];
+    ans += digits[num >> 4];
+  }
+
+  return ans;
+}
+
 int destroy_enclave(sgx_enclave_id_t* const id) {
   sgx_status_t ret = SGX_ERROR_UNEXPECTED;
 

@@ -33,10 +33,13 @@ int main(int argc, const char** argv) {
 
   try {
     std::unique_ptr<Client> client =
-        std::make_unique<Client>("127.0.0.1", "1234");
+        std::make_unique<Client>("localhost", "1234");
+    client->init_enclave();
+    client->generate_session_key();
+    client->close_connection();
   } catch (const std::exception& e) {
     LOG(plog::fatal) << e.what();
   }
 
-  return 0;
+    return 0;
 }

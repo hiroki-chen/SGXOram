@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+static const std::string digits = "0123456789abcdef";
+
 extern "C" {
 void ocall_printf(const char* fmt);
 
@@ -39,6 +41,7 @@ std::vector<std::string> generate_random_strings(const uint32_t& number,
 
 std::vector<std::string> get_data_from_file(std::ifstream* const file);
 
+
 std::vector<Block> convert_to_blocks(const std::vector<std::string>& data);
 
 uint32_t ecall_uniform_random(sgx_enclave_id_t* const id, const uint32_t& lower,
@@ -49,6 +52,8 @@ uint32_t untrusted_uniform_random(const uint32_t& lower, const uint32_t& upper);
 int init_enclave(sgx_enclave_id_t* const id);
 
 int destroy_enclave(sgx_enclave_id_t* const id);
+
+std::string hex_to_string(const uint8_t* array, const size_t& len = 32);
 
 plog::Record& operator<<(plog::Record& record, const Position& position);
 }  // namespace sgx_oram

@@ -160,6 +160,7 @@ sgx_status_t enclave_init_ra(int b_pse, sgx_ra_context_t* p_context) {
 #else
   ret = sgx_ra_init(&g_sp_pub_key, b_pse, p_context);
 #endif
+  printf("In enclave: Initializing the remote attestation context...");
   return ret;
 }
 
@@ -389,4 +390,61 @@ sgx_status_t ecall_unseal(const sgx_sealed_data_t* sealed_data,
       sgx_unseal_data(sealed_data, NULL, NULL, (uint8_t*)plaintext,
                       (uint32_t*)&(plaintext_len));
   return status;
+}
+
+/**
+ * @brief Start to create a context for Diffie-Hellman Key Exchange for this
+ * session.
+ *
+ * @return sgx_status_t
+ */
+sgx_status_t ecall_begin_DHKE() {
+  // Create a ecc system for this session.
+  sgx_status_t status =
+      sgx_ecc256_open_context(crypto_manager->get_state_handle());
+  return status;
+}
+
+/**
+ * @brief Sample a key pair for the connection between enclave and the client.
+ *
+ * @param pubkey
+ * @param pubkey_size
+ * @return sgx_status_t
+ */
+sgx_status_t ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
+  // Sample the key pairs.
+  sgx_status_t status = sgx_ecc256_create_key_pair(
+      crypto_manager->get_secret_key(), crypto_manager->get_public_key(),
+      *crypto_manager->get_state_handle());
+  // Copy the public key to the untrusted memory and let the server send the key
+  // to the client.
+  memcpy(pubkey, crypto_manager->get_public_key(), SGX_ECP256_KEY_SIZE);
+
+  // Print debug information.
+  std::string pk = std::move(hex_to_string(
+      (uint8_t*)(crypto_manager->get_public_key()), SGX_ECP256_KEY_SIZE));
+  std::string sk = std::move(hex_to_string(
+      (uint8_t*)(crypto_manager->get_secret_key()), SGX_ECP256_KEY_SIZE));
+  printf("Key pair sampled! PK: %s, SK: %s", pk.data(), sk.data());
+
+  return status;
+}
+
+sgx_status_t ecall_compute_shared_key(const uint8_t* pubkey,
+                                      size_t pubkey_size) {
+  sgx_ec256_dh_shared_t shared_key;
+  sgx_ec256_public_t client_public_key;
+  memcpy(&client_public_key, pubkey, sizeof(sgx_ec256_public_t));
+
+  std::string pub = std::move(hex_to_string((uint8_t*)(&client_public_key),
+                                            sizeof(sgx_ec256_public_t)));
+  printf("Client public key: %s", pub.data());
+
+  sgx_status_t status = sgx_ecc256_compute_shared_dhkey(
+      crypto_manager->get_secret_key(), &client_public_key, &shared_key,
+      *crypto_manager->get_state_handle());
+  std::string shared =
+      std::move(hex_to_string((uint8_t*)(&shared_key), SGX_ECP256_KEY_SIZE));
+  printf("Shared key: %s", shared.data());
 }

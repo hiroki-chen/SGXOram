@@ -39,6 +39,9 @@ void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_exception_handler, (const char* err_msg
 sgx_status_t ecall_init_oram_controller(sgx_enclave_id_t eid, int* retval);
 sgx_status_t ecall_seal(sgx_enclave_id_t eid, sgx_status_t* retval, const uint8_t* plaintext, size_t plaintext_len, sgx_sealed_data_t* sealed_data, size_t sealed_size);
 sgx_status_t ecall_unseal(sgx_enclave_id_t eid, sgx_status_t* retval, const sgx_sealed_data_t* sealed_data, size_t sealed_size, uint8_t* plaintext, size_t plaintext_len);
+sgx_status_t ecall_begin_DHKE(sgx_enclave_id_t eid, sgx_status_t* retval);
+sgx_status_t ecall_sample_key_pair(sgx_enclave_id_t eid, sgx_status_t* retval, uint8_t* pub_key, size_t pubkey_size);
+sgx_status_t ecall_compute_shared_key(sgx_enclave_id_t eid, sgx_status_t* retval, const uint8_t* pub_key, size_t pubkey_size);
 sgx_status_t enclave_init_ra(sgx_enclave_id_t eid, sgx_status_t* retval, int b_pse, sgx_ra_context_t* p_context);
 sgx_status_t enclave_ra_close(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_context_t context);
 sgx_status_t verify_att_result_mac(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_context_t context, uint8_t* message, size_t message_size, uint8_t* mac, size_t mac_size);

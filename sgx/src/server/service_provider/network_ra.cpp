@@ -29,14 +29,11 @@
  *
  */
 
-
-
 #include <stdint.h>
 #include <stdlib.h>
 #include "network_ra.h"
 #include "service_provider.h"
 #include <cstdio>
-
 
 // Used to send requests to the service provider sample.  It
 // simulates network communication between the ISV app and the
@@ -50,78 +47,63 @@
 // @return int
 
 int ra_network_send_receive(const char *server_url,
-    const ra_samp_request_header_t *p_req,
-    ra_samp_response_header_t **p_resp)
-{
-    int ret = 0;
-    ra_samp_response_header_t* p_resp_msg;
+                            const ra_samp_request_header_t *p_req,
+                            ra_samp_response_header_t **p_resp) {
+  int ret = 0;
+  ra_samp_response_header_t *p_resp_msg;
 
-    if((NULL == server_url) ||
-        (NULL == p_req) ||
-        (NULL == p_resp))
-    {
-        return -1;
-    }
+  if ((NULL == server_url) || (NULL == p_req) || (NULL == p_resp)) {
+    return -1;
+  }
 
-    switch(p_req->type)
-    {
-
+  switch (p_req->type) {
     case TYPE_RA_MSG0:
-        ret = sp_ra_proc_msg0_req((const sample_ra_msg0_t*)((size_t)p_req
-            + sizeof(ra_samp_request_header_t)),
-            p_req->size,
-            &p_resp_msg);
-        if (0 != ret)
-        {
-            fprintf(stderr, "\nError, call sp_ra_proc_msg1_req fail [%s].",
+      ret = sp_ra_proc_msg0_req(
+          (const sample_ra_msg0_t *)((size_t)p_req +
+                                     sizeof(ra_samp_request_header_t)),
+          p_req->size, &p_resp_msg);
+      if (0 != ret) {
+        fprintf(stderr, "\nError, call sp_ra_proc_msg1_req fail [%s].",
                 __FUNCTION__);
-        }
-        else
-        {
-            *p_resp = p_resp_msg;
-        }
-        break;
+      } else {
+        *p_resp = p_resp_msg;
+      }
+      break;
 
     case TYPE_RA_MSG1:
-        ret = sp_ra_proc_msg1_req((const sample_ra_msg1_t*)((size_t)p_req
-            + sizeof(ra_samp_request_header_t)),
-            p_req->size,
-            &p_resp_msg);
-        if(0 != ret)
-        {
-            fprintf(stderr, "\nError, call sp_ra_proc_msg1_req fail [%s].",
+      ret = sp_ra_proc_msg1_req(
+          (const sample_ra_msg1_t *)((size_t)p_req +
+                                     sizeof(ra_samp_request_header_t)),
+          p_req->size, &p_resp_msg);
+      if (0 != ret) {
+        fprintf(stderr, "\nError, call sp_ra_proc_msg1_req fail [%s].",
                 __FUNCTION__);
-        }
-        else
-        {
-            *p_resp = p_resp_msg;
-        }
-        break;
+      } else {
+        *p_resp = p_resp_msg;
+      }
+      break;
 
     case TYPE_RA_MSG3:
-        ret =sp_ra_proc_msg3_req((const sample_ra_msg3_t*)((size_t)p_req +
-            sizeof(ra_samp_request_header_t)),
-            p_req->size,
-            &p_resp_msg);
-        if(0 != ret)
-        {
-            fprintf(stderr, "\nError, call sp_ra_proc_msg3_req fail [%s].",
+      ret = sp_ra_proc_msg3_req(
+          (const sample_ra_msg3_t *)((size_t)p_req +
+                                     sizeof(ra_samp_request_header_t)),
+          p_req->size, &p_resp_msg);
+      if (0 != ret) {
+        fprintf(stderr, "\nError, call sp_ra_proc_msg3_req fail [%s].",
                 __FUNCTION__);
-        }
-        else
-        {
-            *p_resp = p_resp_msg;
-        }
-        break;
+      } else {
+        *p_resp = p_resp_msg;
+      }
+      break;
 
     default:
-        ret = -1;
-        fprintf(stderr, "\nError, unknown ra message type. Type = %d [%s].",
-            p_req->type, __FUNCTION__);
-        break;
-    }
+      ret = -1;
+      fprintf(stderr, "\nError, unknown ra message type. Type = %d [%s].",
+              p_req->type, __FUNCTION__);
+      break;
+  }
 
-    return ret;
+  return ret;
 }
 
 // Used to free the response messages.  In the sample code, the
@@ -130,10 +112,8 @@ int ra_network_send_receive(const char *server_url,
 //
 // @param resp Pointer to the response buffer to be freed.
 
-void ra_free_network_response_buffer(ra_samp_response_header_t *resp)
-{
-    if(resp!=NULL)
-    {
-        free(resp);
-    }
+void ra_free_network_response_buffer(ra_samp_response_header_t *resp) {
+  if (resp != NULL) {
+    free(resp);
+  }
 }

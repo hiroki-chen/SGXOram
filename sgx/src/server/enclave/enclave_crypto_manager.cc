@@ -91,3 +91,9 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
 
   return std::string((char*)plaintext, message_len);
 }
+
+void EnclaveCryptoManager::set_shared_key(
+    const sgx_ec_key_128bit_t* shared_key) {
+  memset(&shared_secret_key, 0, sizeof(sgx_ec_key_128bit_t));
+  memcpy(&shared_secret_key, shared_key, sizeof(sgx_ec_key_128bit_t));
+}

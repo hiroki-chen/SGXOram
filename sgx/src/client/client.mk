@@ -19,6 +19,7 @@ COMMON_INCLUDE_PATH := ../../include
 CLIENT_INCLUDE_PATH := $(COMMON_INCLUDE_PATH)/client
 KEY_PATH := ../../key
 MODE ?= DEBUG
+LIB_PATH := ../../lib
 
 SRC_FILE := $(wildcard $(SRC_PATH)/*.cc)
 OBJ_FILE := $(patsubst $(SRC_PATH)/%.cc, $(BUILD_PATH)/%.o, $(SRC_FILE))
@@ -26,11 +27,12 @@ PROTO_OBJ :=  $(wildcard ../../build/proto/*.o)
 APP_NAME := $(BUILD_PATH)/../bin/client.bin
 
 CXX ?= g++
-CXX_FLAGS ?= -std=c++17 -Wall -Wextra -fPIC -I$(COMMON_INCLUDE_PATH) -I$(CLIENT_INCLUDE_PATH)
+CXX_FLAGS ?= -std=c++17 -Wall -Wextra -fPIC -I$(COMMON_INCLUDE_PATH) -I$(CLIENT_INCLUDE_PATH) 
 CXX_LINK_FLAGS ?= -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
            				-pthread\
            				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           				-ldl
+           				-ldl\
+									-L$(LIB_PATH) -lsample_libcrypto
 
 ifeq ($(MODE), DEBUG)
 	CXX_FLAGS += -O0 -g

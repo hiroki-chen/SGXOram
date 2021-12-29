@@ -41,6 +41,12 @@ enclave {
                                      [ out, size = plaintext_len ] uint8_t *plaintext,
                                      size_t plaintext_len);
 
+    public sgx_status_t ecall_begin_DHKE();
+
+    public sgx_status_t ecall_sample_key_pair([ out, size = pubkey_size ] uint8_t* pub_key, size_t pubkey_size);
+
+    public sgx_status_t ecall_compute_shared_key([ in, size = pubkey_size ] const uint8_t* pub_key, size_t pubkey_size);
+
     // Begin Remote Attestation Interfaces //
 
     // This ecall is a wrapper of sgx_ra_init to create the trusted

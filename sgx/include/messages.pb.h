@@ -23,6 +23,7 @@
 #include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/arena.h>
 #include <google/protobuf/arenastring.h>
+#include <google/protobuf/generated_message_bases.h>
 #include <google/protobuf/generated_message_table_driven.h>
 #include <google/protobuf/generated_message_util.h>
 #include <google/protobuf/metadata_lite.h>
@@ -31,6 +32,7 @@
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
+#include <google/protobuf/empty.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_messages_2eproto
@@ -46,7 +48,7 @@ struct TableStruct_messages_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[6]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[7]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -54,6 +56,9 @@ struct TableStruct_messages_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_messages_2eproto;
 namespace oram {
+class CloseRequest;
+struct CloseRequestDefaultTypeInternal;
+extern CloseRequestDefaultTypeInternal _CloseRequest_default_instance_;
 class InitReply;
 struct InitReplyDefaultTypeInternal;
 extern InitReplyDefaultTypeInternal _InitReply_default_instance_;
@@ -74,6 +79,7 @@ struct WriteRequestDefaultTypeInternal;
 extern WriteRequestDefaultTypeInternal _WriteRequest_default_instance_;
 }  // namespace oram
 PROTOBUF_NAMESPACE_OPEN
+template<> ::oram::CloseRequest* Arena::CreateMaybeMessage<::oram::CloseRequest>(Arena*);
 template<> ::oram::InitReply* Arena::CreateMaybeMessage<::oram::InitReply>(Arena*);
 template<> ::oram::InitRequest* Arena::CreateMaybeMessage<::oram::InitRequest>(Arena*);
 template<> ::oram::ReadReply* Arena::CreateMaybeMessage<::oram::ReadReply>(Arena*);
@@ -207,7 +213,7 @@ class InitRequest final :
     kContentFieldNumber = 2,
     kRoundFieldNumber = 1,
   };
-  // string content = 2;
+  // bytes content = 2;
   void clear_content();
   const std::string& content() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -363,21 +369,21 @@ class InitReply final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kSecretKeyFieldNumber = 2,
+    kContentFieldNumber = 2,
     kSuccessFieldNumber = 1,
   };
-  // string secret_key = 2;
-  void clear_secret_key();
-  const std::string& secret_key() const;
+  // bytes content = 2;
+  void clear_content();
+  const std::string& content() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_secret_key(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_secret_key();
-  PROTOBUF_MUST_USE_RESULT std::string* release_secret_key();
-  void set_allocated_secret_key(std::string* secret_key);
+  void set_content(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_content();
+  PROTOBUF_MUST_USE_RESULT std::string* release_content();
+  void set_allocated_content(std::string* content);
   private:
-  const std::string& _internal_secret_key() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_secret_key(const std::string& value);
-  std::string* _internal_mutable_secret_key();
+  const std::string& _internal_content() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_content(const std::string& value);
+  std::string* _internal_mutable_content();
   public:
 
   // bool success = 1;
@@ -396,7 +402,7 @@ class InitReply final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr secret_key_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr content_;
   bool success_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_messages_2eproto;
@@ -1005,6 +1011,121 @@ class WriteReply final :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_messages_2eproto;
 };
+// -------------------------------------------------------------------
+
+class CloseRequest final :
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:oram.CloseRequest) */ {
+ public:
+  inline CloseRequest() : CloseRequest(nullptr) {}
+  explicit constexpr CloseRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  CloseRequest(const CloseRequest& from);
+  CloseRequest(CloseRequest&& from) noexcept
+    : CloseRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline CloseRequest& operator=(const CloseRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline CloseRequest& operator=(CloseRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const CloseRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const CloseRequest* internal_default_instance() {
+    return reinterpret_cast<const CloseRequest*>(
+               &_CloseRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  friend void swap(CloseRequest& a, CloseRequest& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(CloseRequest* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(CloseRequest* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CloseRequest* New() const final {
+    return new CloseRequest();
+  }
+
+  CloseRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<CloseRequest>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyFrom;
+  inline void CopyFrom(const CloseRequest& from) {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyImpl(this, from);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeFrom;
+  void MergeFrom(const CloseRequest& from) {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl(this, from);
+  }
+  public:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "oram.CloseRequest";
+  }
+  protected:
+  explicit CloseRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:oram.CloseRequest)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_messages_2eproto;
+};
 // ===================================================================
 
 
@@ -1036,7 +1157,7 @@ inline void InitRequest::set_round(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:oram.InitRequest.round)
 }
 
-// string content = 2;
+// bytes content = 2;
 inline void InitRequest::clear_content() {
   content_.ClearToEmpty();
 }
@@ -1048,7 +1169,7 @@ template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
 void InitRequest::set_content(ArgT0&& arg0, ArgT... args) {
  
- content_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+ content_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:oram.InitRequest.content)
 }
 inline std::string* InitRequest::mutable_content() {
@@ -1106,50 +1227,50 @@ inline void InitReply::set_success(bool value) {
   // @@protoc_insertion_point(field_set:oram.InitReply.success)
 }
 
-// string secret_key = 2;
-inline void InitReply::clear_secret_key() {
-  secret_key_.ClearToEmpty();
+// bytes content = 2;
+inline void InitReply::clear_content() {
+  content_.ClearToEmpty();
 }
-inline const std::string& InitReply::secret_key() const {
-  // @@protoc_insertion_point(field_get:oram.InitReply.secret_key)
-  return _internal_secret_key();
+inline const std::string& InitReply::content() const {
+  // @@protoc_insertion_point(field_get:oram.InitReply.content)
+  return _internal_content();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void InitReply::set_secret_key(ArgT0&& arg0, ArgT... args) {
+void InitReply::set_content(ArgT0&& arg0, ArgT... args) {
  
- secret_key_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:oram.InitReply.secret_key)
+ content_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:oram.InitReply.content)
 }
-inline std::string* InitReply::mutable_secret_key() {
-  std::string* _s = _internal_mutable_secret_key();
-  // @@protoc_insertion_point(field_mutable:oram.InitReply.secret_key)
+inline std::string* InitReply::mutable_content() {
+  std::string* _s = _internal_mutable_content();
+  // @@protoc_insertion_point(field_mutable:oram.InitReply.content)
   return _s;
 }
-inline const std::string& InitReply::_internal_secret_key() const {
-  return secret_key_.Get();
+inline const std::string& InitReply::_internal_content() const {
+  return content_.Get();
 }
-inline void InitReply::_internal_set_secret_key(const std::string& value) {
+inline void InitReply::_internal_set_content(const std::string& value) {
   
-  secret_key_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+  content_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* InitReply::_internal_mutable_secret_key() {
+inline std::string* InitReply::_internal_mutable_content() {
   
-  return secret_key_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+  return content_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* InitReply::release_secret_key() {
-  // @@protoc_insertion_point(field_release:oram.InitReply.secret_key)
-  return secret_key_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+inline std::string* InitReply::release_content() {
+  // @@protoc_insertion_point(field_release:oram.InitReply.content)
+  return content_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
-inline void InitReply::set_allocated_secret_key(std::string* secret_key) {
-  if (secret_key != nullptr) {
+inline void InitReply::set_allocated_content(std::string* content) {
+  if (content != nullptr) {
     
   } else {
     
   }
-  secret_key_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), secret_key,
+  content_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), content,
       GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set_allocated:oram.InitReply.secret_key)
+  // @@protoc_insertion_point(field_set_allocated:oram.InitReply.content)
 }
 
 // -------------------------------------------------------------------
@@ -1340,9 +1461,15 @@ inline void WriteReply::set_success(bool value) {
   // @@protoc_insertion_point(field_set:oram.WriteReply.success)
 }
 
+// -------------------------------------------------------------------
+
+// CloseRequest
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

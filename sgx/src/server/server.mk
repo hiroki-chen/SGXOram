@@ -69,7 +69,7 @@ PROTO_OBJ := $(wildcard ../../build/proto/*.o)
 
 App_Cpp_Files := $(wildcard $(SRC_PATH)/app/*.cc)
 App_Cpp_Flags := $(App_C_Flags)
-App_Link_Flags := -L$(CURDIR)/lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lsgx_ukey_exchange -lservice_provider -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
+App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lsgx_ukey_exchange -lservice_provider -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
            				-lpthread\
            				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
            				-ldl
@@ -131,9 +131,9 @@ ServiceProvider_Cpp_Files := $(wildcard $(SRC_PATH)/service_provider/*.cpp)
 ServiceProvider_Cpp_Objects := $(patsubst $(SRC_PATH)/service_provider/%.cpp, $(BUILD_PATH)/service_provider/%.o, $(ServiceProvider_Cpp_Files))
 ServiceProvider_Include_Paths := -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/libcxx 
 
-ServiceProvider_C_Flags := -fPIC -Wno-attributes -I$(INCLUDE_PATH)/$(SP_Crypto_Library_Name)
+ServiceProvider_C_Flags := -fPIC -Wno-attributes -I$(INCLUDE_PATH) -I$(COMMON_INCLUDE_PATH)/sample_libcrypto
 ServiceProvider_Cpp_Flags := $(ServiceProvider_C_Flags)
-ServiceProvider_Link_Flags :=  -shared $(SGX_COMMON_CFLAGS) -L$(CURDIR)/lib -l$(SP_Crypto_Library_Name)
+ServiceProvider_Link_Flags :=  -shared $(SGX_COMMON_CFLAGS) -L../../lib -l$(SP_Crypto_Library_Name)
 
 # Three configuration modes - Debug, prerelease, release
 #   Debug - Macro DEBUG enabled.
@@ -217,7 +217,7 @@ $(BUILD_PATH)/service_provider/%.o: $(SRC_PATH)/service_provider/%.cpp
 $(Service_Provider_Name): $(ServiceProvider_Cpp_Objects)
 	@$(CXX) $^ -o $@ $(ServiceProvider_Link_Flags)
 	@printf "\033[1;93;49mLINK =>  $@\033[0m\n"
-	@cp $(Service_Provider_Name) $(CURDIR)/lib
+	@cp $(Service_Provider_Name) ../../lib
 	@printf "\033[1;93;49mCP <=  $@\033[0m\n"
 
 # Create a RSA private key.

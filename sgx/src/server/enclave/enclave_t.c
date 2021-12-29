@@ -47,6 +47,22 @@ typedef struct ms_ecall_unseal_t {
 	size_t ms_plaintext_len;
 } ms_ecall_unseal_t;
 
+typedef struct ms_ecall_begin_DHKE_t {
+	sgx_status_t ms_retval;
+} ms_ecall_begin_DHKE_t;
+
+typedef struct ms_ecall_sample_key_pair_t {
+	sgx_status_t ms_retval;
+	uint8_t* ms_pub_key;
+	size_t ms_pubkey_size;
+} ms_ecall_sample_key_pair_t;
+
+typedef struct ms_ecall_compute_shared_key_t {
+	sgx_status_t ms_retval;
+	const uint8_t* ms_pub_key;
+	size_t ms_pubkey_size;
+} ms_ecall_compute_shared_key_t;
+
 typedef struct ms_enclave_init_ra_t {
 	sgx_status_t ms_retval;
 	int ms_b_pse;
@@ -266,6 +282,119 @@ static sgx_status_t SGX_CDECL sgx_ecall_unseal(void* pms)
 err:
 	if (_in_sealed_data) free(_in_sealed_data);
 	if (_in_plaintext) free(_in_plaintext);
+	return status;
+}
+
+static sgx_status_t SGX_CDECL sgx_ecall_begin_DHKE(void* pms)
+{
+	CHECK_REF_POINTER(pms, sizeof(ms_ecall_begin_DHKE_t));
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
+	ms_ecall_begin_DHKE_t* ms = SGX_CAST(ms_ecall_begin_DHKE_t*, pms);
+	sgx_status_t status = SGX_SUCCESS;
+
+
+
+	ms->ms_retval = ecall_begin_DHKE();
+
+
+	return status;
+}
+
+static sgx_status_t SGX_CDECL sgx_ecall_sample_key_pair(void* pms)
+{
+	CHECK_REF_POINTER(pms, sizeof(ms_ecall_sample_key_pair_t));
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
+	ms_ecall_sample_key_pair_t* ms = SGX_CAST(ms_ecall_sample_key_pair_t*, pms);
+	sgx_status_t status = SGX_SUCCESS;
+	uint8_t* _tmp_pub_key = ms->ms_pub_key;
+	size_t _tmp_pubkey_size = ms->ms_pubkey_size;
+	size_t _len_pub_key = _tmp_pubkey_size;
+	uint8_t* _in_pub_key = NULL;
+
+	CHECK_UNIQUE_POINTER(_tmp_pub_key, _len_pub_key);
+
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
+
+	if (_tmp_pub_key != NULL && _len_pub_key != 0) {
+		if ( _len_pub_key % sizeof(*_tmp_pub_key) != 0)
+		{
+			status = SGX_ERROR_INVALID_PARAMETER;
+			goto err;
+		}
+		if ((_in_pub_key = (uint8_t*)malloc(_len_pub_key)) == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		memset((void*)_in_pub_key, 0, _len_pub_key);
+	}
+
+	ms->ms_retval = ecall_sample_key_pair(_in_pub_key, _tmp_pubkey_size);
+	if (_in_pub_key) {
+		if (memcpy_s(_tmp_pub_key, _len_pub_key, _in_pub_key, _len_pub_key)) {
+			status = SGX_ERROR_UNEXPECTED;
+			goto err;
+		}
+	}
+
+err:
+	if (_in_pub_key) free(_in_pub_key);
+	return status;
+}
+
+static sgx_status_t SGX_CDECL sgx_ecall_compute_shared_key(void* pms)
+{
+	CHECK_REF_POINTER(pms, sizeof(ms_ecall_compute_shared_key_t));
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
+	ms_ecall_compute_shared_key_t* ms = SGX_CAST(ms_ecall_compute_shared_key_t*, pms);
+	sgx_status_t status = SGX_SUCCESS;
+	const uint8_t* _tmp_pub_key = ms->ms_pub_key;
+	size_t _tmp_pubkey_size = ms->ms_pubkey_size;
+	size_t _len_pub_key = _tmp_pubkey_size;
+	uint8_t* _in_pub_key = NULL;
+
+	CHECK_UNIQUE_POINTER(_tmp_pub_key, _len_pub_key);
+
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
+
+	if (_tmp_pub_key != NULL && _len_pub_key != 0) {
+		if ( _len_pub_key % sizeof(*_tmp_pub_key) != 0)
+		{
+			status = SGX_ERROR_INVALID_PARAMETER;
+			goto err;
+		}
+		_in_pub_key = (uint8_t*)malloc(_len_pub_key);
+		if (_in_pub_key == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		if (memcpy_s(_in_pub_key, _len_pub_key, _tmp_pub_key, _len_pub_key)) {
+			status = SGX_ERROR_UNEXPECTED;
+			goto err;
+		}
+
+	}
+
+	ms->ms_retval = ecall_compute_shared_key((const uint8_t*)_in_pub_key, _tmp_pubkey_size);
+
+err:
+	if (_in_pub_key) free(_in_pub_key);
 	return status;
 }
 
@@ -658,13 +787,16 @@ err:
 
 SGX_EXTERNC const struct {
 	size_t nr_ecall;
-	struct {void* ecall_addr; uint8_t is_priv; uint8_t is_switchless;} ecall_table[10];
+	struct {void* ecall_addr; uint8_t is_priv; uint8_t is_switchless;} ecall_table[13];
 } g_ecall_table = {
-	10,
+	13,
 	{
 		{(void*)(uintptr_t)sgx_ecall_init_oram_controller, 0, 0},
 		{(void*)(uintptr_t)sgx_ecall_seal, 0, 0},
 		{(void*)(uintptr_t)sgx_ecall_unseal, 0, 0},
+		{(void*)(uintptr_t)sgx_ecall_begin_DHKE, 0, 0},
+		{(void*)(uintptr_t)sgx_ecall_sample_key_pair, 0, 0},
+		{(void*)(uintptr_t)sgx_ecall_compute_shared_key, 0, 0},
 		{(void*)(uintptr_t)sgx_enclave_init_ra, 0, 0},
 		{(void*)(uintptr_t)sgx_enclave_ra_close, 0, 0},
 		{(void*)(uintptr_t)sgx_verify_att_result_mac, 0, 0},
@@ -677,14 +809,14 @@ SGX_EXTERNC const struct {
 
 SGX_EXTERNC const struct {
 	size_t nr_ocall;
-	uint8_t entry_table[4][10];
+	uint8_t entry_table[4][13];
 } g_dyn_entry_table = {
 	4,
 	{
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
 	}
 };
 

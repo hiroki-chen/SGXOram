@@ -21,9 +21,15 @@
 #include <grpc++/server.h>
 #include <grpc++/server_builder.h>
 #include <sgx_urts.h>
+#include <sgx_key_exchange.h>
 
 #include <messages.grpc.pb.h>
 #include <messages.pb.h>
+
+#define DH_HALF_KEY_LEN 32
+#define DH_SHARED_KEY_LEN 32
+#define SAMPLE_SP_IV_SIZE 12
+#define MAX_VERIFICATION_RESULT 2
 
 class SGXORAMService final : public oram::sgx_oram::Service {
  private:
@@ -31,6 +37,8 @@ class SGXORAMService final : public oram::sgx_oram::Service {
   std::unordered_map<std::string, std::string> storage;
 
   sgx_status_t init_enclave(sgx_enclave_id_t* const global_eid);
+
+  sgx_status_t status;
 
   sgx_enclave_id_t* const global_eid;
 
@@ -45,6 +53,10 @@ class SGXORAMService final : public oram::sgx_oram::Service {
                             const oram::InitRequest* init_request,
                             oram::InitReply* init_reply) override;
 
+  grpc::Status generate_session_key(grpc::ServerContext* server_context,
+                                    const oram::InitRequest* init_request,
+                                    oram::InitReply* init_reply) override;
+
   grpc::Status read_block(grpc::ServerContext* server_context,
                           const oram::ReadRequest* read_request,
                           oram::ReadReply* read_reply) override;
@@ -52,6 +64,10 @@ class SGXORAMService final : public oram::sgx_oram::Service {
   grpc::Status write_block(grpc::ServerContext* server_context,
                            const oram::WriteRequest* write_request,
                            oram::WriteReply* write_reply) override;
+
+  grpc::Status close_connection(grpc::ServerContext* server_context,
+                                const oram::CloseRequest* close_request,
+                                google::protobuf::Empty* empty) override;
 };
 
 class Server final {

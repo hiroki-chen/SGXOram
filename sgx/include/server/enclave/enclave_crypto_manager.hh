@@ -18,6 +18,7 @@
 #define ENCLAVE_CRYPTO_MANAGER_HH
 
 #include <sgx_tcrypto.h>
+#include <sgx_ecp_types.h>
 
 #include <string>
 
@@ -30,12 +31,36 @@ class EnclaveCryptoManager final {
  private:
   sgx_aes_gcm_128bit_key_t aes_key;
 
+  // This key is derived after Diffie-Hellman Key Exchange procedure.
+  sgx_ec_key_128bit_t shared_secret_key;
+
+  // This key is randomly generated as secret key.
+  sgx_ec256_private_t secret_key;
+
+  sgx_ec256_public_t public_key;
+
+  // ECC handle.
+  sgx_ecc_state_handle_t state_handle;
+
  public:
   /**
    * @brief Construct a new Enclave Crypto Manager object
    *
    */
   EnclaveCryptoManager();
+
+  sgx_ecc_state_handle_t* get_state_handle(void) { return &state_handle; }
+
+  sgx_ec256_private_t* get_secret_key(void) { return &secret_key; }
+
+  sgx_ec256_public_t* get_public_key(void) { return &public_key; }
+
+  /**
+   * @brief Set the shared key object
+   *
+   * @param shared_key
+   */
+  void set_shared_key(const sgx_ec_key_128bit_t* shared_key);
 
   /**
    * @brief Secure Hash Algorithm with 256 bit-length.

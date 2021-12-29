@@ -14,13 +14,27 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef CONFIG_HH
-#define CONFIG_HH
+#include <utils.hh>
 
-#include <string>
+std::string hex_to_string(const uint8_t* array, const size_t& len) {
+  std::string ans;
 
-static const std::string key_path = "./key";
+  for (size_t i = 0; i < len; i++) {
+    // To hex.
+    uint8_t num = array[i];
+    ans += digits[num & 0xf];
+    ans += digits[num >> 4];
+  }
 
-static const std::string enclave_path = "./build/server/enclave/enclave_signed.so";
+  return ans;
+}
 
-#endif
+void convert_endian(uint8_t* array, const size_t& len) {
+  for (size_t i = 0; i < len; i++) {
+    // To hex.
+    uint8_t num = array[i];
+    array[i] = 0;
+    array[i] |= (num & 0xf0);
+    array[i] |= (num & 0x0f) << 4;
+  }
+}
