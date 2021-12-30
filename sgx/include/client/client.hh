@@ -22,6 +22,7 @@
 #include <messages.grpc.pb.h>
 #include <messages.pb.h>
 #include <sample_libcrypto/sample_libcrypto.h>
+#include <service_provider/ecp.h>
 
 // Key pairs.
 // For our own convenience, the keys are hard-coded in the client.
@@ -42,6 +43,9 @@ static const sample_ec256_public_t public_key = {
 class Client final : public oram::sgx_oram::Service {
  private:
   std::unique_ptr<oram::sgx_oram::Stub> stub_;
+
+  // The secrey key.
+  sample_ec_key_128bit_t secret_key_session;
 
  public:
   Client(const std::string& address, const std::string& port);

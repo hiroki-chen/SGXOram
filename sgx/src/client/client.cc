@@ -102,7 +102,17 @@ int Client::generate_session_key(void) {
                      << hex_to_string((uint8_t*)server_pk.data(),
                                       server_pk.size());
 
-    // Calculate the shared key and derive secret key from it.
+    // Calculate the shared key.
+    sample_ecc_state_handle_t state_handle;
+    sample_ecc256_open_context(&state_handle);
+    sample_ec256_dh_shared_t shared_key;
+    sample_ecc256_compute_shared_dhkey(
+        (sample_ec256_private_t*)&secret_key,
+        (sample_ec256_public_t*)(server_pk.data()),
+        (sample_ec256_dh_shared_t*)&shared_key, state_handle);
+    LOG(plog::info) << "Shared key established! The key is "
+                    << hex_to_string((uint8_t*)(&shared_key),
+                                     sizeof(sample_ec256_dh_shared_t));
 
     // Start to send client's public key.
     grpc::ClientContext ctx;
@@ -117,7 +127,18 @@ int Client::generate_session_key(void) {
       return -1;
     }
 
-    LOG(plog::info) << "Shared key established!";
+    // Derive a secret key from the shared key.
+    sample_ec_key_128bit_t smk_key;
+    if (!derive_key((sample_ec_dh_shared_t*)&shared_key, 0u, &smk_key,
+                    &secret_key_session)) {
+      LOG(plog::fatal) << "Cannot derive secret key!";
+    }
+
+    LOG(plog::info) << "The session key is established! The key is "
+                    << hex_to_string((uint8_t*)(&secret_key_session),
+                                     sizeof(sample_ec_key_128bit_t));
+
+    sample_ecc256_close_context(state_handle);
   }
   return 0;
 }

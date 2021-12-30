@@ -27,12 +27,12 @@ PROTO_OBJ :=  $(wildcard ../../build/proto/*.o)
 APP_NAME := $(BUILD_PATH)/../bin/client.bin
 
 CXX ?= g++
-CXX_FLAGS ?= -std=c++17 -Wall -Wextra -fPIC -I$(COMMON_INCLUDE_PATH) -I$(CLIENT_INCLUDE_PATH) 
+CXX_FLAGS ?= -std=c++17 -Wall -Wextra -fPIC -I$(COMMON_INCLUDE_PATH) -I$(CLIENT_INCLUDE_PATH) -DSUPPLIED_KEY_DERIVATION
 CXX_LINK_FLAGS ?= -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
            				-pthread\
            				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
            				-ldl\
-									-L$(LIB_PATH) -lsample_libcrypto
+									-L$(LIB_PATH) -lsample_libcrypto -lservice_provider
 
 ifeq ($(MODE), DEBUG)
 	CXX_FLAGS += -O0 -g

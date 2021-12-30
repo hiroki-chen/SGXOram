@@ -36,6 +36,9 @@ int main(int argc, const char** argv) {
         std::make_unique<Client>("localhost", "1234");
     client->init_enclave();
     client->generate_session_key();
+
+    // Put all the needed operations below.
+    
     client->close_connection();
   } catch (const std::exception& e) {
     LOG(plog::fatal) << e.what();

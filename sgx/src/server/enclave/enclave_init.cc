@@ -100,11 +100,6 @@ bool derive_key(const sgx_ec256_dh_shared_t* p_shared_key, uint8_t key_id,
 // isv defined key derivation function id
 #define ISV_KDF_ID 2
 
-typedef enum _derive_key_type_t {
-  DERIVE_KEY_SMK_SK = 0,
-  DERIVE_KEY_MK_VK,
-} derive_key_type_t;
-
 sgx_status_t key_derivation(const sgx_ec256_dh_shared_t* shared_key,
                             uint16_t kdf_id, sgx_ec_key_128bit_t* smk_key,
                             sgx_ec_key_128bit_t* sk_key,
@@ -419,11 +414,12 @@ sgx_status_t ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
       *crypto_manager->get_state_handle());
   // Copy the public key to the untrusted memory and let the server send the key
   // to the client.
-  memcpy(pubkey, crypto_manager->get_public_key(), SGX_ECP256_KEY_SIZE);
+  memcpy(pubkey, crypto_manager->get_public_key(), sizeof(sgx_ec256_public_t));
 
   // Print debug information.
-  std::string pk = std::move(hex_to_string(
-      (uint8_t*)(crypto_manager->get_public_key()), SGX_ECP256_KEY_SIZE));
+  std::string pk =
+      std::move(hex_to_string((uint8_t*)(crypto_manager->get_public_key()),
+                              sizeof(sgx_ec256_public_t)));
   std::string sk = std::move(hex_to_string(
       (uint8_t*)(crypto_manager->get_secret_key()), SGX_ECP256_KEY_SIZE));
   printf("Key pair sampled! PK: %s, SK: %s", pk.data(), sk.data());
@@ -446,5 +442,22 @@ sgx_status_t ecall_compute_shared_key(const uint8_t* pubkey,
       *crypto_manager->get_state_handle());
   std::string shared =
       std::move(hex_to_string((uint8_t*)(&shared_key), SGX_ECP256_KEY_SIZE));
-  printf("Shared key: %s", shared.data());
+  printf("Shared key computed: %s", shared.data());
+
+  // Derive secret keys from the shared key.
+  // The first key is used to MAC the message while the second key is used for
+  // encryption.
+  sgx_ec_key_128bit_t first_derived_key;
+  sgx_ec_key_128bit_t second_derived_key;
+
+  if (!derive_key(&shared_key, 0u, &first_derived_key, &second_derived_key)) {
+    printf("Cannot derive the session key!");
+    return SGX_ERROR_UNEXPECTED;
+  }
+
+  crypto_manager->set_shared_key(&second_derived_key);
+  printf("The session key is established! The key is %s",
+         hex_to_string((uint8_t*)(&second_derived_key),
+                       sizeof(sgx_ec_key_128bit_t))
+             .data());
 }

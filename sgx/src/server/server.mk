@@ -44,7 +44,7 @@ SGX_COMMON_FLAGS += -Wall -Wextra -Winit-self -Wpointer-arith -Wreturn-type \
                     -Wmissing-include-dirs -Wfloat-equal -Wundef \
                     -Wcast-align -Wcast-qual \
 					-Wno-unused-parameter \
-					-I$(INCLUDE_PATH) -I$(COMMON_INCLUDE_PATH)
+					-I$(INCLUDE_PATH) -I$(COMMON_INCLUDE_PATH) -DSUPPLIED_KEY_DERIVATION
 SGX_COMMON_CFLAGS := $(SGX_COMMON_FLAGS) -Wjump-misses-init -Wstrict-prototypes -Wunsuffixed-float-constants
 SGX_COMMON_CXXFLAGS := $(SGX_COMMON_FLAGS) -Wnon-virtual-dtor -std=c++1z
 
@@ -131,7 +131,7 @@ ServiceProvider_Cpp_Files := $(wildcard $(SRC_PATH)/service_provider/*.cpp)
 ServiceProvider_Cpp_Objects := $(patsubst $(SRC_PATH)/service_provider/%.cpp, $(BUILD_PATH)/service_provider/%.o, $(ServiceProvider_Cpp_Files))
 ServiceProvider_Include_Paths := -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/libcxx 
 
-ServiceProvider_C_Flags := -fPIC -Wno-attributes -I$(INCLUDE_PATH) -I$(COMMON_INCLUDE_PATH)/sample_libcrypto
+ServiceProvider_C_Flags := -fPIC -Wno-attributes -I$(INCLUDE_PATH) -I$(COMMON_INCLUDE_PATH)/service_provider -I$(COMMON_INCLUDE_PATH)/sample_libcrypto
 ServiceProvider_Cpp_Flags := $(ServiceProvider_C_Flags)
 ServiceProvider_Link_Flags :=  -shared $(SGX_COMMON_CFLAGS) -L../../lib -l$(SP_Crypto_Library_Name)
 
@@ -211,7 +211,7 @@ $(App_Name): $(BUILD_PATH)/enclave/enclave_u.o $(App_Cpp_Objects)
 
 # Service provider settings.
 $(BUILD_PATH)/service_provider/%.o: $(SRC_PATH)/service_provider/%.cpp
-	$(CXX) $(SGX_COMMON_CXXFLAGS) $(ServiceProvider_Cpp_Flags) -c $< -o $@
+	@$(CXX) $(SGX_COMMON_CXXFLAGS) $(ServiceProvider_Cpp_Flags) -c $< -o $@
 	@printf "\033[1;93;49mCXX  <=  $<\033[0m\n"
 
 $(Service_Provider_Name): $(ServiceProvider_Cpp_Objects)

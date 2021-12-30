@@ -74,25 +74,27 @@ grpc::Status SGXORAMService::generate_session_key(
       return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
     }
 
-    uint8_t pk[SGX_ECP256_KEY_SIZE];
-    if (ecall_sample_key_pair(*global_eid, &status, pk, SGX_ECP256_KEY_SIZE) !=
-        SGX_SUCCESS) {
+    uint8_t pk[sizeof(sgx_ec256_public_t)];
+    if (ecall_sample_key_pair(*global_eid, &status, pk,
+                              sizeof(sgx_ec256_public_t)) != SGX_SUCCESS) {
       const std::string error_message = "Enclave cannot sample the key pair!";
       return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
     }
 
     // The public key is sampled. Send it to the client.
-    init_reply->set_content(std::string((char*)&pk, SGX_ECP256_KEY_SIZE));
+    init_reply->set_content(
+        std::string((char*)&pk, sizeof(sgx_ec256_public_t)));
     return grpc::Status::OK;
   } else if (round == 2) {
     // Round = 2 denotes that the client has sent its public key to the server.
     const std::string client_pk = init_request->content();
-    LOG(plog::debug) << "In server runner: " << sgx_oram::hex_to_string((uint8_t*)(client_pk.data()), 64);
+    LOG(plog::debug) << "In server runner: "
+                     << sgx_oram::hex_to_string((uint8_t*)(client_pk.data()),
+                                                64);
     // Call the enclave.
     if (ecall_compute_shared_key(*global_eid, &status,
                                  (const uint8_t*)client_pk.data(),
                                  client_pk.size()) != SGX_SUCCESS) {
-      
     }
 
     return grpc::Status::OK;
