@@ -1,0 +1,105 @@
+==4168== Memcheck, a memory error detector
+==4168== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==4168== Using Valgrind-3.13.0 and LibVEX; rerun with -h for copyright info
+==4168== Command: ./build/bin/server.bin
+==4168== 
+==4168== Invalid read of size 8
+==4168==    at 0x86623C8: ??? (in /usr/local/lib/libcrypto.so)
+==4168==    by 0x84F4946: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84F6670: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84F679D: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x7922018: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7922550: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7925DB0: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x78A146C: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x78A1D23: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7880653: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7695597: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x5903D83: ??? (in /usr/local/lib/libgrpc++.so.1.46.0-dev)
+==4168==  Address 0x8b82878 is 8 bytes before a block of size 1,362 alloc'd
+==4168==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4168==    by 0x68A9E52: ??? (in /usr/local/lib/libcrypto.so.1.1)
+==4168== 
+==4168== Invalid write of size 1
+==4168==    at 0x6A181BF: ??? (in /usr/local/lib/libcrypto.so.1.1)
+==4168==    by 0x84F4946: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84F6670: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84F679D: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x7922018: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7922550: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7925DB0: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x78A146C: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x78A1D23: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7880653: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7695597: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x5903D83: ??? (in /usr/local/lib/libgrpc++.so.1.46.0-dev)
+==4168==  Address 0x8b82878 is 8 bytes before a block of size 1,362 alloc'd
+==4168==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4168==    by 0x68A9E52: ??? (in /usr/local/lib/libcrypto.so.1.1)
+==4168== 
+==4168== Invalid write of size 1
+==4168==    at 0x6A181C9: ??? (in /usr/local/lib/libcrypto.so.1.1)
+==4168==    by 0x84F4946: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84F6670: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84F679D: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x7922018: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7922550: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7925DB0: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x78A146C: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x78A1D23: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7880653: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7695597: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x5903D83: ??? (in /usr/local/lib/libgrpc++.so.1.46.0-dev)
+==4168==  Address 0x8b82879 is 7 bytes before a block of size 1,362 alloc'd
+==4168==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4168==    by 0x68A9E52: ??? (in /usr/local/lib/libcrypto.so.1.1)
+==4168== 
+==4168== Invalid free() / delete / delete[] / realloc()
+==4168==    at 0x4C32D3B: free (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4168==    by 0x866241B: ??? (in /usr/local/lib/libcrypto.so)
+==4168==    by 0x84F4946: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84F6670: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84F679D: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x7922018: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7922550: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7925DB0: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x78A146C: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x78A1D23: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7880653: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7695597: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==  Address 0x8b82878 is 8 bytes before a block of size 1,362 alloc'd
+==4168==    at 0x4C31B0F: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==4168==    by 0x68A9E52: ??? (in /usr/local/lib/libcrypto.so.1.1)
+==4168== 
+==4168== 
+==4168== Process terminating with default action of signal 11 (SIGSEGV): dumping core
+==4168==  Bad permissions for mapped region at address 0x6A54224
+==4168==    at 0x6A54224: ??? (in /usr/local/lib/libcrypto.so.1.1)
+==4168==    by 0x84D7316: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84D6574: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84D6955: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84F66BB: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x84F679D: ??? (in /usr/local/lib/libssl.so)
+==4168==    by 0x7922018: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7922550: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7925DB0: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x78A146C: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x78A1D23: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168==    by 0x7880653: ??? (in /usr/local/lib/libgrpc.so.24.0.0)
+==4168== 
+==4168== HEAP SUMMARY:
+==4168==     in use at exit: 515,962 bytes in 3,815 blocks
+==4168==   total heap usage: 20,068 allocs, 16,254 frees, 933,465 bytes allocated
+==4168== 
+==4168== LEAK SUMMARY:
+==4168==    definitely lost: 1,362 bytes in 1 blocks
+==4168==    indirectly lost: 0 bytes in 0 blocks
+==4168==      possibly lost: 1,248 bytes in 3 blocks
+==4168==    still reachable: 513,352 bytes in 3,811 blocks
+==4168==                       of which reachable via heuristic:
+==4168==                         length64           : 2,862 bytes in 12 blocks
+==4168==         suppressed: 0 bytes in 0 blocks
+==4168== Rerun with --leak-check=full to see details of leaked memory
+==4168== 
+==4168== For counts of detected and suppressed errors, rerun with: -v
+==4168== ERROR SUMMARY: 10 errors from 4 contexts (suppressed: 0 from 0)

@@ -20,6 +20,7 @@ CLIENT_INCLUDE_PATH := $(COMMON_INCLUDE_PATH)/client
 KEY_PATH := ../../key
 MODE ?= DEBUG
 LIB_PATH := ../../lib
+GRPC_PATH := /usr/local
 
 SRC_FILE := $(wildcard $(SRC_PATH)/*.cc)
 OBJ_FILE := $(patsubst $(SRC_PATH)/%.cc, $(BUILD_PATH)/%.o, $(SRC_FILE))
@@ -28,12 +29,12 @@ APP_NAME := $(BUILD_PATH)/../bin/client.bin
 
 CXX ?= g++
 CXX_FLAGS ?= -std=c++17 -Wall -Wextra -fPIC -I$(COMMON_INCLUDE_PATH) -I$(CLIENT_INCLUDE_PATH) -DSUPPLIED_KEY_DERIVATION
-CXX_LINK_FLAGS ?= -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
-           				-pthread\
-           				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           				-ldl\
-									-L$(LIB_PATH) -lsample_libcrypto -lservice_provider
-
+CXX_LINK_FLAGS ?= -L$(LIB_PATH) -lsample_libcrypto -lservice_provider\
+								  -L$(GRPC_PATH)/lib `pkg-config --libs protobuf grpc++`\
+									-pthread\
+									-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
+									-ldl
+									
 ifeq ($(MODE), DEBUG)
 	CXX_FLAGS += -O0 -g
 else
@@ -52,7 +53,7 @@ all: mkdir $(APP_NAME)
 	@printf "\033[1;93;49mClient created.\033[0m\n"
 
 $(APP_NAME): $(OBJ_FILE) $(PROTO_OBJ)
-	@$(CXX) -o $@ $^ $(CXX_LINK_FLAGS)
+	@$(CXX) $^ $(CXX_LINK_FLAGS) -o $@ 
 	@printf "\033[1;93;49mLINK => $@\033[0m\n"
 
 $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cc

@@ -28,6 +28,7 @@ COMMON_INCLUDE_PATH := ../../include
 SRC_PATH := $(CURDIR)
 BUILD_PATH := ../../build/server
 KEY_PATH := ../../key
+GRPC_PATH := /usr/local
 
 # Include the SGX's official buildenv.mk
 include $(SGX_SDK)/buildenv.mk
@@ -69,7 +70,8 @@ PROTO_OBJ := $(wildcard ../../build/proto/*.o)
 
 App_Cpp_Files := $(wildcard $(SRC_PATH)/app/*.cc)
 App_Cpp_Flags := $(App_C_Flags)
-App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lsgx_ukey_exchange -lservice_provider -L/usr/local/lib `pkg-config --libs protobuf grpc++`\
+App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lsgx_ukey_exchange -lservice_provider\
+									-L$(GRPC_PATH)/lib `pkg-config --libs protobuf grpc++`\
            				-lpthread\
            				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
            				-ldl
