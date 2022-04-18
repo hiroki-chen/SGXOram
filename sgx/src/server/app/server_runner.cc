@@ -13,6 +13,7 @@
  */
 #include <fstream>
 #include <sstream>
+#include <cmath>
 
 #include <configs.hh>
 #include <utils.hh>
@@ -29,6 +30,17 @@ static std::string read_keycert(const std::string& path) {
     file.close();
   }
   return oss.str();
+}
+
+static void print_oram_config(const OramConfiguration& oram_config) {
+  LOG(plog::info) << "ORAM Configuration:";
+  LOG(plog::info) << "  way: " << oram_config.way;
+  LOG(plog::info) << "  number: " << oram_config.number;
+  LOG(plog::info) << "  bucket_size: " << oram_config.bucket_size;
+  LOG(plog::info) << "  type: " << oram_config.type;
+  LOG(plog::info) << "  constant: " << oram_config.constant;
+  LOG(plog::info) << "  round: " << oram_config.round;
+  LOG(plog::info) << "  level: " << oram_config.level;
 }
 
 grpc::Status SGXORAMService::init_enclave(grpc::ServerContext* server_context,
@@ -121,6 +133,36 @@ grpc::Status SGXORAMService::close_connection(
   exit(0);
 }
 
+grpc::Status SGXORAMService::init_oram(
+    grpc::ServerContext* server_context,
+    const oram::OramInitRequest* oram_init_request,
+    google::protobuf::Empty* empty) {
+  // The configuration of the ORAM is set by the network communication between
+  // the client and the server.
+  oram_config.way = oram_init_request->way();
+  oram_config.number = oram_init_request->number();
+  oram_config.constant = oram_init_request->constant();
+  oram_config.round = oram_init_request->round();
+  oram_config.type = oram_init_request->type();
+  oram_config.bucket_size = oram_init_request->bucket_size();
+
+  // Calculate the level of the ORAM tree.
+  oram_config.level =
+      std::ceil(std::log(oram_config.number / oram_config.bucket_size) /
+                std::log(oram_config.way));
+  // Print the configuration.
+  print_oram_config(oram_config);
+
+  LOG(plog::debug) << "The server has properly configured the ORAM.";
+  return grpc::Status::OK;
+}
+
+void Server::store_compressed_slot(const char* const fingerprint,
+                                   const std::string& compressed_slot) {
+  // Store the compressed slot.
+  service->storage[fingerprint] = compressed_slot;
+}
+
 void Server::run(const std::string& address,
                  sgx_enclave_id_t* const global_eid) {
   service = std::make_unique<SGXORAMService>(global_eid);
@@ -156,4 +198,5 @@ sgx_status_t SGXORAMService::init_enclave(sgx_enclave_id_t* const global_eid) {
 
   sgx_status_t ret = SGX_ERROR_UNEXPECTED;
   ecall_init_oram_controller(*global_eid, (int*)&ret);
+  return ret;
 }

@@ -31,9 +31,21 @@
 #define SAMPLE_SP_IV_SIZE 12
 #define MAX_VERIFICATION_RESULT 2
 
+struct OramConfiguration {
+  uint32_t way;
+  uint32_t number;
+  uint32_t bucket_size;
+  uint32_t type;
+  uint32_t constant;
+  uint32_t round;
+  uint32_t level;
+};
+
 class SGXORAMService final : public oram::sgx_oram::Service {
  private:
-  // Maps between fingerprint and serialized json string.
+  // This will be the storage for all the slots on the server.
+  // The storage is organized as a unordered map where the key is the
+  // fingerprint.
   std::unordered_map<std::string, std::string> storage;
 
   sgx_status_t init_enclave(sgx_enclave_id_t* const global_eid);
@@ -41,6 +53,10 @@ class SGXORAMService final : public oram::sgx_oram::Service {
   sgx_status_t status;
 
   sgx_enclave_id_t* const global_eid;
+
+  OramConfiguration oram_config;
+
+  friend class Server;
 
  public:
   SGXORAMService() = delete;
@@ -68,6 +84,10 @@ class SGXORAMService final : public oram::sgx_oram::Service {
   grpc::Status close_connection(grpc::ServerContext* server_context,
                                 const oram::CloseRequest* close_request,
                                 google::protobuf::Empty* empty) override;
+
+  grpc::Status init_oram(grpc::ServerContext* server_context,
+                         const oram::OramInitRequest* oram_init_request,
+                         google::protobuf::Empty* empty) override;
 };
 
 class Server final {
@@ -80,4 +100,11 @@ class Server final {
   Server() = default;
 
   void run(const std::string& address, sgx_enclave_id_t* const global_eid);
+
+  void store_compressed_slot(const char* const fingerprint,
+                             const std::string& compressed_slot);
+
+  std::string get_compressed_slot(const char* const fingerprint) {
+    return service->storage[fingerprint];
+  }
 };

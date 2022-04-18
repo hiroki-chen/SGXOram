@@ -93,14 +93,17 @@ typedef struct ms_ocall_printf_t {
 	const char* ms_str;
 } ms_ocall_printf_t;
 
-typedef struct ms_ocall_get_slot_t {
-	const char* ms_slot_fingerprint;
-} ms_ocall_get_slot_t;
+typedef struct ms_ocall_read_slot_t {
+	size_t ms_retval;
+	const char* ms_slot_finderprint;
+	uint8_t* ms_slot;
+	size_t ms_slot_size;
+} ms_ocall_read_slot_t;
 
 typedef struct ms_ocall_write_slot_t {
-	const char* ms_slot_finger_print;
-	const uint8_t* ms_data;
-	size_t ms_data_len;
+	const char* ms_slot_finderprint;
+	const uint8_t* ms_slot;
+	size_t ms_slot_size;
 } ms_ocall_write_slot_t;
 
 typedef struct ms_ocall_exception_handler_t {
@@ -115,10 +118,10 @@ static sgx_status_t SGX_CDECL enclave_ocall_printf(void* pms)
 	return SGX_SUCCESS;
 }
 
-static sgx_status_t SGX_CDECL enclave_ocall_get_slot(void* pms)
+static sgx_status_t SGX_CDECL enclave_ocall_read_slot(void* pms)
 {
-	ms_ocall_get_slot_t* ms = SGX_CAST(ms_ocall_get_slot_t*, pms);
-	ocall_get_slot(ms->ms_slot_fingerprint);
+	ms_ocall_read_slot_t* ms = SGX_CAST(ms_ocall_read_slot_t*, pms);
+	ms->ms_retval = ocall_read_slot(ms->ms_slot_finderprint, ms->ms_slot, ms->ms_slot_size);
 
 	return SGX_SUCCESS;
 }
@@ -126,7 +129,7 @@ static sgx_status_t SGX_CDECL enclave_ocall_get_slot(void* pms)
 static sgx_status_t SGX_CDECL enclave_ocall_write_slot(void* pms)
 {
 	ms_ocall_write_slot_t* ms = SGX_CAST(ms_ocall_write_slot_t*, pms);
-	ocall_write_slot(ms->ms_slot_finger_print, ms->ms_data, ms->ms_data_len);
+	ocall_write_slot(ms->ms_slot_finderprint, ms->ms_slot, ms->ms_slot_size);
 
 	return SGX_SUCCESS;
 }
@@ -146,7 +149,7 @@ static const struct {
 	4,
 	{
 		(void*)enclave_ocall_printf,
-		(void*)enclave_ocall_get_slot,
+		(void*)enclave_ocall_read_slot,
 		(void*)enclave_ocall_write_slot,
 		(void*)enclave_ocall_exception_handler,
 	}

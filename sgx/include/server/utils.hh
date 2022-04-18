@@ -26,8 +26,6 @@ static const std::string digits = "0123456789abcdef";
 
 extern "C" {
 void ocall_printf(const char* fmt);
-
-void ocall_get_slot(const char* fingerprint);
 }
 
 // This file contains wrapper functions and some utility functions

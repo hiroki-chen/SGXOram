@@ -20,11 +20,20 @@
 #include <grpc++/client_context.h>
 #include <grpc++/create_channel.h>
 #include <grpc++/security/credentials.h>
+#include <gflags/gflags.h>
 
 #include <plog/Log.h>
 #include <configs.hh>
 #include <client/client.hh>
 #include <client/utils.hh>
+
+// Declare the external variables captured in the arguments.
+DECLARE_uint32(way);
+DECLARE_uint32(number);
+DECLARE_uint32(bucket_size);
+DECLARE_uint32(type);
+DECLARE_double(constant);
+DECLARE_uint32(round);
 
 static std::string read_keycert(const std::string& path) {
   std::ifstream file(path, std::ifstream::in);
@@ -77,6 +86,27 @@ int Client::close_connection(void) {
   oram::CloseRequest request;
   google::protobuf::Empty empty;
   stub_->close_connection(&context, request, &empty);
+
+  return 0;
+}
+
+int Client::init_oram(void) {
+  grpc::ClientContext context;
+  oram::OramInitRequest request;
+
+  // Set the parameters of the ORAM in the request.
+  request.set_way(FLAGS_way);
+  request.set_number(FLAGS_number);
+  request.set_bucket_size(FLAGS_bucket_size);
+  request.set_type(FLAGS_type);
+  request.set_constant(FLAGS_constant);
+  request.set_round(FLAGS_round);
+
+  // Print the log.
+  LOG(plog::info) << "Sending parameters of the ORAM to the server!";
+
+  google::protobuf::Empty empty;
+  stub_->init_oram(&context, request, &empty);
 
   return 0;
 }

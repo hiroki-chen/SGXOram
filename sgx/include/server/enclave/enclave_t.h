@@ -33,8 +33,8 @@ sgx_status_t sgx_ra_proc_msg2_trusted(sgx_ra_context_t context, const sgx_ra_msg
 sgx_status_t sgx_ra_get_msg3_trusted(sgx_ra_context_t context, uint32_t quote_size, sgx_report_t* qe_report, sgx_ra_msg3_t* p_msg3, uint32_t msg3_size);
 
 sgx_status_t SGX_CDECL ocall_printf(const char* str);
-sgx_status_t SGX_CDECL ocall_get_slot(const char* slot_fingerprint);
-sgx_status_t SGX_CDECL ocall_write_slot(const char* slot_finger_print, const uint8_t* data, size_t data_len);
+sgx_status_t SGX_CDECL ocall_read_slot(size_t* retval, const char* slot_finderprint, uint8_t* slot, size_t slot_size);
+sgx_status_t SGX_CDECL ocall_write_slot(const char* slot_finderprint, const uint8_t* slot, size_t slot_size);
 sgx_status_t SGX_CDECL ocall_exception_handler(const char* err_msg);
 
 #ifdef __cplusplus

@@ -23,13 +23,13 @@ extern "C" {
 #define OCALL_PRINTF_DEFINED__
 void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_printf, (const char* str));
 #endif
-#ifndef OCALL_GET_SLOT_DEFINED__
-#define OCALL_GET_SLOT_DEFINED__
-void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_get_slot, (const char* slot_fingerprint));
+#ifndef OCALL_READ_SLOT_DEFINED__
+#define OCALL_READ_SLOT_DEFINED__
+size_t SGX_UBRIDGE(SGX_NOCONVENTION, ocall_read_slot, (const char* slot_finderprint, uint8_t* slot, size_t slot_size));
 #endif
 #ifndef OCALL_WRITE_SLOT_DEFINED__
 #define OCALL_WRITE_SLOT_DEFINED__
-void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_write_slot, (const char* slot_finger_print, const uint8_t* data, size_t data_len));
+void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_write_slot, (const char* slot_finderprint, const uint8_t* slot, size_t slot_size));
 #endif
 #ifndef OCALL_EXCEPTION_HANDLER_DEFINED__
 #define OCALL_EXCEPTION_HANDLER_DEFINED__

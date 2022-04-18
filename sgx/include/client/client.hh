@@ -55,6 +55,8 @@ class Client final : public oram::sgx_oram::Service {
   int close_connection(void);
 
   int generate_session_key(void);
+
+  int init_oram(void);
 };
 
 #endif

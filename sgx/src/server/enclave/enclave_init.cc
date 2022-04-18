@@ -17,6 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdexcept>
+#include <string>
 
 #include <sgx_tcrypto.h>
 #include <sgx_tkey_exchange.h>
@@ -308,22 +309,18 @@ uint32_t uniform_random(uint32_t lower, uint32_t upper) {
 
 int ecall_init_oram_controller() {
   crypto_manager = new EnclaveCryptoManager();
+  // Test compression.
+  ocall_write_slot("testtttestejijsijfis", (uint8_t*)("testtttestejijsijfis"),
+                   strlen("testtttestejijsijfis"));
+  // Test decompression.
+  uint8_t buf[4096];
+  size_t size;
+  // The size should be pre-defined.
+  ocall_read_slot(&size, "testtttestejijsijfis", buf, 4096);
+  printf("%s\n", std::string((char*)buf, size).data());
   // printf("%s", crypto_manager->enclave_sha256("Hello World!").data());
   const std::string cipher = crypto_manager->enclave_aes_128_gcm_encrypt(
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eget "
-      "lacus condimentum, tincidunt eros id, ultricies dui. Donec placerat "
-      "nulla tristique, hendrerit dui et, congue quam. Nunc urna ex, efficitur "
-      "eu elit id, commodo pharetra elit. Aliquam ac felis a tellus tempor "
-      "scelerisque. Donec varius, enim quis bibendum lobortis, urna neque "
-      "interdum orci, ac vulputate lorem arcu ut lacus. Suspendisse potenti. "
-      "Nam sodales quis mi elementum malesuada. Lorem ipsum dolor sit amet, "
-      "consectetur adipiscing elit. Donec orci lectus, commodo vel elit non, "
-      "condimentum vehicula metus. Proin at nulla nisi. Vestibulum vulputate "
-      "volutpat urna et aliquam. Donec condimentum odio ipsum, in pharetra sem "
-      "euismod eget. Vestibulum eleifend gravida arcu, eu cursus turpis "
-      "lacinia venenatis. Ut sollicitudin enim nec nisi congue feugiat. "
-      "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices "
-      "posuere cubilia curae;");
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eget ");
   sprintf(cipher, true);
   sprintf(crypto_manager->enclave_aes_128_gcm_decrypt(cipher));
 

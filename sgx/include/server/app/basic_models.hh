@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2021 Haobin Chen
+ Copyright (c) 2022 Haobin Chen
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -20,7 +20,37 @@
 #include <string>
 #include <vector>
 
+// Fixed. Better not chan
+#define DEFAULT_ORAM_DATA_SIZE 4096
+#define DEFAULT_ORAM_BLOCK_SIZE 4160
+#define DEFAULT_SLOT_SIZE 32
+
 namespace sgx_oram {
+// TODO: Defined a C-like struct for all the data structures so as to do
+// serialization and deserialization.
+
+// The ORAM block (4096 + 32 + 32) bytes in total.
+typedef struct _oram_block_t {
+  // The block identifier.
+  uint32_t bid;
+  // The block address (real).
+  uint32_t address;
+  // The block data.
+  uint8_t data[DEFAULT_ORAM_DATA_SIZE];
+} oram_block_t;
+
+typedef struct _oram_slot_t {
+  // The range of the slot.
+  uint32_t range_begin;
+  uint32_t range_end;
+  // The level of the slot.
+  uint32_t level;
+  // The available space of the slot.
+  uint32_t dummy_number;
+  // The storage of the slot.
+  std::vector<oram_block_t> blocks;
+} oram_slot_t;
+
 typedef struct Position {
   uint32_t level_cur;
 

@@ -26,7 +26,7 @@ sgx_oram::Position::Position(
     , bid_cur(bid_cur)
     , bid_dst(bid_dst)
 {
-}
+} 
 
 sgx_oram::Block::Block(const bool& is_dummy, const std::string& data, const uint32_t& bid, const uint32_t& address)
     : is_dummy(is_dummy)

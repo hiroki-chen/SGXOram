@@ -11,19 +11,31 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <enclave/enclave_u.h>
-#include <utils.hh>
-#include <plog/Log.h>
-#include <utils.hh>
-#include <configs.hh>
-
 #include <algorithm>
 #include <iostream>
 #include <random>
+#include <memory>
+
+#include <gzip/compress.hpp>
+#include <gzip/decompress.hpp>
+#include <app/server_runner.hh>
+#include <plog/Log.h>
+
+#include <enclave/enclave_u.h>
+#include <utils.hh>
+#include <configs.hh>
+
+extern std::unique_ptr<Server> server_runner;
 
 void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
                       size_t data_len) {
   LOG(plog::debug) << "In enclave: " << slot_finger_print;
+
+  const char* data_ptr = reinterpret_cast<const char*>(data);
+  std::string compressed_data = gzip::compress(data_ptr, data_len);
+  server_runner->store_compressed_slot(slot_finger_print, compressed_data);
+
+  LOG(plog::debug) << "Compressed: " << sgx_oram::hex_to_string((uint8_t*)compressed_data.data(), compressed_data.size());
 }
 
 // Debug function.
@@ -31,11 +43,24 @@ void ocall_printf(const char* message) {
   LOG(plog::debug) << "In enclave: " << message;
 }
 
-void ocall_get_slot(const char* fingerprint) { ; }
-
 // Exception handler.
 void ocall_exception_handler(const char* err_msg) {
   throw std::runtime_error(err_msg);
+}
+
+size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
+                     size_t data_len) {
+  LOG(plog::debug) << "In enclave: " << slot_finger_print;
+
+  std::string compressed_data = server_runner->get_compressed_slot(slot_finger_print);
+  const char* data_ptr = reinterpret_cast<const char*>(compressed_data.data());
+  std::string decompressed_data = gzip::decompress(data_ptr, compressed_data.size());
+
+  LOG(plog::debug) << "Decompressed: " << sgx_oram::hex_to_string((uint8_t*)decompressed_data.data(), decompressed_data.size());
+
+  const size_t decompressed_size = decompressed_data.size();
+  memcpy(data, decompressed_data.data(), decompressed_size);
+  return decompressed_size;
 }
 
 namespace sgx_oram {

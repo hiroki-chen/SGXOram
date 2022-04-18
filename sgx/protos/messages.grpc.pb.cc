@@ -24,6 +24,7 @@ namespace oram {
 static const char* sgx_oram_method_names[] = {
   "/oram.sgx_oram/init_enclave",
   "/oram.sgx_oram/generate_session_key",
+  "/oram.sgx_oram/init_oram",
   "/oram.sgx_oram/read_block",
   "/oram.sgx_oram/write_block",
   "/oram.sgx_oram/close_connection",
@@ -38,9 +39,10 @@ std::unique_ptr< sgx_oram::Stub> sgx_oram::NewStub(const std::shared_ptr< ::grpc
 sgx_oram::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_init_enclave_(sgx_oram_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_generate_session_key_(sgx_oram_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_read_block_(sgx_oram_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_write_block_(sgx_oram_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_close_connection_(sgx_oram_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_init_oram_(sgx_oram_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_read_block_(sgx_oram_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_write_block_(sgx_oram_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_close_connection_(sgx_oram_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status sgx_oram::Stub::init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::oram::InitReply* response) {
@@ -85,6 +87,29 @@ void sgx_oram::Stub::async::generate_session_key(::grpc::ClientContext* context,
 ::grpc::ClientAsyncResponseReader< ::oram::InitReply>* sgx_oram::Stub::Asyncgenerate_session_keyRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncgenerate_session_keyRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status sgx_oram::Stub::init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::google::protobuf::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::oram::OramInitRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_init_oram_, context, request, response);
+}
+
+void sgx_oram::Stub::async::init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::oram::OramInitRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_init_oram_, context, request, response, std::move(f));
+}
+
+void sgx_oram::Stub::async::init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_init_oram_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* sgx_oram::Stub::PrepareAsyncinit_oramRaw(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::oram::OramInitRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_init_oram_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* sgx_oram::Stub::Asyncinit_oramRaw(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncinit_oramRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -182,6 +207,16 @@ sgx_oram::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       sgx_oram_method_names[2],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::OramInitRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](sgx_oram::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::oram::OramInitRequest* req,
+             ::google::protobuf::Empty* resp) {
+               return service->init_oram(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      sgx_oram_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::ReadRequest, ::oram::ReadReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](sgx_oram::Service* service,
              ::grpc::ServerContext* ctx,
@@ -190,7 +225,7 @@ sgx_oram::Service::Service() {
                return service->read_block(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      sgx_oram_method_names[3],
+      sgx_oram_method_names[4],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::WriteRequest, ::oram::WriteReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](sgx_oram::Service* service,
@@ -200,7 +235,7 @@ sgx_oram::Service::Service() {
                return service->write_block(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      sgx_oram_method_names[4],
+      sgx_oram_method_names[5],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::CloseRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](sgx_oram::Service* service,
@@ -222,6 +257,13 @@ sgx_oram::Service::~Service() {
 }
 
 ::grpc::Status sgx_oram::Service::generate_session_key(::grpc::ServerContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status sgx_oram::Service::init_oram(::grpc::ServerContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response) {
   (void) context;
   (void) request;
   (void) response;

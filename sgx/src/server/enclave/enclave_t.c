@@ -119,14 +119,17 @@ typedef struct ms_ocall_printf_t {
 	const char* ms_str;
 } ms_ocall_printf_t;
 
-typedef struct ms_ocall_get_slot_t {
-	const char* ms_slot_fingerprint;
-} ms_ocall_get_slot_t;
+typedef struct ms_ocall_read_slot_t {
+	size_t ms_retval;
+	const char* ms_slot_finderprint;
+	uint8_t* ms_slot;
+	size_t ms_slot_size;
+} ms_ocall_read_slot_t;
 
 typedef struct ms_ocall_write_slot_t {
-	const char* ms_slot_finger_print;
-	const uint8_t* ms_data;
-	size_t ms_data_len;
+	const char* ms_slot_finderprint;
+	const uint8_t* ms_slot;
+	size_t ms_slot_size;
 } ms_ocall_write_slot_t;
 
 typedef struct ms_ocall_exception_handler_t {
@@ -869,19 +872,24 @@ sgx_status_t SGX_CDECL ocall_printf(const char* str)
 	return status;
 }
 
-sgx_status_t SGX_CDECL ocall_get_slot(const char* slot_fingerprint)
+sgx_status_t SGX_CDECL ocall_read_slot(size_t* retval, const char* slot_finderprint, uint8_t* slot, size_t slot_size)
 {
 	sgx_status_t status = SGX_SUCCESS;
-	size_t _len_slot_fingerprint = slot_fingerprint ? strlen(slot_fingerprint) + 1 : 0;
+	size_t _len_slot_finderprint = slot_finderprint ? strlen(slot_finderprint) + 1 : 0;
+	size_t _len_slot = slot_size;
 
-	ms_ocall_get_slot_t* ms = NULL;
-	size_t ocalloc_size = sizeof(ms_ocall_get_slot_t);
+	ms_ocall_read_slot_t* ms = NULL;
+	size_t ocalloc_size = sizeof(ms_ocall_read_slot_t);
 	void *__tmp = NULL;
 
+	void *__tmp_slot = NULL;
 
-	CHECK_ENCLAVE_POINTER(slot_fingerprint, _len_slot_fingerprint);
+	CHECK_ENCLAVE_POINTER(slot_finderprint, _len_slot_finderprint);
+	CHECK_ENCLAVE_POINTER(slot, _len_slot);
 
-	if (ADD_ASSIGN_OVERFLOW(ocalloc_size, (slot_fingerprint != NULL) ? _len_slot_fingerprint : 0))
+	if (ADD_ASSIGN_OVERFLOW(ocalloc_size, (slot_finderprint != NULL) ? _len_slot_finderprint : 0))
+		return SGX_ERROR_INVALID_PARAMETER;
+	if (ADD_ASSIGN_OVERFLOW(ocalloc_size, (slot != NULL) ? _len_slot : 0))
 		return SGX_ERROR_INVALID_PARAMETER;
 
 	__tmp = sgx_ocalloc(ocalloc_size);
@@ -889,51 +897,73 @@ sgx_status_t SGX_CDECL ocall_get_slot(const char* slot_fingerprint)
 		sgx_ocfree();
 		return SGX_ERROR_UNEXPECTED;
 	}
-	ms = (ms_ocall_get_slot_t*)__tmp;
-	__tmp = (void *)((size_t)__tmp + sizeof(ms_ocall_get_slot_t));
-	ocalloc_size -= sizeof(ms_ocall_get_slot_t);
+	ms = (ms_ocall_read_slot_t*)__tmp;
+	__tmp = (void *)((size_t)__tmp + sizeof(ms_ocall_read_slot_t));
+	ocalloc_size -= sizeof(ms_ocall_read_slot_t);
 
-	if (slot_fingerprint != NULL) {
-		ms->ms_slot_fingerprint = (const char*)__tmp;
-		if (_len_slot_fingerprint % sizeof(*slot_fingerprint) != 0) {
+	if (slot_finderprint != NULL) {
+		ms->ms_slot_finderprint = (const char*)__tmp;
+		if (_len_slot_finderprint % sizeof(*slot_finderprint) != 0) {
 			sgx_ocfree();
 			return SGX_ERROR_INVALID_PARAMETER;
 		}
-		if (memcpy_s(__tmp, ocalloc_size, slot_fingerprint, _len_slot_fingerprint)) {
+		if (memcpy_s(__tmp, ocalloc_size, slot_finderprint, _len_slot_finderprint)) {
 			sgx_ocfree();
 			return SGX_ERROR_UNEXPECTED;
 		}
-		__tmp = (void *)((size_t)__tmp + _len_slot_fingerprint);
-		ocalloc_size -= _len_slot_fingerprint;
+		__tmp = (void *)((size_t)__tmp + _len_slot_finderprint);
+		ocalloc_size -= _len_slot_finderprint;
 	} else {
-		ms->ms_slot_fingerprint = NULL;
+		ms->ms_slot_finderprint = NULL;
 	}
 	
+	if (slot != NULL) {
+		ms->ms_slot = (uint8_t*)__tmp;
+		__tmp_slot = __tmp;
+		if (_len_slot % sizeof(*slot) != 0) {
+			sgx_ocfree();
+			return SGX_ERROR_INVALID_PARAMETER;
+		}
+		memset(__tmp_slot, 0, _len_slot);
+		__tmp = (void *)((size_t)__tmp + _len_slot);
+		ocalloc_size -= _len_slot;
+	} else {
+		ms->ms_slot = NULL;
+	}
+	
+	ms->ms_slot_size = slot_size;
 	status = sgx_ocall(1, ms);
 
 	if (status == SGX_SUCCESS) {
+		if (retval) *retval = ms->ms_retval;
+		if (slot) {
+			if (memcpy_s((void*)slot, _len_slot, __tmp_slot, _len_slot)) {
+				sgx_ocfree();
+				return SGX_ERROR_UNEXPECTED;
+			}
+		}
 	}
 	sgx_ocfree();
 	return status;
 }
 
-sgx_status_t SGX_CDECL ocall_write_slot(const char* slot_finger_print, const uint8_t* data, size_t data_len)
+sgx_status_t SGX_CDECL ocall_write_slot(const char* slot_finderprint, const uint8_t* slot, size_t slot_size)
 {
 	sgx_status_t status = SGX_SUCCESS;
-	size_t _len_slot_finger_print = slot_finger_print ? strlen(slot_finger_print) + 1 : 0;
-	size_t _len_data = data_len;
+	size_t _len_slot_finderprint = slot_finderprint ? strlen(slot_finderprint) + 1 : 0;
+	size_t _len_slot = slot_size;
 
 	ms_ocall_write_slot_t* ms = NULL;
 	size_t ocalloc_size = sizeof(ms_ocall_write_slot_t);
 	void *__tmp = NULL;
 
 
-	CHECK_ENCLAVE_POINTER(slot_finger_print, _len_slot_finger_print);
-	CHECK_ENCLAVE_POINTER(data, _len_data);
+	CHECK_ENCLAVE_POINTER(slot_finderprint, _len_slot_finderprint);
+	CHECK_ENCLAVE_POINTER(slot, _len_slot);
 
-	if (ADD_ASSIGN_OVERFLOW(ocalloc_size, (slot_finger_print != NULL) ? _len_slot_finger_print : 0))
+	if (ADD_ASSIGN_OVERFLOW(ocalloc_size, (slot_finderprint != NULL) ? _len_slot_finderprint : 0))
 		return SGX_ERROR_INVALID_PARAMETER;
-	if (ADD_ASSIGN_OVERFLOW(ocalloc_size, (data != NULL) ? _len_data : 0))
+	if (ADD_ASSIGN_OVERFLOW(ocalloc_size, (slot != NULL) ? _len_slot : 0))
 		return SGX_ERROR_INVALID_PARAMETER;
 
 	__tmp = sgx_ocalloc(ocalloc_size);
@@ -945,39 +975,39 @@ sgx_status_t SGX_CDECL ocall_write_slot(const char* slot_finger_print, const uin
 	__tmp = (void *)((size_t)__tmp + sizeof(ms_ocall_write_slot_t));
 	ocalloc_size -= sizeof(ms_ocall_write_slot_t);
 
-	if (slot_finger_print != NULL) {
-		ms->ms_slot_finger_print = (const char*)__tmp;
-		if (_len_slot_finger_print % sizeof(*slot_finger_print) != 0) {
+	if (slot_finderprint != NULL) {
+		ms->ms_slot_finderprint = (const char*)__tmp;
+		if (_len_slot_finderprint % sizeof(*slot_finderprint) != 0) {
 			sgx_ocfree();
 			return SGX_ERROR_INVALID_PARAMETER;
 		}
-		if (memcpy_s(__tmp, ocalloc_size, slot_finger_print, _len_slot_finger_print)) {
+		if (memcpy_s(__tmp, ocalloc_size, slot_finderprint, _len_slot_finderprint)) {
 			sgx_ocfree();
 			return SGX_ERROR_UNEXPECTED;
 		}
-		__tmp = (void *)((size_t)__tmp + _len_slot_finger_print);
-		ocalloc_size -= _len_slot_finger_print;
+		__tmp = (void *)((size_t)__tmp + _len_slot_finderprint);
+		ocalloc_size -= _len_slot_finderprint;
 	} else {
-		ms->ms_slot_finger_print = NULL;
+		ms->ms_slot_finderprint = NULL;
 	}
 	
-	if (data != NULL) {
-		ms->ms_data = (const uint8_t*)__tmp;
-		if (_len_data % sizeof(*data) != 0) {
+	if (slot != NULL) {
+		ms->ms_slot = (const uint8_t*)__tmp;
+		if (_len_slot % sizeof(*slot) != 0) {
 			sgx_ocfree();
 			return SGX_ERROR_INVALID_PARAMETER;
 		}
-		if (memcpy_s(__tmp, ocalloc_size, data, _len_data)) {
+		if (memcpy_s(__tmp, ocalloc_size, slot, _len_slot)) {
 			sgx_ocfree();
 			return SGX_ERROR_UNEXPECTED;
 		}
-		__tmp = (void *)((size_t)__tmp + _len_data);
-		ocalloc_size -= _len_data;
+		__tmp = (void *)((size_t)__tmp + _len_slot);
+		ocalloc_size -= _len_slot;
 	} else {
-		ms->ms_data = NULL;
+		ms->ms_slot = NULL;
 	}
 	
-	ms->ms_data_len = data_len;
+	ms->ms_slot_size = slot_size;
 	status = sgx_ocall(2, ms);
 
 	if (status == SGX_SUCCESS) {

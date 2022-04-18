@@ -33,7 +33,7 @@ CXX_LINK_FLAGS ?= -L$(LIB_PATH) -lsample_libcrypto -lservice_provider\
 								  -L$(GRPC_PATH)/lib `pkg-config --libs protobuf grpc++`\
 									-pthread\
 									-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-									-ldl
+									-ldl -lgflags
 									
 ifeq ($(MODE), DEBUG)
 	CXX_FLAGS += -O0 -g

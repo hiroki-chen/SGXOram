@@ -13,6 +13,8 @@ service sgx_oram {
 
   rpc generate_session_key(InitRequest) returns (InitReply) {}
 
+  rpc init_oram(OramInitRequest) returns (google.protobuf.Empty) {}
+
   // ===================================================== //
   // Functions for remote attestation and key derivation.
  // rpc send_message1(MessageMSG1) returns (MessageMSG2) {}
@@ -40,6 +42,15 @@ message InitReply {
   // This is done by SGX's remote attestation procedure.
   // This field is valid iff. the negotiation finishes.
   bytes content = 2;
+}
+
+message OramInitRequest {
+  uint32 way = 1;
+  uint32 number = 2;
+  uint32 bucket_size = 3;
+  uint32 type = 4;
+  uint32 constant = 5;
+  uint32 round = 6;
 }
 
 message ReadRequest {

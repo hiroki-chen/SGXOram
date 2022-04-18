@@ -48,7 +48,7 @@ struct TableStruct_messages_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[7]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -65,6 +65,9 @@ extern InitReplyDefaultTypeInternal _InitReply_default_instance_;
 class InitRequest;
 struct InitRequestDefaultTypeInternal;
 extern InitRequestDefaultTypeInternal _InitRequest_default_instance_;
+class OramInitRequest;
+struct OramInitRequestDefaultTypeInternal;
+extern OramInitRequestDefaultTypeInternal _OramInitRequest_default_instance_;
 class ReadReply;
 struct ReadReplyDefaultTypeInternal;
 extern ReadReplyDefaultTypeInternal _ReadReply_default_instance_;
@@ -82,6 +85,7 @@ PROTOBUF_NAMESPACE_OPEN
 template<> ::oram::CloseRequest* Arena::CreateMaybeMessage<::oram::CloseRequest>(Arena*);
 template<> ::oram::InitReply* Arena::CreateMaybeMessage<::oram::InitReply>(Arena*);
 template<> ::oram::InitRequest* Arena::CreateMaybeMessage<::oram::InitRequest>(Arena*);
+template<> ::oram::OramInitRequest* Arena::CreateMaybeMessage<::oram::OramInitRequest>(Arena*);
 template<> ::oram::ReadReply* Arena::CreateMaybeMessage<::oram::ReadReply>(Arena*);
 template<> ::oram::ReadRequest* Arena::CreateMaybeMessage<::oram::ReadRequest>(Arena*);
 template<> ::oram::WriteReply* Arena::CreateMaybeMessage<::oram::WriteReply>(Arena*);
@@ -415,6 +419,207 @@ class InitReply final :
 };
 // -------------------------------------------------------------------
 
+class OramInitRequest final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:oram.OramInitRequest) */ {
+ public:
+  inline OramInitRequest() : OramInitRequest(nullptr) {}
+  ~OramInitRequest() override;
+  explicit constexpr OramInitRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  OramInitRequest(const OramInitRequest& from);
+  OramInitRequest(OramInitRequest&& from) noexcept
+    : OramInitRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline OramInitRequest& operator=(const OramInitRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline OramInitRequest& operator=(OramInitRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const OramInitRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const OramInitRequest* internal_default_instance() {
+    return reinterpret_cast<const OramInitRequest*>(
+               &_OramInitRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    2;
+
+  friend void swap(OramInitRequest& a, OramInitRequest& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(OramInitRequest* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(OramInitRequest* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  OramInitRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<OramInitRequest>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const OramInitRequest& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const OramInitRequest& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(OramInitRequest* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "oram.OramInitRequest";
+  }
+  protected:
+  explicit OramInitRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kWayFieldNumber = 1,
+    kNumberFieldNumber = 2,
+    kBucketSizeFieldNumber = 3,
+    kTypeFieldNumber = 4,
+    kConstantFieldNumber = 5,
+    kRoundFieldNumber = 6,
+  };
+  // uint32 way = 1;
+  void clear_way();
+  uint32_t way() const;
+  void set_way(uint32_t value);
+  private:
+  uint32_t _internal_way() const;
+  void _internal_set_way(uint32_t value);
+  public:
+
+  // uint32 number = 2;
+  void clear_number();
+  uint32_t number() const;
+  void set_number(uint32_t value);
+  private:
+  uint32_t _internal_number() const;
+  void _internal_set_number(uint32_t value);
+  public:
+
+  // uint32 bucket_size = 3;
+  void clear_bucket_size();
+  uint32_t bucket_size() const;
+  void set_bucket_size(uint32_t value);
+  private:
+  uint32_t _internal_bucket_size() const;
+  void _internal_set_bucket_size(uint32_t value);
+  public:
+
+  // uint32 type = 4;
+  void clear_type();
+  uint32_t type() const;
+  void set_type(uint32_t value);
+  private:
+  uint32_t _internal_type() const;
+  void _internal_set_type(uint32_t value);
+  public:
+
+  // uint32 constant = 5;
+  void clear_constant();
+  uint32_t constant() const;
+  void set_constant(uint32_t value);
+  private:
+  uint32_t _internal_constant() const;
+  void _internal_set_constant(uint32_t value);
+  public:
+
+  // uint32 round = 6;
+  void clear_round();
+  uint32_t round() const;
+  void set_round(uint32_t value);
+  private:
+  uint32_t _internal_round() const;
+  void _internal_set_round(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:oram.OramInitRequest)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  uint32_t way_;
+  uint32_t number_;
+  uint32_t bucket_size_;
+  uint32_t type_;
+  uint32_t constant_;
+  uint32_t round_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_messages_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ReadRequest final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:oram.ReadRequest) */ {
  public:
@@ -463,7 +668,7 @@ class ReadRequest final :
                &_ReadRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(ReadRequest& a, ReadRequest& b) {
     a.Swap(&b);
@@ -609,7 +814,7 @@ class ReadReply final :
                &_ReadReply_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(ReadReply& a, ReadReply& b) {
     a.Swap(&b);
@@ -771,7 +976,7 @@ class WriteRequest final :
                &_WriteRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(WriteRequest& a, WriteRequest& b) {
     a.Swap(&b);
@@ -933,7 +1138,7 @@ class WriteReply final :
                &_WriteReply_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(WriteReply& a, WriteReply& b) {
     a.Swap(&b);
@@ -1078,7 +1283,7 @@ class CloseRequest final :
                &_CloseRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(CloseRequest& a, CloseRequest& b) {
     a.Swap(&b);
@@ -1306,6 +1511,130 @@ inline void InitReply::set_allocated_content(std::string* content) {
 
 // -------------------------------------------------------------------
 
+// OramInitRequest
+
+// uint32 way = 1;
+inline void OramInitRequest::clear_way() {
+  way_ = 0u;
+}
+inline uint32_t OramInitRequest::_internal_way() const {
+  return way_;
+}
+inline uint32_t OramInitRequest::way() const {
+  // @@protoc_insertion_point(field_get:oram.OramInitRequest.way)
+  return _internal_way();
+}
+inline void OramInitRequest::_internal_set_way(uint32_t value) {
+  
+  way_ = value;
+}
+inline void OramInitRequest::set_way(uint32_t value) {
+  _internal_set_way(value);
+  // @@protoc_insertion_point(field_set:oram.OramInitRequest.way)
+}
+
+// uint32 number = 2;
+inline void OramInitRequest::clear_number() {
+  number_ = 0u;
+}
+inline uint32_t OramInitRequest::_internal_number() const {
+  return number_;
+}
+inline uint32_t OramInitRequest::number() const {
+  // @@protoc_insertion_point(field_get:oram.OramInitRequest.number)
+  return _internal_number();
+}
+inline void OramInitRequest::_internal_set_number(uint32_t value) {
+  
+  number_ = value;
+}
+inline void OramInitRequest::set_number(uint32_t value) {
+  _internal_set_number(value);
+  // @@protoc_insertion_point(field_set:oram.OramInitRequest.number)
+}
+
+// uint32 bucket_size = 3;
+inline void OramInitRequest::clear_bucket_size() {
+  bucket_size_ = 0u;
+}
+inline uint32_t OramInitRequest::_internal_bucket_size() const {
+  return bucket_size_;
+}
+inline uint32_t OramInitRequest::bucket_size() const {
+  // @@protoc_insertion_point(field_get:oram.OramInitRequest.bucket_size)
+  return _internal_bucket_size();
+}
+inline void OramInitRequest::_internal_set_bucket_size(uint32_t value) {
+  
+  bucket_size_ = value;
+}
+inline void OramInitRequest::set_bucket_size(uint32_t value) {
+  _internal_set_bucket_size(value);
+  // @@protoc_insertion_point(field_set:oram.OramInitRequest.bucket_size)
+}
+
+// uint32 type = 4;
+inline void OramInitRequest::clear_type() {
+  type_ = 0u;
+}
+inline uint32_t OramInitRequest::_internal_type() const {
+  return type_;
+}
+inline uint32_t OramInitRequest::type() const {
+  // @@protoc_insertion_point(field_get:oram.OramInitRequest.type)
+  return _internal_type();
+}
+inline void OramInitRequest::_internal_set_type(uint32_t value) {
+  
+  type_ = value;
+}
+inline void OramInitRequest::set_type(uint32_t value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:oram.OramInitRequest.type)
+}
+
+// uint32 constant = 5;
+inline void OramInitRequest::clear_constant() {
+  constant_ = 0u;
+}
+inline uint32_t OramInitRequest::_internal_constant() const {
+  return constant_;
+}
+inline uint32_t OramInitRequest::constant() const {
+  // @@protoc_insertion_point(field_get:oram.OramInitRequest.constant)
+  return _internal_constant();
+}
+inline void OramInitRequest::_internal_set_constant(uint32_t value) {
+  
+  constant_ = value;
+}
+inline void OramInitRequest::set_constant(uint32_t value) {
+  _internal_set_constant(value);
+  // @@protoc_insertion_point(field_set:oram.OramInitRequest.constant)
+}
+
+// uint32 round = 6;
+inline void OramInitRequest::clear_round() {
+  round_ = 0u;
+}
+inline uint32_t OramInitRequest::_internal_round() const {
+  return round_;
+}
+inline uint32_t OramInitRequest::round() const {
+  // @@protoc_insertion_point(field_get:oram.OramInitRequest.round)
+  return _internal_round();
+}
+inline void OramInitRequest::_internal_set_round(uint32_t value) {
+  
+  round_ = value;
+}
+inline void OramInitRequest::set_round(uint32_t value) {
+  _internal_set_round(value);
+  // @@protoc_insertion_point(field_set:oram.OramInitRequest.round)
+}
+
+// -------------------------------------------------------------------
+
 // ReadRequest
 
 // uint32 address = 1;
@@ -1509,6 +1838,8 @@ inline void WriteReply::set_success(bool value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
