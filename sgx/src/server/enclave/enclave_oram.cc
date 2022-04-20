@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2021 Haobin Chen
+ Copyright (c) 2022 Haobin Chen and Siyi Lv
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -14,24 +14,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <app/basic_models.hh>
+#include <sgx_urts.h>
 
-sgx_oram::Position::Position(
-    const uint32_t& level_cur,
-    const uint32_t& offset,
-    const uint32_t& bid_cur,
-    const uint32_t& bid_dst)
-    : level_cur(level_cur)
-    , offset(offset)
-    , bid_cur(bid_cur)
-    , bid_dst(bid_dst)
-{
-}
+#include <enclave/enclave_t.h>
 
-sgx_oram::Block::Block(const bool& is_dummy, const std::string& data, const uint32_t& bid, const uint32_t& address)
-    : is_dummy(is_dummy)
-    , data(data)
-    , bid(bid)
-    , address(address)
-{
+sgx_status_t ecall_access_data(int op_type, uint8_t* data, size_t data_len) {
+  return SGX_SUCCESS;
 }

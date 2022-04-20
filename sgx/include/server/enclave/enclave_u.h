@@ -35,8 +35,41 @@ void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_write_slot, (const char* slot_finderpri
 #define OCALL_EXCEPTION_HANDLER_DEFINED__
 void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_exception_handler, (const char* err_msg));
 #endif
+#ifndef PTHREAD_WAIT_TIMEOUT_OCALL_DEFINED__
+#define PTHREAD_WAIT_TIMEOUT_OCALL_DEFINED__
+int SGX_UBRIDGE(SGX_CDECL, pthread_wait_timeout_ocall, (unsigned long long waiter, unsigned long long timeout));
+#endif
+#ifndef PTHREAD_CREATE_OCALL_DEFINED__
+#define PTHREAD_CREATE_OCALL_DEFINED__
+int SGX_UBRIDGE(SGX_CDECL, pthread_create_ocall, (unsigned long long self));
+#endif
+#ifndef PTHREAD_WAKEUP_OCALL_DEFINED__
+#define PTHREAD_WAKEUP_OCALL_DEFINED__
+int SGX_UBRIDGE(SGX_CDECL, pthread_wakeup_ocall, (unsigned long long waiter));
+#endif
+#ifndef SGX_OC_CPUIDEX_DEFINED__
+#define SGX_OC_CPUIDEX_DEFINED__
+void SGX_UBRIDGE(SGX_CDECL, sgx_oc_cpuidex, (int cpuinfo[4], int leaf, int subleaf));
+#endif
+#ifndef SGX_THREAD_WAIT_UNTRUSTED_EVENT_OCALL_DEFINED__
+#define SGX_THREAD_WAIT_UNTRUSTED_EVENT_OCALL_DEFINED__
+int SGX_UBRIDGE(SGX_CDECL, sgx_thread_wait_untrusted_event_ocall, (const void* self));
+#endif
+#ifndef SGX_THREAD_SET_UNTRUSTED_EVENT_OCALL_DEFINED__
+#define SGX_THREAD_SET_UNTRUSTED_EVENT_OCALL_DEFINED__
+int SGX_UBRIDGE(SGX_CDECL, sgx_thread_set_untrusted_event_ocall, (const void* waiter));
+#endif
+#ifndef SGX_THREAD_SETWAIT_UNTRUSTED_EVENTS_OCALL_DEFINED__
+#define SGX_THREAD_SETWAIT_UNTRUSTED_EVENTS_OCALL_DEFINED__
+int SGX_UBRIDGE(SGX_CDECL, sgx_thread_setwait_untrusted_events_ocall, (const void* waiter, const void* self));
+#endif
+#ifndef SGX_THREAD_SET_MULTIPLE_UNTRUSTED_EVENTS_OCALL_DEFINED__
+#define SGX_THREAD_SET_MULTIPLE_UNTRUSTED_EVENTS_OCALL_DEFINED__
+int SGX_UBRIDGE(SGX_CDECL, sgx_thread_set_multiple_untrusted_events_ocall, (const void** waiters, size_t total));
+#endif
 
 sgx_status_t ecall_init_oram_controller(sgx_enclave_id_t eid, int* retval);
+sgx_status_t ecall_access_data(sgx_enclave_id_t eid, sgx_status_t* retval, int op_type, uint8_t* data, size_t data_len);
 sgx_status_t ecall_seal(sgx_enclave_id_t eid, sgx_status_t* retval, const uint8_t* plaintext, size_t plaintext_len, sgx_sealed_data_t* sealed_data, size_t sealed_size);
 sgx_status_t ecall_unseal(sgx_enclave_id_t eid, sgx_status_t* retval, const sgx_sealed_data_t* sealed_data, size_t sealed_size, uint8_t* plaintext, size_t plaintext_len);
 sgx_status_t ecall_begin_DHKE(sgx_enclave_id_t eid, sgx_status_t* retval);
@@ -45,6 +78,7 @@ sgx_status_t ecall_compute_shared_key(sgx_enclave_id_t eid, sgx_status_t* retval
 sgx_status_t enclave_init_ra(sgx_enclave_id_t eid, sgx_status_t* retval, int b_pse, sgx_ra_context_t* p_context);
 sgx_status_t enclave_ra_close(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_context_t context);
 sgx_status_t verify_att_result_mac(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_context_t context, uint8_t* message, size_t message_size, uint8_t* mac, size_t mac_size);
+sgx_status_t verify_secret_data(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_context_t context, uint8_t* p_secret, uint32_t secret_size, uint8_t* gcm_mac, uint32_t max_verification_length, uint8_t* p_ret);
 sgx_status_t put_secret_data(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_context_t context, uint8_t* p_secret, uint32_t secret_size, uint8_t* gcm_mac);
 sgx_status_t sgx_ra_get_ga(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_context_t context, sgx_ec256_public_t* g_a);
 sgx_status_t sgx_ra_proc_msg2_trusted(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_context_t context, const sgx_ra_msg2_t* p_msg2, const sgx_target_info_t* p_qe_target, sgx_report_t* p_report, sgx_quote_nonce_t* p_nonce);

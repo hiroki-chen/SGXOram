@@ -15,6 +15,7 @@
 #include <iostream>
 #include <random>
 #include <memory>
+#include <fstream>
 
 #include <gzip/compress.hpp>
 #include <gzip/decompress.hpp>
@@ -29,18 +30,20 @@ extern std::unique_ptr<Server> server_runner;
 
 void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
                       size_t data_len) {
-  LOG(plog::debug) << "In enclave: " << slot_finger_print;
+  LOG(plog::debug) << "The fingerprint for the slot is: " << slot_finger_print;
 
   const char* data_ptr = reinterpret_cast<const char*>(data);
   std::string compressed_data = gzip::compress(data_ptr, data_len);
   server_runner->store_compressed_slot(slot_finger_print, compressed_data);
 
-  LOG(plog::debug) << "Compressed: " << sgx_oram::hex_to_string((uint8_t*)compressed_data.data(), compressed_data.size());
+  LOG(plog::debug) << "Compressed: "
+                   << sgx_oram::hex_to_string((uint8_t*)compressed_data.data(),
+                                              compressed_data.size());
 }
 
 // Debug function.
 void ocall_printf(const char* message) {
-  LOG(plog::debug) << "In enclave: " << message;
+  LOG(plog::debug) << "The fingerprint for the slot is: " << message;
 }
 
 // Exception handler.
@@ -49,18 +52,29 @@ void ocall_exception_handler(const char* err_msg) {
 }
 
 size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
-                     size_t data_len) {
-  LOG(plog::debug) << "In enclave: " << slot_finger_print;
+                       size_t data_len) {
+  LOG(plog::debug) << "The fingerprint for the slot is: " << slot_finger_print;
 
-  std::string compressed_data = server_runner->get_compressed_slot(slot_finger_print);
-  const char* data_ptr = reinterpret_cast<const char*>(compressed_data.data());
-  std::string decompressed_data = gzip::decompress(data_ptr, compressed_data.size());
+  // Check if the slot is in the memory.
+  bool is_in_memory = server_runner->is_in_storage(slot_finger_print);
 
-  LOG(plog::debug) << "Decompressed: " << sgx_oram::hex_to_string((uint8_t*)decompressed_data.data(), decompressed_data.size());
+  if (is_in_memory) {
+    std::string compressed_data =
+        server_runner->get_compressed_slot(slot_finger_print);
+    const char* data_ptr =
+        reinterpret_cast<const char*>(compressed_data.data());
+    std::string decompressed_data =
+        gzip::decompress(data_ptr, compressed_data.size());
 
-  const size_t decompressed_size = decompressed_data.size();
-  memcpy(data, decompressed_data.data(), decompressed_size);
-  return decompressed_size;
+    const size_t decompressed_size = decompressed_data.size();
+    memcpy(data, decompressed_data.data(), decompressed_size);
+    return decompressed_size;
+  } else {
+    LOG(plog::debug) << "Slot not found in memory.";
+
+    // TODO: Find the slot in the directory called data.
+    return 0;
+  }
 }
 
 namespace sgx_oram {
@@ -76,21 +90,6 @@ std::vector<std::string> generate_random_strings(const uint32_t& number,
     }
     ans.push_back(s);
   }
-
-  return ans;
-}
-
-std::vector<Block> convert_to_blocks(const std::vector<std::string>& data) {
-  std::vector<Block> ans;
-
-  uint32_t i = 0;
-  std::transform(
-      data.begin(), data.end(), std::back_inserter(ans),
-      [&i](const std::string& s) { return Block(false, s, i, i++); });
-
-  std::random_device rd;
-  std::mt19937 engine(rd());
-  std::shuffle(ans.begin(), ans.end(), engine);
 
   return ans;
 }
@@ -117,32 +116,6 @@ uint32_t untrusted_uniform_random(const uint32_t& lower,
   std::mt19937 engine(rd());
   std::uniform_int_distribution<uint32_t> dist(lower, upper);
   return dist(engine);
-}
-
-// Friend operator.
-plog::Record& operator<<(plog::Record& record, const Slot& slot) {
-  const auto storage = slot.storage;
-  record << "Slot range: [" << slot.range.first << ", " << slot.range.second
-         << "] "
-         << "Slot size: " << slot.storage.size()
-         << " dummy number: " << slot.dummy_number;
-  for (auto item : storage) {
-    if (!item.is_dummy) {
-      record << std::endl
-             << " data: " << item.data << " bid: " << item.bid
-             << " address: " << item.address << std::endl;
-    }
-  }
-  return record;
-}
-
-plog::Record& operator<<(plog::Record& record, const Position& position) {
-  record << "level: " << position.level_cur << ", offset: " << position.offset
-         << ", bid_cur: " << position.bid_cur
-         << ", bid_dst: " << position.bid_dst
-         << ", slot_num: " << position.slot_num;
-
-  return record;
 }
 
 int init_enclave(sgx_enclave_id_t* const id) {
@@ -181,4 +154,11 @@ int destroy_enclave(sgx_enclave_id_t* const id) {
 
   return 0;
 }
+
+void safe_free(void* ptr) {
+  if (ptr != nullptr) {
+    free(ptr);
+  }
+}
+
 }  // namespace sgx_oram

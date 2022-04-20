@@ -23,8 +23,12 @@ namespace oram {
 
 static const char* sgx_oram_method_names[] = {
   "/oram.sgx_oram/init_enclave",
-  "/oram.sgx_oram/generate_session_key",
   "/oram.sgx_oram/init_oram",
+  "/oram.sgx_oram/generate_session_key",
+  "/oram.sgx_oram/remote_attestation_begin",
+  "/oram.sgx_oram/remote_attestation_msg0",
+  "/oram.sgx_oram/remote_attestation_msg2",
+  "/oram.sgx_oram/remote_attestation_final",
   "/oram.sgx_oram/read_block",
   "/oram.sgx_oram/write_block",
   "/oram.sgx_oram/close_connection",
@@ -38,11 +42,15 @@ std::unique_ptr< sgx_oram::Stub> sgx_oram::NewStub(const std::shared_ptr< ::grpc
 
 sgx_oram::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_init_enclave_(sgx_oram_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_generate_session_key_(sgx_oram_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_init_oram_(sgx_oram_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_read_block_(sgx_oram_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_write_block_(sgx_oram_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_close_connection_(sgx_oram_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_init_oram_(sgx_oram_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_generate_session_key_(sgx_oram_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_remote_attestation_begin_(sgx_oram_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_remote_attestation_msg0_(sgx_oram_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_remote_attestation_msg2_(sgx_oram_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_remote_attestation_final_(sgx_oram_method_names[6], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_read_block_(sgx_oram_method_names[7], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_write_block_(sgx_oram_method_names[8], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_close_connection_(sgx_oram_method_names[9], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status sgx_oram::Stub::init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::oram::InitReply* response) {
@@ -64,6 +72,29 @@ void sgx_oram::Stub::async::init_enclave(::grpc::ClientContext* context, const :
 ::grpc::ClientAsyncResponseReader< ::oram::InitReply>* sgx_oram::Stub::Asyncinit_enclaveRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncinit_enclaveRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status sgx_oram::Stub::init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::google::protobuf::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::oram::OramInitRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_init_oram_, context, request, response);
+}
+
+void sgx_oram::Stub::async::init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::oram::OramInitRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_init_oram_, context, request, response, std::move(f));
+}
+
+void sgx_oram::Stub::async::init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_init_oram_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* sgx_oram::Stub::PrepareAsyncinit_oramRaw(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::oram::OramInitRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_init_oram_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* sgx_oram::Stub::Asyncinit_oramRaw(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncinit_oramRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -91,25 +122,94 @@ void sgx_oram::Stub::async::generate_session_key(::grpc::ClientContext* context,
   return result;
 }
 
-::grpc::Status sgx_oram::Stub::init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::google::protobuf::Empty* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::oram::OramInitRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_init_oram_, context, request, response);
+::grpc::Status sgx_oram::Stub::remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::oram::Message0* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::oram::InitialMessage, ::oram::Message0, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_remote_attestation_begin_, context, request, response);
 }
 
-void sgx_oram::Stub::async::init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::oram::OramInitRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_init_oram_, context, request, response, std::move(f));
+void sgx_oram::Stub::async::remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::oram::InitialMessage, ::oram::Message0, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_remote_attestation_begin_, context, request, response, std::move(f));
 }
 
-void sgx_oram::Stub::async::init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_init_oram_, context, request, response, reactor);
+void sgx_oram::Stub::async::remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_remote_attestation_begin_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* sgx_oram::Stub::PrepareAsyncinit_oramRaw(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::oram::OramInitRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_init_oram_, context, request);
+::grpc::ClientAsyncResponseReader< ::oram::Message0>* sgx_oram::Stub::PrepareAsyncremote_attestation_beginRaw(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::oram::Message0, ::oram::InitialMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_remote_attestation_begin_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* sgx_oram::Stub::Asyncinit_oramRaw(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::oram::Message0>* sgx_oram::Stub::Asyncremote_attestation_beginRaw(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncinit_oramRaw(context, request, cq);
+    this->PrepareAsyncremote_attestation_beginRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status sgx_oram::Stub::remote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0& request, ::oram::Message1* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::oram::Message0, ::oram::Message1, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_remote_attestation_msg0_, context, request, response);
+}
+
+void sgx_oram::Stub::async::remote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0* request, ::oram::Message1* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::oram::Message0, ::oram::Message1, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_remote_attestation_msg0_, context, request, response, std::move(f));
+}
+
+void sgx_oram::Stub::async::remote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0* request, ::oram::Message1* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_remote_attestation_msg0_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::oram::Message1>* sgx_oram::Stub::PrepareAsyncremote_attestation_msg0Raw(::grpc::ClientContext* context, const ::oram::Message0& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::oram::Message1, ::oram::Message0, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_remote_attestation_msg0_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::oram::Message1>* sgx_oram::Stub::Asyncremote_attestation_msg0Raw(::grpc::ClientContext* context, const ::oram::Message0& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncremote_attestation_msg0Raw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status sgx_oram::Stub::remote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2& request, ::oram::Message3* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::oram::Message2, ::oram::Message3, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_remote_attestation_msg2_, context, request, response);
+}
+
+void sgx_oram::Stub::async::remote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2* request, ::oram::Message3* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::oram::Message2, ::oram::Message3, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_remote_attestation_msg2_, context, request, response, std::move(f));
+}
+
+void sgx_oram::Stub::async::remote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2* request, ::oram::Message3* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_remote_attestation_msg2_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::oram::Message3>* sgx_oram::Stub::PrepareAsyncremote_attestation_msg2Raw(::grpc::ClientContext* context, const ::oram::Message2& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::oram::Message3, ::oram::Message2, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_remote_attestation_msg2_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::oram::Message3>* sgx_oram::Stub::Asyncremote_attestation_msg2Raw(::grpc::ClientContext* context, const ::oram::Message2& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncremote_attestation_msg2Raw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status sgx_oram::Stub::remote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::google::protobuf::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::oram::AttestationMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_remote_attestation_final_, context, request, response);
+}
+
+void sgx_oram::Stub::async::remote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::oram::AttestationMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_remote_attestation_final_, context, request, response, std::move(f));
+}
+
+void sgx_oram::Stub::async::remote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_remote_attestation_final_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* sgx_oram::Stub::PrepareAsyncremote_attestation_finalRaw(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::oram::AttestationMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_remote_attestation_final_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* sgx_oram::Stub::Asyncremote_attestation_finalRaw(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncremote_attestation_finalRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -197,16 +297,6 @@ sgx_oram::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       sgx_oram_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::InitRequest, ::oram::InitReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
-          [](sgx_oram::Service* service,
-             ::grpc::ServerContext* ctx,
-             const ::oram::InitRequest* req,
-             ::oram::InitReply* resp) {
-               return service->generate_session_key(ctx, req, resp);
-             }, this)));
-  AddMethod(new ::grpc::internal::RpcServiceMethod(
-      sgx_oram_method_names[2],
-      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::OramInitRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](sgx_oram::Service* service,
              ::grpc::ServerContext* ctx,
@@ -215,7 +305,57 @@ sgx_oram::Service::Service() {
                return service->init_oram(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
+      sgx_oram_method_names[2],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::InitRequest, ::oram::InitReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](sgx_oram::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::oram::InitRequest* req,
+             ::oram::InitReply* resp) {
+               return service->generate_session_key(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
       sgx_oram_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::InitialMessage, ::oram::Message0, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](sgx_oram::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::oram::InitialMessage* req,
+             ::oram::Message0* resp) {
+               return service->remote_attestation_begin(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      sgx_oram_method_names[4],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::Message0, ::oram::Message1, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](sgx_oram::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::oram::Message0* req,
+             ::oram::Message1* resp) {
+               return service->remote_attestation_msg0(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      sgx_oram_method_names[5],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::Message2, ::oram::Message3, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](sgx_oram::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::oram::Message2* req,
+             ::oram::Message3* resp) {
+               return service->remote_attestation_msg2(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      sgx_oram_method_names[6],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::AttestationMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](sgx_oram::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::oram::AttestationMessage* req,
+             ::google::protobuf::Empty* resp) {
+               return service->remote_attestation_final(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      sgx_oram_method_names[7],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::ReadRequest, ::oram::ReadReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](sgx_oram::Service* service,
@@ -225,7 +365,7 @@ sgx_oram::Service::Service() {
                return service->read_block(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      sgx_oram_method_names[4],
+      sgx_oram_method_names[8],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::WriteRequest, ::oram::WriteReply, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](sgx_oram::Service* service,
@@ -235,7 +375,7 @@ sgx_oram::Service::Service() {
                return service->write_block(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      sgx_oram_method_names[5],
+      sgx_oram_method_names[9],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::oram::CloseRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](sgx_oram::Service* service,
@@ -256,6 +396,13 @@ sgx_oram::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
+::grpc::Status sgx_oram::Service::init_oram(::grpc::ServerContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
 ::grpc::Status sgx_oram::Service::generate_session_key(::grpc::ServerContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response) {
   (void) context;
   (void) request;
@@ -263,7 +410,28 @@ sgx_oram::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status sgx_oram::Service::init_oram(::grpc::ServerContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response) {
+::grpc::Status sgx_oram::Service::remote_attestation_begin(::grpc::ServerContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status sgx_oram::Service::remote_attestation_msg0(::grpc::ServerContext* context, const ::oram::Message0* request, ::oram::Message1* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status sgx_oram::Service::remote_attestation_msg2(::grpc::ServerContext* context, const ::oram::Message2* request, ::oram::Message3* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status sgx_oram::Service::remote_attestation_final(::grpc::ServerContext* context, const ::oram::AttestationMessage* request, ::google::protobuf::Empty* response) {
   (void) context;
   (void) request;
   (void) response;

@@ -22,7 +22,7 @@
 #include <messages.grpc.pb.h>
 #include <messages.pb.h>
 #include <sample_libcrypto/sample_libcrypto.h>
-#include <service_provider/ecp.h>
+#include <service_provider/service_provider.h>
 
 // Key pairs.
 // For our own convenience, the keys are hard-coded in the client.

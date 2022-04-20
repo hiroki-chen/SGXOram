@@ -5,6 +5,13 @@ typedef struct ms_ecall_init_oram_controller_t {
 	int ms_retval;
 } ms_ecall_init_oram_controller_t;
 
+typedef struct ms_ecall_access_data_t {
+	sgx_status_t ms_retval;
+	int ms_op_type;
+	uint8_t* ms_data;
+	size_t ms_data_len;
+} ms_ecall_access_data_t;
+
 typedef struct ms_ecall_seal_t {
 	sgx_status_t ms_retval;
 	const uint8_t* ms_plaintext;
@@ -56,6 +63,16 @@ typedef struct ms_verify_att_result_mac_t {
 	uint8_t* ms_mac;
 	size_t ms_mac_size;
 } ms_verify_att_result_mac_t;
+
+typedef struct ms_verify_secret_data_t {
+	sgx_status_t ms_retval;
+	sgx_ra_context_t ms_context;
+	uint8_t* ms_p_secret;
+	uint32_t ms_secret_size;
+	uint8_t* ms_gcm_mac;
+	uint32_t ms_max_verification_length;
+	uint8_t* ms_p_ret;
+} ms_verify_secret_data_t;
 
 typedef struct ms_put_secret_data_t {
 	sgx_status_t ms_retval;
@@ -110,6 +127,50 @@ typedef struct ms_ocall_exception_handler_t {
 	const char* ms_err_msg;
 } ms_ocall_exception_handler_t;
 
+typedef struct ms_pthread_wait_timeout_ocall_t {
+	int ms_retval;
+	unsigned long long ms_waiter;
+	unsigned long long ms_timeout;
+} ms_pthread_wait_timeout_ocall_t;
+
+typedef struct ms_pthread_create_ocall_t {
+	int ms_retval;
+	unsigned long long ms_self;
+} ms_pthread_create_ocall_t;
+
+typedef struct ms_pthread_wakeup_ocall_t {
+	int ms_retval;
+	unsigned long long ms_waiter;
+} ms_pthread_wakeup_ocall_t;
+
+typedef struct ms_sgx_oc_cpuidex_t {
+	int* ms_cpuinfo;
+	int ms_leaf;
+	int ms_subleaf;
+} ms_sgx_oc_cpuidex_t;
+
+typedef struct ms_sgx_thread_wait_untrusted_event_ocall_t {
+	int ms_retval;
+	const void* ms_self;
+} ms_sgx_thread_wait_untrusted_event_ocall_t;
+
+typedef struct ms_sgx_thread_set_untrusted_event_ocall_t {
+	int ms_retval;
+	const void* ms_waiter;
+} ms_sgx_thread_set_untrusted_event_ocall_t;
+
+typedef struct ms_sgx_thread_setwait_untrusted_events_ocall_t {
+	int ms_retval;
+	const void* ms_waiter;
+	const void* ms_self;
+} ms_sgx_thread_setwait_untrusted_events_ocall_t;
+
+typedef struct ms_sgx_thread_set_multiple_untrusted_events_ocall_t {
+	int ms_retval;
+	const void** ms_waiters;
+	size_t ms_total;
+} ms_sgx_thread_set_multiple_untrusted_events_ocall_t;
+
 static sgx_status_t SGX_CDECL enclave_ocall_printf(void* pms)
 {
 	ms_ocall_printf_t* ms = SGX_CAST(ms_ocall_printf_t*, pms);
@@ -142,16 +203,88 @@ static sgx_status_t SGX_CDECL enclave_ocall_exception_handler(void* pms)
 	return SGX_SUCCESS;
 }
 
+static sgx_status_t SGX_CDECL enclave_pthread_wait_timeout_ocall(void* pms)
+{
+	ms_pthread_wait_timeout_ocall_t* ms = SGX_CAST(ms_pthread_wait_timeout_ocall_t*, pms);
+	ms->ms_retval = pthread_wait_timeout_ocall(ms->ms_waiter, ms->ms_timeout);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL enclave_pthread_create_ocall(void* pms)
+{
+	ms_pthread_create_ocall_t* ms = SGX_CAST(ms_pthread_create_ocall_t*, pms);
+	ms->ms_retval = pthread_create_ocall(ms->ms_self);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL enclave_pthread_wakeup_ocall(void* pms)
+{
+	ms_pthread_wakeup_ocall_t* ms = SGX_CAST(ms_pthread_wakeup_ocall_t*, pms);
+	ms->ms_retval = pthread_wakeup_ocall(ms->ms_waiter);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL enclave_sgx_oc_cpuidex(void* pms)
+{
+	ms_sgx_oc_cpuidex_t* ms = SGX_CAST(ms_sgx_oc_cpuidex_t*, pms);
+	sgx_oc_cpuidex(ms->ms_cpuinfo, ms->ms_leaf, ms->ms_subleaf);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL enclave_sgx_thread_wait_untrusted_event_ocall(void* pms)
+{
+	ms_sgx_thread_wait_untrusted_event_ocall_t* ms = SGX_CAST(ms_sgx_thread_wait_untrusted_event_ocall_t*, pms);
+	ms->ms_retval = sgx_thread_wait_untrusted_event_ocall(ms->ms_self);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL enclave_sgx_thread_set_untrusted_event_ocall(void* pms)
+{
+	ms_sgx_thread_set_untrusted_event_ocall_t* ms = SGX_CAST(ms_sgx_thread_set_untrusted_event_ocall_t*, pms);
+	ms->ms_retval = sgx_thread_set_untrusted_event_ocall(ms->ms_waiter);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL enclave_sgx_thread_setwait_untrusted_events_ocall(void* pms)
+{
+	ms_sgx_thread_setwait_untrusted_events_ocall_t* ms = SGX_CAST(ms_sgx_thread_setwait_untrusted_events_ocall_t*, pms);
+	ms->ms_retval = sgx_thread_setwait_untrusted_events_ocall(ms->ms_waiter, ms->ms_self);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL enclave_sgx_thread_set_multiple_untrusted_events_ocall(void* pms)
+{
+	ms_sgx_thread_set_multiple_untrusted_events_ocall_t* ms = SGX_CAST(ms_sgx_thread_set_multiple_untrusted_events_ocall_t*, pms);
+	ms->ms_retval = sgx_thread_set_multiple_untrusted_events_ocall(ms->ms_waiters, ms->ms_total);
+
+	return SGX_SUCCESS;
+}
+
 static const struct {
 	size_t nr_ocall;
-	void * table[4];
+	void * table[12];
 } ocall_table_enclave = {
-	4,
+	12,
 	{
 		(void*)enclave_ocall_printf,
 		(void*)enclave_ocall_read_slot,
 		(void*)enclave_ocall_write_slot,
 		(void*)enclave_ocall_exception_handler,
+		(void*)enclave_pthread_wait_timeout_ocall,
+		(void*)enclave_pthread_create_ocall,
+		(void*)enclave_pthread_wakeup_ocall,
+		(void*)enclave_sgx_oc_cpuidex,
+		(void*)enclave_sgx_thread_wait_untrusted_event_ocall,
+		(void*)enclave_sgx_thread_set_untrusted_event_ocall,
+		(void*)enclave_sgx_thread_setwait_untrusted_events_ocall,
+		(void*)enclave_sgx_thread_set_multiple_untrusted_events_ocall,
 	}
 };
 sgx_status_t ecall_init_oram_controller(sgx_enclave_id_t eid, int* retval)
@@ -159,6 +292,18 @@ sgx_status_t ecall_init_oram_controller(sgx_enclave_id_t eid, int* retval)
 	sgx_status_t status;
 	ms_ecall_init_oram_controller_t ms;
 	status = sgx_ecall(eid, 0, &ocall_table_enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t ecall_access_data(sgx_enclave_id_t eid, sgx_status_t* retval, int op_type, uint8_t* data, size_t data_len)
+{
+	sgx_status_t status;
+	ms_ecall_access_data_t ms;
+	ms.ms_op_type = op_type;
+	ms.ms_data = data;
+	ms.ms_data_len = data_len;
+	status = sgx_ecall(eid, 1, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -171,7 +316,7 @@ sgx_status_t ecall_seal(sgx_enclave_id_t eid, sgx_status_t* retval, const uint8_
 	ms.ms_plaintext_len = plaintext_len;
 	ms.ms_sealed_data = sealed_data;
 	ms.ms_sealed_size = sealed_size;
-	status = sgx_ecall(eid, 1, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 2, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -184,7 +329,7 @@ sgx_status_t ecall_unseal(sgx_enclave_id_t eid, sgx_status_t* retval, const sgx_
 	ms.ms_sealed_size = sealed_size;
 	ms.ms_plaintext = plaintext;
 	ms.ms_plaintext_len = plaintext_len;
-	status = sgx_ecall(eid, 2, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 3, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -193,7 +338,7 @@ sgx_status_t ecall_begin_DHKE(sgx_enclave_id_t eid, sgx_status_t* retval)
 {
 	sgx_status_t status;
 	ms_ecall_begin_DHKE_t ms;
-	status = sgx_ecall(eid, 3, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 4, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -204,7 +349,7 @@ sgx_status_t ecall_sample_key_pair(sgx_enclave_id_t eid, sgx_status_t* retval, u
 	ms_ecall_sample_key_pair_t ms;
 	ms.ms_pub_key = pub_key;
 	ms.ms_pubkey_size = pubkey_size;
-	status = sgx_ecall(eid, 4, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 5, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -215,7 +360,7 @@ sgx_status_t ecall_compute_shared_key(sgx_enclave_id_t eid, sgx_status_t* retval
 	ms_ecall_compute_shared_key_t ms;
 	ms.ms_pub_key = pub_key;
 	ms.ms_pubkey_size = pubkey_size;
-	status = sgx_ecall(eid, 5, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 6, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -226,7 +371,7 @@ sgx_status_t enclave_init_ra(sgx_enclave_id_t eid, sgx_status_t* retval, int b_p
 	ms_enclave_init_ra_t ms;
 	ms.ms_b_pse = b_pse;
 	ms.ms_p_context = p_context;
-	status = sgx_ecall(eid, 6, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 7, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -236,7 +381,7 @@ sgx_status_t enclave_ra_close(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra
 	sgx_status_t status;
 	ms_enclave_ra_close_t ms;
 	ms.ms_context = context;
-	status = sgx_ecall(eid, 7, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 8, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -250,7 +395,22 @@ sgx_status_t verify_att_result_mac(sgx_enclave_id_t eid, sgx_status_t* retval, s
 	ms.ms_message_size = message_size;
 	ms.ms_mac = mac;
 	ms.ms_mac_size = mac_size;
-	status = sgx_ecall(eid, 8, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 9, &ocall_table_enclave, &ms);
+	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
+	return status;
+}
+
+sgx_status_t verify_secret_data(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_context_t context, uint8_t* p_secret, uint32_t secret_size, uint8_t* gcm_mac, uint32_t max_verification_length, uint8_t* p_ret)
+{
+	sgx_status_t status;
+	ms_verify_secret_data_t ms;
+	ms.ms_context = context;
+	ms.ms_p_secret = p_secret;
+	ms.ms_secret_size = secret_size;
+	ms.ms_gcm_mac = gcm_mac;
+	ms.ms_max_verification_length = max_verification_length;
+	ms.ms_p_ret = p_ret;
+	status = sgx_ecall(eid, 10, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -263,7 +423,7 @@ sgx_status_t put_secret_data(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_
 	ms.ms_p_secret = p_secret;
 	ms.ms_secret_size = secret_size;
 	ms.ms_gcm_mac = gcm_mac;
-	status = sgx_ecall(eid, 9, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 11, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -274,7 +434,7 @@ sgx_status_t sgx_ra_get_ga(sgx_enclave_id_t eid, sgx_status_t* retval, sgx_ra_co
 	ms_sgx_ra_get_ga_t ms;
 	ms.ms_context = context;
 	ms.ms_g_a = g_a;
-	status = sgx_ecall(eid, 10, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 12, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -288,7 +448,7 @@ sgx_status_t sgx_ra_proc_msg2_trusted(sgx_enclave_id_t eid, sgx_status_t* retval
 	ms.ms_p_qe_target = p_qe_target;
 	ms.ms_p_report = p_report;
 	ms.ms_p_nonce = p_nonce;
-	status = sgx_ecall(eid, 11, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 13, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
@@ -302,7 +462,7 @@ sgx_status_t sgx_ra_get_msg3_trusted(sgx_enclave_id_t eid, sgx_status_t* retval,
 	ms.ms_qe_report = qe_report;
 	ms.ms_p_msg3 = p_msg3;
 	ms.ms_msg3_size = msg3_size;
-	status = sgx_ecall(eid, 12, &ocall_table_enclave, &ms);
+	status = sgx_ecall(eid, 14, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }

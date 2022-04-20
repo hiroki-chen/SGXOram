@@ -48,7 +48,7 @@ struct TableStruct_messages_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[8]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[14]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -56,6 +56,9 @@ struct TableStruct_messages_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_messages_2eproto;
 namespace oram {
+class AttestationMessage;
+struct AttestationMessageDefaultTypeInternal;
+extern AttestationMessageDefaultTypeInternal _AttestationMessage_default_instance_;
 class CloseRequest;
 struct CloseRequestDefaultTypeInternal;
 extern CloseRequestDefaultTypeInternal _CloseRequest_default_instance_;
@@ -65,6 +68,21 @@ extern InitReplyDefaultTypeInternal _InitReply_default_instance_;
 class InitRequest;
 struct InitRequestDefaultTypeInternal;
 extern InitRequestDefaultTypeInternal _InitRequest_default_instance_;
+class InitialMessage;
+struct InitialMessageDefaultTypeInternal;
+extern InitialMessageDefaultTypeInternal _InitialMessage_default_instance_;
+class Message0;
+struct Message0DefaultTypeInternal;
+extern Message0DefaultTypeInternal _Message0_default_instance_;
+class Message1;
+struct Message1DefaultTypeInternal;
+extern Message1DefaultTypeInternal _Message1_default_instance_;
+class Message2;
+struct Message2DefaultTypeInternal;
+extern Message2DefaultTypeInternal _Message2_default_instance_;
+class Message3;
+struct Message3DefaultTypeInternal;
+extern Message3DefaultTypeInternal _Message3_default_instance_;
 class OramInitRequest;
 struct OramInitRequestDefaultTypeInternal;
 extern OramInitRequestDefaultTypeInternal _OramInitRequest_default_instance_;
@@ -82,9 +100,15 @@ struct WriteRequestDefaultTypeInternal;
 extern WriteRequestDefaultTypeInternal _WriteRequest_default_instance_;
 }  // namespace oram
 PROTOBUF_NAMESPACE_OPEN
+template<> ::oram::AttestationMessage* Arena::CreateMaybeMessage<::oram::AttestationMessage>(Arena*);
 template<> ::oram::CloseRequest* Arena::CreateMaybeMessage<::oram::CloseRequest>(Arena*);
 template<> ::oram::InitReply* Arena::CreateMaybeMessage<::oram::InitReply>(Arena*);
 template<> ::oram::InitRequest* Arena::CreateMaybeMessage<::oram::InitRequest>(Arena*);
+template<> ::oram::InitialMessage* Arena::CreateMaybeMessage<::oram::InitialMessage>(Arena*);
+template<> ::oram::Message0* Arena::CreateMaybeMessage<::oram::Message0>(Arena*);
+template<> ::oram::Message1* Arena::CreateMaybeMessage<::oram::Message1>(Arena*);
+template<> ::oram::Message2* Arena::CreateMaybeMessage<::oram::Message2>(Arena*);
+template<> ::oram::Message3* Arena::CreateMaybeMessage<::oram::Message3>(Arena*);
 template<> ::oram::OramInitRequest* Arena::CreateMaybeMessage<::oram::OramInitRequest>(Arena*);
 template<> ::oram::ReadReply* Arena::CreateMaybeMessage<::oram::ReadReply>(Arena*);
 template<> ::oram::ReadRequest* Arena::CreateMaybeMessage<::oram::ReadRequest>(Arena*);
@@ -1352,6 +1376,1699 @@ class CloseRequest final :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_messages_2eproto;
 };
+// -------------------------------------------------------------------
+
+class InitialMessage final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:oram.InitialMessage) */ {
+ public:
+  inline InitialMessage() : InitialMessage(nullptr) {}
+  ~InitialMessage() override;
+  explicit constexpr InitialMessage(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  InitialMessage(const InitialMessage& from);
+  InitialMessage(InitialMessage&& from) noexcept
+    : InitialMessage() {
+    *this = ::std::move(from);
+  }
+
+  inline InitialMessage& operator=(const InitialMessage& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline InitialMessage& operator=(InitialMessage&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const InitialMessage& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const InitialMessage* internal_default_instance() {
+    return reinterpret_cast<const InitialMessage*>(
+               &_InitialMessage_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  friend void swap(InitialMessage& a, InitialMessage& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(InitialMessage* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(InitialMessage* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  InitialMessage* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<InitialMessage>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const InitialMessage& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const InitialMessage& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(InitialMessage* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "oram.InitialMessage";
+  }
+  protected:
+  explicit InitialMessage(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTypeFieldNumber = 1,
+    kSizeFieldNumber = 2,
+  };
+  // uint32 type = 1;
+  void clear_type();
+  uint32_t type() const;
+  void set_type(uint32_t value);
+  private:
+  uint32_t _internal_type() const;
+  void _internal_set_type(uint32_t value);
+  public:
+
+  // optional uint32 size = 2;
+  bool has_size() const;
+  private:
+  bool _internal_has_size() const;
+  public:
+  void clear_size();
+  uint32_t size() const;
+  void set_size(uint32_t value);
+  private:
+  uint32_t _internal_size() const;
+  void _internal_set_size(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:oram.InitialMessage)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  uint32_t type_;
+  uint32_t size_;
+  friend struct ::TableStruct_messages_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Message0 final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:oram.Message0) */ {
+ public:
+  inline Message0() : Message0(nullptr) {}
+  ~Message0() override;
+  explicit constexpr Message0(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  Message0(const Message0& from);
+  Message0(Message0&& from) noexcept
+    : Message0() {
+    *this = ::std::move(from);
+  }
+
+  inline Message0& operator=(const Message0& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Message0& operator=(Message0&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const Message0& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const Message0* internal_default_instance() {
+    return reinterpret_cast<const Message0*>(
+               &_Message0_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    9;
+
+  friend void swap(Message0& a, Message0& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Message0* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Message0* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  Message0* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<Message0>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const Message0& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const Message0& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Message0* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "oram.Message0";
+  }
+  protected:
+  explicit Message0(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTypeFieldNumber = 1,
+    kEpidFieldNumber = 2,
+    kStatusFieldNumber = 3,
+  };
+  // uint32 type = 1;
+  void clear_type();
+  uint32_t type() const;
+  void set_type(uint32_t value);
+  private:
+  uint32_t _internal_type() const;
+  void _internal_set_type(uint32_t value);
+  public:
+
+  // uint32 epid = 2;
+  void clear_epid();
+  uint32_t epid() const;
+  void set_epid(uint32_t value);
+  private:
+  uint32_t _internal_epid() const;
+  void _internal_set_epid(uint32_t value);
+  public:
+
+  // optional uint32 status = 3;
+  bool has_status() const;
+  private:
+  bool _internal_has_status() const;
+  public:
+  void clear_status();
+  uint32_t status() const;
+  void set_status(uint32_t value);
+  private:
+  uint32_t _internal_status() const;
+  void _internal_set_status(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:oram.Message0)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  uint32_t type_;
+  uint32_t epid_;
+  uint32_t status_;
+  friend struct ::TableStruct_messages_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Message1 final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:oram.Message1) */ {
+ public:
+  inline Message1() : Message1(nullptr) {}
+  ~Message1() override;
+  explicit constexpr Message1(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  Message1(const Message1& from);
+  Message1(Message1&& from) noexcept
+    : Message1() {
+    *this = ::std::move(from);
+  }
+
+  inline Message1& operator=(const Message1& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Message1& operator=(Message1&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const Message1& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const Message1* internal_default_instance() {
+    return reinterpret_cast<const Message1*>(
+               &_Message1_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    10;
+
+  friend void swap(Message1& a, Message1& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Message1* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Message1* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  Message1* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<Message1>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const Message1& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const Message1& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Message1* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "oram.Message1";
+  }
+  protected:
+  explicit Message1(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kGaXFieldNumber = 2,
+    kGaYFieldNumber = 3,
+    kGIDFieldNumber = 4,
+    kTypeFieldNumber = 1,
+  };
+  // repeated uint32 GaX = 2 [packed = true];
+  int gax_size() const;
+  private:
+  int _internal_gax_size() const;
+  public:
+  void clear_gax();
+  private:
+  uint32_t _internal_gax(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_gax() const;
+  void _internal_add_gax(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_gax();
+  public:
+  uint32_t gax(int index) const;
+  void set_gax(int index, uint32_t value);
+  void add_gax(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      gax() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_gax();
+
+  // repeated uint32 GaY = 3 [packed = true];
+  int gay_size() const;
+  private:
+  int _internal_gay_size() const;
+  public:
+  void clear_gay();
+  private:
+  uint32_t _internal_gay(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_gay() const;
+  void _internal_add_gay(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_gay();
+  public:
+  uint32_t gay(int index) const;
+  void set_gay(int index, uint32_t value);
+  void add_gay(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      gay() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_gay();
+
+  // repeated uint32 GID = 4 [packed = true];
+  int gid_size() const;
+  private:
+  int _internal_gid_size() const;
+  public:
+  void clear_gid();
+  private:
+  uint32_t _internal_gid(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_gid() const;
+  void _internal_add_gid(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_gid();
+  public:
+  uint32_t gid(int index) const;
+  void set_gid(int index, uint32_t value);
+  void add_gid(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      gid() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_gid();
+
+  // uint32 type = 1;
+  void clear_type();
+  uint32_t type() const;
+  void set_type(uint32_t value);
+  private:
+  uint32_t _internal_type() const;
+  void _internal_set_type(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:oram.Message1)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > gax_;
+  mutable std::atomic<int> _gax_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > gay_;
+  mutable std::atomic<int> _gay_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > gid_;
+  mutable std::atomic<int> _gid_cached_byte_size_;
+  uint32_t type_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_messages_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Message2 final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:oram.Message2) */ {
+ public:
+  inline Message2() : Message2(nullptr) {}
+  ~Message2() override;
+  explicit constexpr Message2(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  Message2(const Message2& from);
+  Message2(Message2&& from) noexcept
+    : Message2() {
+    *this = ::std::move(from);
+  }
+
+  inline Message2& operator=(const Message2& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Message2& operator=(Message2&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const Message2& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const Message2* internal_default_instance() {
+    return reinterpret_cast<const Message2*>(
+               &_Message2_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    11;
+
+  friend void swap(Message2& a, Message2& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Message2* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Message2* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  Message2* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<Message2>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const Message2& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const Message2& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Message2* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "oram.Message2";
+  }
+  protected:
+  explicit Message2(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kPublicKeyGxFieldNumber = 3,
+    kPublicKeyGyFieldNumber = 4,
+    kSpidFieldNumber = 6,
+    kSignatureXFieldNumber = 8,
+    kSignatureYFieldNumber = 9,
+    kSmacFieldNumber = 10,
+    kSigrlFieldNumber = 12,
+    kTypeFieldNumber = 1,
+    kSizeFieldNumber = 2,
+    kQuoteTypeFieldNumber = 5,
+    kCmacKdfIdFieldNumber = 7,
+    kSizeSigrlFieldNumber = 11,
+  };
+  // repeated uint32 public_key_gx = 3 [packed = true];
+  int public_key_gx_size() const;
+  private:
+  int _internal_public_key_gx_size() const;
+  public:
+  void clear_public_key_gx();
+  private:
+  uint32_t _internal_public_key_gx(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_public_key_gx() const;
+  void _internal_add_public_key_gx(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_public_key_gx();
+  public:
+  uint32_t public_key_gx(int index) const;
+  void set_public_key_gx(int index, uint32_t value);
+  void add_public_key_gx(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      public_key_gx() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_public_key_gx();
+
+  // repeated uint32 public_key_gy = 4 [packed = true];
+  int public_key_gy_size() const;
+  private:
+  int _internal_public_key_gy_size() const;
+  public:
+  void clear_public_key_gy();
+  private:
+  uint32_t _internal_public_key_gy(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_public_key_gy() const;
+  void _internal_add_public_key_gy(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_public_key_gy();
+  public:
+  uint32_t public_key_gy(int index) const;
+  void set_public_key_gy(int index, uint32_t value);
+  void add_public_key_gy(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      public_key_gy() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_public_key_gy();
+
+  // repeated uint32 spid = 6 [packed = true];
+  int spid_size() const;
+  private:
+  int _internal_spid_size() const;
+  public:
+  void clear_spid();
+  private:
+  uint32_t _internal_spid(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_spid() const;
+  void _internal_add_spid(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_spid();
+  public:
+  uint32_t spid(int index) const;
+  void set_spid(int index, uint32_t value);
+  void add_spid(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      spid() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_spid();
+
+  // repeated uint32 signature_x = 8 [packed = true];
+  int signature_x_size() const;
+  private:
+  int _internal_signature_x_size() const;
+  public:
+  void clear_signature_x();
+  private:
+  uint32_t _internal_signature_x(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_signature_x() const;
+  void _internal_add_signature_x(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_signature_x();
+  public:
+  uint32_t signature_x(int index) const;
+  void set_signature_x(int index, uint32_t value);
+  void add_signature_x(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      signature_x() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_signature_x();
+
+  // repeated uint32 signature_y = 9 [packed = true];
+  int signature_y_size() const;
+  private:
+  int _internal_signature_y_size() const;
+  public:
+  void clear_signature_y();
+  private:
+  uint32_t _internal_signature_y(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_signature_y() const;
+  void _internal_add_signature_y(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_signature_y();
+  public:
+  uint32_t signature_y(int index) const;
+  void set_signature_y(int index, uint32_t value);
+  void add_signature_y(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      signature_y() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_signature_y();
+
+  // repeated uint32 smac = 10 [packed = true];
+  int smac_size() const;
+  private:
+  int _internal_smac_size() const;
+  public:
+  void clear_smac();
+  private:
+  uint32_t _internal_smac(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_smac() const;
+  void _internal_add_smac(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_smac();
+  public:
+  uint32_t smac(int index) const;
+  void set_smac(int index, uint32_t value);
+  void add_smac(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      smac() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_smac();
+
+  // repeated uint32 sigrl = 12 [packed = true];
+  int sigrl_size() const;
+  private:
+  int _internal_sigrl_size() const;
+  public:
+  void clear_sigrl();
+  private:
+  uint32_t _internal_sigrl(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_sigrl() const;
+  void _internal_add_sigrl(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_sigrl();
+  public:
+  uint32_t sigrl(int index) const;
+  void set_sigrl(int index, uint32_t value);
+  void add_sigrl(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      sigrl() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_sigrl();
+
+  // uint32 type = 1;
+  void clear_type();
+  uint32_t type() const;
+  void set_type(uint32_t value);
+  private:
+  uint32_t _internal_type() const;
+  void _internal_set_type(uint32_t value);
+  public:
+
+  // optional uint32 size = 2;
+  bool has_size() const;
+  private:
+  bool _internal_has_size() const;
+  public:
+  void clear_size();
+  uint32_t size() const;
+  void set_size(uint32_t value);
+  private:
+  uint32_t _internal_size() const;
+  void _internal_set_size(uint32_t value);
+  public:
+
+  // optional uint32 quote_type = 5;
+  bool has_quote_type() const;
+  private:
+  bool _internal_has_quote_type() const;
+  public:
+  void clear_quote_type();
+  uint32_t quote_type() const;
+  void set_quote_type(uint32_t value);
+  private:
+  uint32_t _internal_quote_type() const;
+  void _internal_set_quote_type(uint32_t value);
+  public:
+
+  // optional uint32 cmac_kdf_id = 7;
+  bool has_cmac_kdf_id() const;
+  private:
+  bool _internal_has_cmac_kdf_id() const;
+  public:
+  void clear_cmac_kdf_id();
+  uint32_t cmac_kdf_id() const;
+  void set_cmac_kdf_id(uint32_t value);
+  private:
+  uint32_t _internal_cmac_kdf_id() const;
+  void _internal_set_cmac_kdf_id(uint32_t value);
+  public:
+
+  // optional uint32 size_sigrl = 11;
+  bool has_size_sigrl() const;
+  private:
+  bool _internal_has_size_sigrl() const;
+  public:
+  void clear_size_sigrl();
+  uint32_t size_sigrl() const;
+  void set_size_sigrl(uint32_t value);
+  private:
+  uint32_t _internal_size_sigrl() const;
+  void _internal_set_size_sigrl(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:oram.Message2)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > public_key_gx_;
+  mutable std::atomic<int> _public_key_gx_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > public_key_gy_;
+  mutable std::atomic<int> _public_key_gy_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > spid_;
+  mutable std::atomic<int> _spid_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > signature_x_;
+  mutable std::atomic<int> _signature_x_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > signature_y_;
+  mutable std::atomic<int> _signature_y_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > smac_;
+  mutable std::atomic<int> _smac_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > sigrl_;
+  mutable std::atomic<int> _sigrl_cached_byte_size_;
+  uint32_t type_;
+  uint32_t size_;
+  uint32_t quote_type_;
+  uint32_t cmac_kdf_id_;
+  uint32_t size_sigrl_;
+  friend struct ::TableStruct_messages_2eproto;
+};
+// -------------------------------------------------------------------
+
+class Message3 final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:oram.Message3) */ {
+ public:
+  inline Message3() : Message3(nullptr) {}
+  ~Message3() override;
+  explicit constexpr Message3(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  Message3(const Message3& from);
+  Message3(Message3&& from) noexcept
+    : Message3() {
+    *this = ::std::move(from);
+  }
+
+  inline Message3& operator=(const Message3& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline Message3& operator=(Message3&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const Message3& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const Message3* internal_default_instance() {
+    return reinterpret_cast<const Message3*>(
+               &_Message3_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    12;
+
+  friend void swap(Message3& a, Message3& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(Message3* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(Message3* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  Message3* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<Message3>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const Message3& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const Message3& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(Message3* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "oram.Message3";
+  }
+  protected:
+  explicit Message3(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSgxMacFieldNumber = 3,
+    kGaxMsg3FieldNumber = 4,
+    kGayMsg3FieldNumber = 5,
+    kSecPropertyFieldNumber = 6,
+    kQuoteFieldNumber = 7,
+    kTypeFieldNumber = 1,
+    kSizeFieldNumber = 2,
+  };
+  // repeated uint32 sgx_mac = 3 [packed = true];
+  int sgx_mac_size() const;
+  private:
+  int _internal_sgx_mac_size() const;
+  public:
+  void clear_sgx_mac();
+  private:
+  uint32_t _internal_sgx_mac(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_sgx_mac() const;
+  void _internal_add_sgx_mac(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_sgx_mac();
+  public:
+  uint32_t sgx_mac(int index) const;
+  void set_sgx_mac(int index, uint32_t value);
+  void add_sgx_mac(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      sgx_mac() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_sgx_mac();
+
+  // repeated uint32 gax_msg3 = 4 [packed = true];
+  int gax_msg3_size() const;
+  private:
+  int _internal_gax_msg3_size() const;
+  public:
+  void clear_gax_msg3();
+  private:
+  uint32_t _internal_gax_msg3(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_gax_msg3() const;
+  void _internal_add_gax_msg3(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_gax_msg3();
+  public:
+  uint32_t gax_msg3(int index) const;
+  void set_gax_msg3(int index, uint32_t value);
+  void add_gax_msg3(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      gax_msg3() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_gax_msg3();
+
+  // repeated uint32 gay_msg3 = 5 [packed = true];
+  int gay_msg3_size() const;
+  private:
+  int _internal_gay_msg3_size() const;
+  public:
+  void clear_gay_msg3();
+  private:
+  uint32_t _internal_gay_msg3(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_gay_msg3() const;
+  void _internal_add_gay_msg3(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_gay_msg3();
+  public:
+  uint32_t gay_msg3(int index) const;
+  void set_gay_msg3(int index, uint32_t value);
+  void add_gay_msg3(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      gay_msg3() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_gay_msg3();
+
+  // repeated uint32 sec_property = 6 [packed = true];
+  int sec_property_size() const;
+  private:
+  int _internal_sec_property_size() const;
+  public:
+  void clear_sec_property();
+  private:
+  uint32_t _internal_sec_property(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_sec_property() const;
+  void _internal_add_sec_property(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_sec_property();
+  public:
+  uint32_t sec_property(int index) const;
+  void set_sec_property(int index, uint32_t value);
+  void add_sec_property(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      sec_property() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_sec_property();
+
+  // repeated uint32 quote = 7 [packed = true];
+  int quote_size() const;
+  private:
+  int _internal_quote_size() const;
+  public:
+  void clear_quote();
+  private:
+  uint32_t _internal_quote(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_quote() const;
+  void _internal_add_quote(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_quote();
+  public:
+  uint32_t quote(int index) const;
+  void set_quote(int index, uint32_t value);
+  void add_quote(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      quote() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_quote();
+
+  // uint32 type = 1;
+  void clear_type();
+  uint32_t type() const;
+  void set_type(uint32_t value);
+  private:
+  uint32_t _internal_type() const;
+  void _internal_set_type(uint32_t value);
+  public:
+
+  // optional uint32 size = 2;
+  bool has_size() const;
+  private:
+  bool _internal_has_size() const;
+  public:
+  void clear_size();
+  uint32_t size() const;
+  void set_size(uint32_t value);
+  private:
+  uint32_t _internal_size() const;
+  void _internal_set_size(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:oram.Message3)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > sgx_mac_;
+  mutable std::atomic<int> _sgx_mac_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > gax_msg3_;
+  mutable std::atomic<int> _gax_msg3_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > gay_msg3_;
+  mutable std::atomic<int> _gay_msg3_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > sec_property_;
+  mutable std::atomic<int> _sec_property_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > quote_;
+  mutable std::atomic<int> _quote_cached_byte_size_;
+  uint32_t type_;
+  uint32_t size_;
+  friend struct ::TableStruct_messages_2eproto;
+};
+// -------------------------------------------------------------------
+
+class AttestationMessage final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:oram.AttestationMessage) */ {
+ public:
+  inline AttestationMessage() : AttestationMessage(nullptr) {}
+  ~AttestationMessage() override;
+  explicit constexpr AttestationMessage(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  AttestationMessage(const AttestationMessage& from);
+  AttestationMessage(AttestationMessage&& from) noexcept
+    : AttestationMessage() {
+    *this = ::std::move(from);
+  }
+
+  inline AttestationMessage& operator=(const AttestationMessage& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline AttestationMessage& operator=(AttestationMessage&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const AttestationMessage& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const AttestationMessage* internal_default_instance() {
+    return reinterpret_cast<const AttestationMessage*>(
+               &_AttestationMessage_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    13;
+
+  friend void swap(AttestationMessage& a, AttestationMessage& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(AttestationMessage* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(AttestationMessage* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  AttestationMessage* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<AttestationMessage>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const AttestationMessage& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const AttestationMessage& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(AttestationMessage* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "oram.AttestationMessage";
+  }
+  protected:
+  explicit AttestationMessage(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kLatestEquivalentTcbPsvnFieldNumber = 6,
+    kLatestPseIsvsvnFieldNumber = 7,
+    kLatestPsdaSvnFieldNumber = 8,
+    kPerformanceRekeyGidFieldNumber = 9,
+    kEcSign256XFieldNumber = 10,
+    kEcSign256YFieldNumber = 11,
+    kMacSmkFieldNumber = 12,
+    kReservedFieldNumber = 14,
+    kPayloadTagFieldNumber = 15,
+    kPayloadFieldNumber = 16,
+    kTypeFieldNumber = 1,
+    kSizeFieldNumber = 2,
+    kEpidGroupStatusFieldNumber = 3,
+    kTcbEvaluationStatusFieldNumber = 4,
+    kPseEvaluationStatusFieldNumber = 5,
+    kResultSizeFieldNumber = 13,
+  };
+  // repeated uint32 latest_equivalent_tcb_psvn = 6 [packed = true];
+  int latest_equivalent_tcb_psvn_size() const;
+  private:
+  int _internal_latest_equivalent_tcb_psvn_size() const;
+  public:
+  void clear_latest_equivalent_tcb_psvn();
+  private:
+  uint32_t _internal_latest_equivalent_tcb_psvn(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_latest_equivalent_tcb_psvn() const;
+  void _internal_add_latest_equivalent_tcb_psvn(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_latest_equivalent_tcb_psvn();
+  public:
+  uint32_t latest_equivalent_tcb_psvn(int index) const;
+  void set_latest_equivalent_tcb_psvn(int index, uint32_t value);
+  void add_latest_equivalent_tcb_psvn(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      latest_equivalent_tcb_psvn() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_latest_equivalent_tcb_psvn();
+
+  // repeated uint32 latest_pse_isvsvn = 7 [packed = true];
+  int latest_pse_isvsvn_size() const;
+  private:
+  int _internal_latest_pse_isvsvn_size() const;
+  public:
+  void clear_latest_pse_isvsvn();
+  private:
+  uint32_t _internal_latest_pse_isvsvn(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_latest_pse_isvsvn() const;
+  void _internal_add_latest_pse_isvsvn(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_latest_pse_isvsvn();
+  public:
+  uint32_t latest_pse_isvsvn(int index) const;
+  void set_latest_pse_isvsvn(int index, uint32_t value);
+  void add_latest_pse_isvsvn(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      latest_pse_isvsvn() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_latest_pse_isvsvn();
+
+  // repeated uint32 latest_psda_svn = 8 [packed = true];
+  int latest_psda_svn_size() const;
+  private:
+  int _internal_latest_psda_svn_size() const;
+  public:
+  void clear_latest_psda_svn();
+  private:
+  uint32_t _internal_latest_psda_svn(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_latest_psda_svn() const;
+  void _internal_add_latest_psda_svn(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_latest_psda_svn();
+  public:
+  uint32_t latest_psda_svn(int index) const;
+  void set_latest_psda_svn(int index, uint32_t value);
+  void add_latest_psda_svn(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      latest_psda_svn() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_latest_psda_svn();
+
+  // repeated uint32 performance_rekey_gid = 9 [packed = true];
+  int performance_rekey_gid_size() const;
+  private:
+  int _internal_performance_rekey_gid_size() const;
+  public:
+  void clear_performance_rekey_gid();
+  private:
+  uint32_t _internal_performance_rekey_gid(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_performance_rekey_gid() const;
+  void _internal_add_performance_rekey_gid(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_performance_rekey_gid();
+  public:
+  uint32_t performance_rekey_gid(int index) const;
+  void set_performance_rekey_gid(int index, uint32_t value);
+  void add_performance_rekey_gid(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      performance_rekey_gid() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_performance_rekey_gid();
+
+  // repeated uint32 ec_sign256_x = 10 [packed = true];
+  int ec_sign256_x_size() const;
+  private:
+  int _internal_ec_sign256_x_size() const;
+  public:
+  void clear_ec_sign256_x();
+  private:
+  uint32_t _internal_ec_sign256_x(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_ec_sign256_x() const;
+  void _internal_add_ec_sign256_x(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_ec_sign256_x();
+  public:
+  uint32_t ec_sign256_x(int index) const;
+  void set_ec_sign256_x(int index, uint32_t value);
+  void add_ec_sign256_x(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      ec_sign256_x() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_ec_sign256_x();
+
+  // repeated uint32 ec_sign256_y = 11 [packed = true];
+  int ec_sign256_y_size() const;
+  private:
+  int _internal_ec_sign256_y_size() const;
+  public:
+  void clear_ec_sign256_y();
+  private:
+  uint32_t _internal_ec_sign256_y(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_ec_sign256_y() const;
+  void _internal_add_ec_sign256_y(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_ec_sign256_y();
+  public:
+  uint32_t ec_sign256_y(int index) const;
+  void set_ec_sign256_y(int index, uint32_t value);
+  void add_ec_sign256_y(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      ec_sign256_y() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_ec_sign256_y();
+
+  // repeated uint32 mac_smk = 12 [packed = true];
+  int mac_smk_size() const;
+  private:
+  int _internal_mac_smk_size() const;
+  public:
+  void clear_mac_smk();
+  private:
+  uint32_t _internal_mac_smk(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_mac_smk() const;
+  void _internal_add_mac_smk(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_mac_smk();
+  public:
+  uint32_t mac_smk(int index) const;
+  void set_mac_smk(int index, uint32_t value);
+  void add_mac_smk(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      mac_smk() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_mac_smk();
+
+  // repeated uint32 reserved = 14 [packed = true];
+  int reserved_size() const;
+  private:
+  int _internal_reserved_size() const;
+  public:
+  void clear_reserved();
+  private:
+  uint32_t _internal_reserved(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_reserved() const;
+  void _internal_add_reserved(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_reserved();
+  public:
+  uint32_t reserved(int index) const;
+  void set_reserved(int index, uint32_t value);
+  void add_reserved(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      reserved() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_reserved();
+
+  // repeated uint32 payload_tag = 15 [packed = true];
+  int payload_tag_size() const;
+  private:
+  int _internal_payload_tag_size() const;
+  public:
+  void clear_payload_tag();
+  private:
+  uint32_t _internal_payload_tag(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_payload_tag() const;
+  void _internal_add_payload_tag(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_payload_tag();
+  public:
+  uint32_t payload_tag(int index) const;
+  void set_payload_tag(int index, uint32_t value);
+  void add_payload_tag(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      payload_tag() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_payload_tag();
+
+  // repeated uint32 payload = 16 [packed = true];
+  int payload_size() const;
+  private:
+  int _internal_payload_size() const;
+  public:
+  void clear_payload();
+  private:
+  uint32_t _internal_payload(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_payload() const;
+  void _internal_add_payload(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_payload();
+  public:
+  uint32_t payload(int index) const;
+  void set_payload(int index, uint32_t value);
+  void add_payload(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      payload() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_payload();
+
+  // uint32 type = 1;
+  void clear_type();
+  uint32_t type() const;
+  void set_type(uint32_t value);
+  private:
+  uint32_t _internal_type() const;
+  void _internal_set_type(uint32_t value);
+  public:
+
+  // uint32 size = 2;
+  void clear_size();
+  uint32_t size() const;
+  void set_size(uint32_t value);
+  private:
+  uint32_t _internal_size() const;
+  void _internal_set_size(uint32_t value);
+  public:
+
+  // optional uint32 epid_group_status = 3;
+  bool has_epid_group_status() const;
+  private:
+  bool _internal_has_epid_group_status() const;
+  public:
+  void clear_epid_group_status();
+  uint32_t epid_group_status() const;
+  void set_epid_group_status(uint32_t value);
+  private:
+  uint32_t _internal_epid_group_status() const;
+  void _internal_set_epid_group_status(uint32_t value);
+  public:
+
+  // optional uint32 tcb_evaluation_status = 4;
+  bool has_tcb_evaluation_status() const;
+  private:
+  bool _internal_has_tcb_evaluation_status() const;
+  public:
+  void clear_tcb_evaluation_status();
+  uint32_t tcb_evaluation_status() const;
+  void set_tcb_evaluation_status(uint32_t value);
+  private:
+  uint32_t _internal_tcb_evaluation_status() const;
+  void _internal_set_tcb_evaluation_status(uint32_t value);
+  public:
+
+  // optional uint32 pse_evaluation_status = 5;
+  bool has_pse_evaluation_status() const;
+  private:
+  bool _internal_has_pse_evaluation_status() const;
+  public:
+  void clear_pse_evaluation_status();
+  uint32_t pse_evaluation_status() const;
+  void set_pse_evaluation_status(uint32_t value);
+  private:
+  uint32_t _internal_pse_evaluation_status() const;
+  void _internal_set_pse_evaluation_status(uint32_t value);
+  public:
+
+  // optional uint32 result_size = 13;
+  bool has_result_size() const;
+  private:
+  bool _internal_has_result_size() const;
+  public:
+  void clear_result_size();
+  uint32_t result_size() const;
+  void set_result_size(uint32_t value);
+  private:
+  uint32_t _internal_result_size() const;
+  void _internal_set_result_size(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:oram.AttestationMessage)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > latest_equivalent_tcb_psvn_;
+  mutable std::atomic<int> _latest_equivalent_tcb_psvn_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > latest_pse_isvsvn_;
+  mutable std::atomic<int> _latest_pse_isvsvn_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > latest_psda_svn_;
+  mutable std::atomic<int> _latest_psda_svn_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > performance_rekey_gid_;
+  mutable std::atomic<int> _performance_rekey_gid_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > ec_sign256_x_;
+  mutable std::atomic<int> _ec_sign256_x_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > ec_sign256_y_;
+  mutable std::atomic<int> _ec_sign256_y_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > mac_smk_;
+  mutable std::atomic<int> _mac_smk_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > reserved_;
+  mutable std::atomic<int> _reserved_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > payload_tag_;
+  mutable std::atomic<int> _payload_tag_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > payload_;
+  mutable std::atomic<int> _payload_cached_byte_size_;
+  uint32_t type_;
+  uint32_t size_;
+  uint32_t epid_group_status_;
+  uint32_t tcb_evaluation_status_;
+  uint32_t pse_evaluation_status_;
+  uint32_t result_size_;
+  friend struct ::TableStruct_messages_2eproto;
+};
 // ===================================================================
 
 
@@ -1835,9 +3552,1688 @@ inline void WriteReply::set_success(bool value) {
 
 // CloseRequest
 
+// -------------------------------------------------------------------
+
+// InitialMessage
+
+// uint32 type = 1;
+inline void InitialMessage::clear_type() {
+  type_ = 0u;
+}
+inline uint32_t InitialMessage::_internal_type() const {
+  return type_;
+}
+inline uint32_t InitialMessage::type() const {
+  // @@protoc_insertion_point(field_get:oram.InitialMessage.type)
+  return _internal_type();
+}
+inline void InitialMessage::_internal_set_type(uint32_t value) {
+  
+  type_ = value;
+}
+inline void InitialMessage::set_type(uint32_t value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:oram.InitialMessage.type)
+}
+
+// optional uint32 size = 2;
+inline bool InitialMessage::_internal_has_size() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool InitialMessage::has_size() const {
+  return _internal_has_size();
+}
+inline void InitialMessage::clear_size() {
+  size_ = 0u;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline uint32_t InitialMessage::_internal_size() const {
+  return size_;
+}
+inline uint32_t InitialMessage::size() const {
+  // @@protoc_insertion_point(field_get:oram.InitialMessage.size)
+  return _internal_size();
+}
+inline void InitialMessage::_internal_set_size(uint32_t value) {
+  _has_bits_[0] |= 0x00000001u;
+  size_ = value;
+}
+inline void InitialMessage::set_size(uint32_t value) {
+  _internal_set_size(value);
+  // @@protoc_insertion_point(field_set:oram.InitialMessage.size)
+}
+
+// -------------------------------------------------------------------
+
+// Message0
+
+// uint32 type = 1;
+inline void Message0::clear_type() {
+  type_ = 0u;
+}
+inline uint32_t Message0::_internal_type() const {
+  return type_;
+}
+inline uint32_t Message0::type() const {
+  // @@protoc_insertion_point(field_get:oram.Message0.type)
+  return _internal_type();
+}
+inline void Message0::_internal_set_type(uint32_t value) {
+  
+  type_ = value;
+}
+inline void Message0::set_type(uint32_t value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:oram.Message0.type)
+}
+
+// uint32 epid = 2;
+inline void Message0::clear_epid() {
+  epid_ = 0u;
+}
+inline uint32_t Message0::_internal_epid() const {
+  return epid_;
+}
+inline uint32_t Message0::epid() const {
+  // @@protoc_insertion_point(field_get:oram.Message0.epid)
+  return _internal_epid();
+}
+inline void Message0::_internal_set_epid(uint32_t value) {
+  
+  epid_ = value;
+}
+inline void Message0::set_epid(uint32_t value) {
+  _internal_set_epid(value);
+  // @@protoc_insertion_point(field_set:oram.Message0.epid)
+}
+
+// optional uint32 status = 3;
+inline bool Message0::_internal_has_status() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool Message0::has_status() const {
+  return _internal_has_status();
+}
+inline void Message0::clear_status() {
+  status_ = 0u;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline uint32_t Message0::_internal_status() const {
+  return status_;
+}
+inline uint32_t Message0::status() const {
+  // @@protoc_insertion_point(field_get:oram.Message0.status)
+  return _internal_status();
+}
+inline void Message0::_internal_set_status(uint32_t value) {
+  _has_bits_[0] |= 0x00000001u;
+  status_ = value;
+}
+inline void Message0::set_status(uint32_t value) {
+  _internal_set_status(value);
+  // @@protoc_insertion_point(field_set:oram.Message0.status)
+}
+
+// -------------------------------------------------------------------
+
+// Message1
+
+// uint32 type = 1;
+inline void Message1::clear_type() {
+  type_ = 0u;
+}
+inline uint32_t Message1::_internal_type() const {
+  return type_;
+}
+inline uint32_t Message1::type() const {
+  // @@protoc_insertion_point(field_get:oram.Message1.type)
+  return _internal_type();
+}
+inline void Message1::_internal_set_type(uint32_t value) {
+  
+  type_ = value;
+}
+inline void Message1::set_type(uint32_t value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:oram.Message1.type)
+}
+
+// repeated uint32 GaX = 2 [packed = true];
+inline int Message1::_internal_gax_size() const {
+  return gax_.size();
+}
+inline int Message1::gax_size() const {
+  return _internal_gax_size();
+}
+inline void Message1::clear_gax() {
+  gax_.Clear();
+}
+inline uint32_t Message1::_internal_gax(int index) const {
+  return gax_.Get(index);
+}
+inline uint32_t Message1::gax(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message1.GaX)
+  return _internal_gax(index);
+}
+inline void Message1::set_gax(int index, uint32_t value) {
+  gax_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message1.GaX)
+}
+inline void Message1::_internal_add_gax(uint32_t value) {
+  gax_.Add(value);
+}
+inline void Message1::add_gax(uint32_t value) {
+  _internal_add_gax(value);
+  // @@protoc_insertion_point(field_add:oram.Message1.GaX)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message1::_internal_gax() const {
+  return gax_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message1::gax() const {
+  // @@protoc_insertion_point(field_list:oram.Message1.GaX)
+  return _internal_gax();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message1::_internal_mutable_gax() {
+  return &gax_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message1::mutable_gax() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message1.GaX)
+  return _internal_mutable_gax();
+}
+
+// repeated uint32 GaY = 3 [packed = true];
+inline int Message1::_internal_gay_size() const {
+  return gay_.size();
+}
+inline int Message1::gay_size() const {
+  return _internal_gay_size();
+}
+inline void Message1::clear_gay() {
+  gay_.Clear();
+}
+inline uint32_t Message1::_internal_gay(int index) const {
+  return gay_.Get(index);
+}
+inline uint32_t Message1::gay(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message1.GaY)
+  return _internal_gay(index);
+}
+inline void Message1::set_gay(int index, uint32_t value) {
+  gay_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message1.GaY)
+}
+inline void Message1::_internal_add_gay(uint32_t value) {
+  gay_.Add(value);
+}
+inline void Message1::add_gay(uint32_t value) {
+  _internal_add_gay(value);
+  // @@protoc_insertion_point(field_add:oram.Message1.GaY)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message1::_internal_gay() const {
+  return gay_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message1::gay() const {
+  // @@protoc_insertion_point(field_list:oram.Message1.GaY)
+  return _internal_gay();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message1::_internal_mutable_gay() {
+  return &gay_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message1::mutable_gay() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message1.GaY)
+  return _internal_mutable_gay();
+}
+
+// repeated uint32 GID = 4 [packed = true];
+inline int Message1::_internal_gid_size() const {
+  return gid_.size();
+}
+inline int Message1::gid_size() const {
+  return _internal_gid_size();
+}
+inline void Message1::clear_gid() {
+  gid_.Clear();
+}
+inline uint32_t Message1::_internal_gid(int index) const {
+  return gid_.Get(index);
+}
+inline uint32_t Message1::gid(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message1.GID)
+  return _internal_gid(index);
+}
+inline void Message1::set_gid(int index, uint32_t value) {
+  gid_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message1.GID)
+}
+inline void Message1::_internal_add_gid(uint32_t value) {
+  gid_.Add(value);
+}
+inline void Message1::add_gid(uint32_t value) {
+  _internal_add_gid(value);
+  // @@protoc_insertion_point(field_add:oram.Message1.GID)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message1::_internal_gid() const {
+  return gid_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message1::gid() const {
+  // @@protoc_insertion_point(field_list:oram.Message1.GID)
+  return _internal_gid();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message1::_internal_mutable_gid() {
+  return &gid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message1::mutable_gid() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message1.GID)
+  return _internal_mutable_gid();
+}
+
+// -------------------------------------------------------------------
+
+// Message2
+
+// uint32 type = 1;
+inline void Message2::clear_type() {
+  type_ = 0u;
+}
+inline uint32_t Message2::_internal_type() const {
+  return type_;
+}
+inline uint32_t Message2::type() const {
+  // @@protoc_insertion_point(field_get:oram.Message2.type)
+  return _internal_type();
+}
+inline void Message2::_internal_set_type(uint32_t value) {
+  
+  type_ = value;
+}
+inline void Message2::set_type(uint32_t value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:oram.Message2.type)
+}
+
+// optional uint32 size = 2;
+inline bool Message2::_internal_has_size() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool Message2::has_size() const {
+  return _internal_has_size();
+}
+inline void Message2::clear_size() {
+  size_ = 0u;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline uint32_t Message2::_internal_size() const {
+  return size_;
+}
+inline uint32_t Message2::size() const {
+  // @@protoc_insertion_point(field_get:oram.Message2.size)
+  return _internal_size();
+}
+inline void Message2::_internal_set_size(uint32_t value) {
+  _has_bits_[0] |= 0x00000001u;
+  size_ = value;
+}
+inline void Message2::set_size(uint32_t value) {
+  _internal_set_size(value);
+  // @@protoc_insertion_point(field_set:oram.Message2.size)
+}
+
+// repeated uint32 public_key_gx = 3 [packed = true];
+inline int Message2::_internal_public_key_gx_size() const {
+  return public_key_gx_.size();
+}
+inline int Message2::public_key_gx_size() const {
+  return _internal_public_key_gx_size();
+}
+inline void Message2::clear_public_key_gx() {
+  public_key_gx_.Clear();
+}
+inline uint32_t Message2::_internal_public_key_gx(int index) const {
+  return public_key_gx_.Get(index);
+}
+inline uint32_t Message2::public_key_gx(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message2.public_key_gx)
+  return _internal_public_key_gx(index);
+}
+inline void Message2::set_public_key_gx(int index, uint32_t value) {
+  public_key_gx_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message2.public_key_gx)
+}
+inline void Message2::_internal_add_public_key_gx(uint32_t value) {
+  public_key_gx_.Add(value);
+}
+inline void Message2::add_public_key_gx(uint32_t value) {
+  _internal_add_public_key_gx(value);
+  // @@protoc_insertion_point(field_add:oram.Message2.public_key_gx)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::_internal_public_key_gx() const {
+  return public_key_gx_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::public_key_gx() const {
+  // @@protoc_insertion_point(field_list:oram.Message2.public_key_gx)
+  return _internal_public_key_gx();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::_internal_mutable_public_key_gx() {
+  return &public_key_gx_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::mutable_public_key_gx() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message2.public_key_gx)
+  return _internal_mutable_public_key_gx();
+}
+
+// repeated uint32 public_key_gy = 4 [packed = true];
+inline int Message2::_internal_public_key_gy_size() const {
+  return public_key_gy_.size();
+}
+inline int Message2::public_key_gy_size() const {
+  return _internal_public_key_gy_size();
+}
+inline void Message2::clear_public_key_gy() {
+  public_key_gy_.Clear();
+}
+inline uint32_t Message2::_internal_public_key_gy(int index) const {
+  return public_key_gy_.Get(index);
+}
+inline uint32_t Message2::public_key_gy(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message2.public_key_gy)
+  return _internal_public_key_gy(index);
+}
+inline void Message2::set_public_key_gy(int index, uint32_t value) {
+  public_key_gy_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message2.public_key_gy)
+}
+inline void Message2::_internal_add_public_key_gy(uint32_t value) {
+  public_key_gy_.Add(value);
+}
+inline void Message2::add_public_key_gy(uint32_t value) {
+  _internal_add_public_key_gy(value);
+  // @@protoc_insertion_point(field_add:oram.Message2.public_key_gy)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::_internal_public_key_gy() const {
+  return public_key_gy_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::public_key_gy() const {
+  // @@protoc_insertion_point(field_list:oram.Message2.public_key_gy)
+  return _internal_public_key_gy();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::_internal_mutable_public_key_gy() {
+  return &public_key_gy_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::mutable_public_key_gy() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message2.public_key_gy)
+  return _internal_mutable_public_key_gy();
+}
+
+// optional uint32 quote_type = 5;
+inline bool Message2::_internal_has_quote_type() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool Message2::has_quote_type() const {
+  return _internal_has_quote_type();
+}
+inline void Message2::clear_quote_type() {
+  quote_type_ = 0u;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline uint32_t Message2::_internal_quote_type() const {
+  return quote_type_;
+}
+inline uint32_t Message2::quote_type() const {
+  // @@protoc_insertion_point(field_get:oram.Message2.quote_type)
+  return _internal_quote_type();
+}
+inline void Message2::_internal_set_quote_type(uint32_t value) {
+  _has_bits_[0] |= 0x00000002u;
+  quote_type_ = value;
+}
+inline void Message2::set_quote_type(uint32_t value) {
+  _internal_set_quote_type(value);
+  // @@protoc_insertion_point(field_set:oram.Message2.quote_type)
+}
+
+// repeated uint32 spid = 6 [packed = true];
+inline int Message2::_internal_spid_size() const {
+  return spid_.size();
+}
+inline int Message2::spid_size() const {
+  return _internal_spid_size();
+}
+inline void Message2::clear_spid() {
+  spid_.Clear();
+}
+inline uint32_t Message2::_internal_spid(int index) const {
+  return spid_.Get(index);
+}
+inline uint32_t Message2::spid(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message2.spid)
+  return _internal_spid(index);
+}
+inline void Message2::set_spid(int index, uint32_t value) {
+  spid_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message2.spid)
+}
+inline void Message2::_internal_add_spid(uint32_t value) {
+  spid_.Add(value);
+}
+inline void Message2::add_spid(uint32_t value) {
+  _internal_add_spid(value);
+  // @@protoc_insertion_point(field_add:oram.Message2.spid)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::_internal_spid() const {
+  return spid_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::spid() const {
+  // @@protoc_insertion_point(field_list:oram.Message2.spid)
+  return _internal_spid();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::_internal_mutable_spid() {
+  return &spid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::mutable_spid() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message2.spid)
+  return _internal_mutable_spid();
+}
+
+// optional uint32 cmac_kdf_id = 7;
+inline bool Message2::_internal_has_cmac_kdf_id() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool Message2::has_cmac_kdf_id() const {
+  return _internal_has_cmac_kdf_id();
+}
+inline void Message2::clear_cmac_kdf_id() {
+  cmac_kdf_id_ = 0u;
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline uint32_t Message2::_internal_cmac_kdf_id() const {
+  return cmac_kdf_id_;
+}
+inline uint32_t Message2::cmac_kdf_id() const {
+  // @@protoc_insertion_point(field_get:oram.Message2.cmac_kdf_id)
+  return _internal_cmac_kdf_id();
+}
+inline void Message2::_internal_set_cmac_kdf_id(uint32_t value) {
+  _has_bits_[0] |= 0x00000004u;
+  cmac_kdf_id_ = value;
+}
+inline void Message2::set_cmac_kdf_id(uint32_t value) {
+  _internal_set_cmac_kdf_id(value);
+  // @@protoc_insertion_point(field_set:oram.Message2.cmac_kdf_id)
+}
+
+// repeated uint32 signature_x = 8 [packed = true];
+inline int Message2::_internal_signature_x_size() const {
+  return signature_x_.size();
+}
+inline int Message2::signature_x_size() const {
+  return _internal_signature_x_size();
+}
+inline void Message2::clear_signature_x() {
+  signature_x_.Clear();
+}
+inline uint32_t Message2::_internal_signature_x(int index) const {
+  return signature_x_.Get(index);
+}
+inline uint32_t Message2::signature_x(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message2.signature_x)
+  return _internal_signature_x(index);
+}
+inline void Message2::set_signature_x(int index, uint32_t value) {
+  signature_x_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message2.signature_x)
+}
+inline void Message2::_internal_add_signature_x(uint32_t value) {
+  signature_x_.Add(value);
+}
+inline void Message2::add_signature_x(uint32_t value) {
+  _internal_add_signature_x(value);
+  // @@protoc_insertion_point(field_add:oram.Message2.signature_x)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::_internal_signature_x() const {
+  return signature_x_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::signature_x() const {
+  // @@protoc_insertion_point(field_list:oram.Message2.signature_x)
+  return _internal_signature_x();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::_internal_mutable_signature_x() {
+  return &signature_x_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::mutable_signature_x() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message2.signature_x)
+  return _internal_mutable_signature_x();
+}
+
+// repeated uint32 signature_y = 9 [packed = true];
+inline int Message2::_internal_signature_y_size() const {
+  return signature_y_.size();
+}
+inline int Message2::signature_y_size() const {
+  return _internal_signature_y_size();
+}
+inline void Message2::clear_signature_y() {
+  signature_y_.Clear();
+}
+inline uint32_t Message2::_internal_signature_y(int index) const {
+  return signature_y_.Get(index);
+}
+inline uint32_t Message2::signature_y(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message2.signature_y)
+  return _internal_signature_y(index);
+}
+inline void Message2::set_signature_y(int index, uint32_t value) {
+  signature_y_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message2.signature_y)
+}
+inline void Message2::_internal_add_signature_y(uint32_t value) {
+  signature_y_.Add(value);
+}
+inline void Message2::add_signature_y(uint32_t value) {
+  _internal_add_signature_y(value);
+  // @@protoc_insertion_point(field_add:oram.Message2.signature_y)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::_internal_signature_y() const {
+  return signature_y_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::signature_y() const {
+  // @@protoc_insertion_point(field_list:oram.Message2.signature_y)
+  return _internal_signature_y();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::_internal_mutable_signature_y() {
+  return &signature_y_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::mutable_signature_y() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message2.signature_y)
+  return _internal_mutable_signature_y();
+}
+
+// repeated uint32 smac = 10 [packed = true];
+inline int Message2::_internal_smac_size() const {
+  return smac_.size();
+}
+inline int Message2::smac_size() const {
+  return _internal_smac_size();
+}
+inline void Message2::clear_smac() {
+  smac_.Clear();
+}
+inline uint32_t Message2::_internal_smac(int index) const {
+  return smac_.Get(index);
+}
+inline uint32_t Message2::smac(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message2.smac)
+  return _internal_smac(index);
+}
+inline void Message2::set_smac(int index, uint32_t value) {
+  smac_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message2.smac)
+}
+inline void Message2::_internal_add_smac(uint32_t value) {
+  smac_.Add(value);
+}
+inline void Message2::add_smac(uint32_t value) {
+  _internal_add_smac(value);
+  // @@protoc_insertion_point(field_add:oram.Message2.smac)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::_internal_smac() const {
+  return smac_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::smac() const {
+  // @@protoc_insertion_point(field_list:oram.Message2.smac)
+  return _internal_smac();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::_internal_mutable_smac() {
+  return &smac_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::mutable_smac() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message2.smac)
+  return _internal_mutable_smac();
+}
+
+// optional uint32 size_sigrl = 11;
+inline bool Message2::_internal_has_size_sigrl() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool Message2::has_size_sigrl() const {
+  return _internal_has_size_sigrl();
+}
+inline void Message2::clear_size_sigrl() {
+  size_sigrl_ = 0u;
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline uint32_t Message2::_internal_size_sigrl() const {
+  return size_sigrl_;
+}
+inline uint32_t Message2::size_sigrl() const {
+  // @@protoc_insertion_point(field_get:oram.Message2.size_sigrl)
+  return _internal_size_sigrl();
+}
+inline void Message2::_internal_set_size_sigrl(uint32_t value) {
+  _has_bits_[0] |= 0x00000008u;
+  size_sigrl_ = value;
+}
+inline void Message2::set_size_sigrl(uint32_t value) {
+  _internal_set_size_sigrl(value);
+  // @@protoc_insertion_point(field_set:oram.Message2.size_sigrl)
+}
+
+// repeated uint32 sigrl = 12 [packed = true];
+inline int Message2::_internal_sigrl_size() const {
+  return sigrl_.size();
+}
+inline int Message2::sigrl_size() const {
+  return _internal_sigrl_size();
+}
+inline void Message2::clear_sigrl() {
+  sigrl_.Clear();
+}
+inline uint32_t Message2::_internal_sigrl(int index) const {
+  return sigrl_.Get(index);
+}
+inline uint32_t Message2::sigrl(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message2.sigrl)
+  return _internal_sigrl(index);
+}
+inline void Message2::set_sigrl(int index, uint32_t value) {
+  sigrl_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message2.sigrl)
+}
+inline void Message2::_internal_add_sigrl(uint32_t value) {
+  sigrl_.Add(value);
+}
+inline void Message2::add_sigrl(uint32_t value) {
+  _internal_add_sigrl(value);
+  // @@protoc_insertion_point(field_add:oram.Message2.sigrl)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::_internal_sigrl() const {
+  return sigrl_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message2::sigrl() const {
+  // @@protoc_insertion_point(field_list:oram.Message2.sigrl)
+  return _internal_sigrl();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::_internal_mutable_sigrl() {
+  return &sigrl_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message2::mutable_sigrl() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message2.sigrl)
+  return _internal_mutable_sigrl();
+}
+
+// -------------------------------------------------------------------
+
+// Message3
+
+// uint32 type = 1;
+inline void Message3::clear_type() {
+  type_ = 0u;
+}
+inline uint32_t Message3::_internal_type() const {
+  return type_;
+}
+inline uint32_t Message3::type() const {
+  // @@protoc_insertion_point(field_get:oram.Message3.type)
+  return _internal_type();
+}
+inline void Message3::_internal_set_type(uint32_t value) {
+  
+  type_ = value;
+}
+inline void Message3::set_type(uint32_t value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:oram.Message3.type)
+}
+
+// optional uint32 size = 2;
+inline bool Message3::_internal_has_size() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool Message3::has_size() const {
+  return _internal_has_size();
+}
+inline void Message3::clear_size() {
+  size_ = 0u;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline uint32_t Message3::_internal_size() const {
+  return size_;
+}
+inline uint32_t Message3::size() const {
+  // @@protoc_insertion_point(field_get:oram.Message3.size)
+  return _internal_size();
+}
+inline void Message3::_internal_set_size(uint32_t value) {
+  _has_bits_[0] |= 0x00000001u;
+  size_ = value;
+}
+inline void Message3::set_size(uint32_t value) {
+  _internal_set_size(value);
+  // @@protoc_insertion_point(field_set:oram.Message3.size)
+}
+
+// repeated uint32 sgx_mac = 3 [packed = true];
+inline int Message3::_internal_sgx_mac_size() const {
+  return sgx_mac_.size();
+}
+inline int Message3::sgx_mac_size() const {
+  return _internal_sgx_mac_size();
+}
+inline void Message3::clear_sgx_mac() {
+  sgx_mac_.Clear();
+}
+inline uint32_t Message3::_internal_sgx_mac(int index) const {
+  return sgx_mac_.Get(index);
+}
+inline uint32_t Message3::sgx_mac(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message3.sgx_mac)
+  return _internal_sgx_mac(index);
+}
+inline void Message3::set_sgx_mac(int index, uint32_t value) {
+  sgx_mac_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message3.sgx_mac)
+}
+inline void Message3::_internal_add_sgx_mac(uint32_t value) {
+  sgx_mac_.Add(value);
+}
+inline void Message3::add_sgx_mac(uint32_t value) {
+  _internal_add_sgx_mac(value);
+  // @@protoc_insertion_point(field_add:oram.Message3.sgx_mac)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message3::_internal_sgx_mac() const {
+  return sgx_mac_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message3::sgx_mac() const {
+  // @@protoc_insertion_point(field_list:oram.Message3.sgx_mac)
+  return _internal_sgx_mac();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message3::_internal_mutable_sgx_mac() {
+  return &sgx_mac_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message3::mutable_sgx_mac() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message3.sgx_mac)
+  return _internal_mutable_sgx_mac();
+}
+
+// repeated uint32 gax_msg3 = 4 [packed = true];
+inline int Message3::_internal_gax_msg3_size() const {
+  return gax_msg3_.size();
+}
+inline int Message3::gax_msg3_size() const {
+  return _internal_gax_msg3_size();
+}
+inline void Message3::clear_gax_msg3() {
+  gax_msg3_.Clear();
+}
+inline uint32_t Message3::_internal_gax_msg3(int index) const {
+  return gax_msg3_.Get(index);
+}
+inline uint32_t Message3::gax_msg3(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message3.gax_msg3)
+  return _internal_gax_msg3(index);
+}
+inline void Message3::set_gax_msg3(int index, uint32_t value) {
+  gax_msg3_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message3.gax_msg3)
+}
+inline void Message3::_internal_add_gax_msg3(uint32_t value) {
+  gax_msg3_.Add(value);
+}
+inline void Message3::add_gax_msg3(uint32_t value) {
+  _internal_add_gax_msg3(value);
+  // @@protoc_insertion_point(field_add:oram.Message3.gax_msg3)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message3::_internal_gax_msg3() const {
+  return gax_msg3_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message3::gax_msg3() const {
+  // @@protoc_insertion_point(field_list:oram.Message3.gax_msg3)
+  return _internal_gax_msg3();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message3::_internal_mutable_gax_msg3() {
+  return &gax_msg3_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message3::mutable_gax_msg3() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message3.gax_msg3)
+  return _internal_mutable_gax_msg3();
+}
+
+// repeated uint32 gay_msg3 = 5 [packed = true];
+inline int Message3::_internal_gay_msg3_size() const {
+  return gay_msg3_.size();
+}
+inline int Message3::gay_msg3_size() const {
+  return _internal_gay_msg3_size();
+}
+inline void Message3::clear_gay_msg3() {
+  gay_msg3_.Clear();
+}
+inline uint32_t Message3::_internal_gay_msg3(int index) const {
+  return gay_msg3_.Get(index);
+}
+inline uint32_t Message3::gay_msg3(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message3.gay_msg3)
+  return _internal_gay_msg3(index);
+}
+inline void Message3::set_gay_msg3(int index, uint32_t value) {
+  gay_msg3_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message3.gay_msg3)
+}
+inline void Message3::_internal_add_gay_msg3(uint32_t value) {
+  gay_msg3_.Add(value);
+}
+inline void Message3::add_gay_msg3(uint32_t value) {
+  _internal_add_gay_msg3(value);
+  // @@protoc_insertion_point(field_add:oram.Message3.gay_msg3)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message3::_internal_gay_msg3() const {
+  return gay_msg3_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message3::gay_msg3() const {
+  // @@protoc_insertion_point(field_list:oram.Message3.gay_msg3)
+  return _internal_gay_msg3();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message3::_internal_mutable_gay_msg3() {
+  return &gay_msg3_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message3::mutable_gay_msg3() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message3.gay_msg3)
+  return _internal_mutable_gay_msg3();
+}
+
+// repeated uint32 sec_property = 6 [packed = true];
+inline int Message3::_internal_sec_property_size() const {
+  return sec_property_.size();
+}
+inline int Message3::sec_property_size() const {
+  return _internal_sec_property_size();
+}
+inline void Message3::clear_sec_property() {
+  sec_property_.Clear();
+}
+inline uint32_t Message3::_internal_sec_property(int index) const {
+  return sec_property_.Get(index);
+}
+inline uint32_t Message3::sec_property(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message3.sec_property)
+  return _internal_sec_property(index);
+}
+inline void Message3::set_sec_property(int index, uint32_t value) {
+  sec_property_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message3.sec_property)
+}
+inline void Message3::_internal_add_sec_property(uint32_t value) {
+  sec_property_.Add(value);
+}
+inline void Message3::add_sec_property(uint32_t value) {
+  _internal_add_sec_property(value);
+  // @@protoc_insertion_point(field_add:oram.Message3.sec_property)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message3::_internal_sec_property() const {
+  return sec_property_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message3::sec_property() const {
+  // @@protoc_insertion_point(field_list:oram.Message3.sec_property)
+  return _internal_sec_property();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message3::_internal_mutable_sec_property() {
+  return &sec_property_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message3::mutable_sec_property() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message3.sec_property)
+  return _internal_mutable_sec_property();
+}
+
+// repeated uint32 quote = 7 [packed = true];
+inline int Message3::_internal_quote_size() const {
+  return quote_.size();
+}
+inline int Message3::quote_size() const {
+  return _internal_quote_size();
+}
+inline void Message3::clear_quote() {
+  quote_.Clear();
+}
+inline uint32_t Message3::_internal_quote(int index) const {
+  return quote_.Get(index);
+}
+inline uint32_t Message3::quote(int index) const {
+  // @@protoc_insertion_point(field_get:oram.Message3.quote)
+  return _internal_quote(index);
+}
+inline void Message3::set_quote(int index, uint32_t value) {
+  quote_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.Message3.quote)
+}
+inline void Message3::_internal_add_quote(uint32_t value) {
+  quote_.Add(value);
+}
+inline void Message3::add_quote(uint32_t value) {
+  _internal_add_quote(value);
+  // @@protoc_insertion_point(field_add:oram.Message3.quote)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message3::_internal_quote() const {
+  return quote_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+Message3::quote() const {
+  // @@protoc_insertion_point(field_list:oram.Message3.quote)
+  return _internal_quote();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message3::_internal_mutable_quote() {
+  return &quote_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+Message3::mutable_quote() {
+  // @@protoc_insertion_point(field_mutable_list:oram.Message3.quote)
+  return _internal_mutable_quote();
+}
+
+// -------------------------------------------------------------------
+
+// AttestationMessage
+
+// uint32 type = 1;
+inline void AttestationMessage::clear_type() {
+  type_ = 0u;
+}
+inline uint32_t AttestationMessage::_internal_type() const {
+  return type_;
+}
+inline uint32_t AttestationMessage::type() const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.type)
+  return _internal_type();
+}
+inline void AttestationMessage::_internal_set_type(uint32_t value) {
+  
+  type_ = value;
+}
+inline void AttestationMessage::set_type(uint32_t value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.type)
+}
+
+// uint32 size = 2;
+inline void AttestationMessage::clear_size() {
+  size_ = 0u;
+}
+inline uint32_t AttestationMessage::_internal_size() const {
+  return size_;
+}
+inline uint32_t AttestationMessage::size() const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.size)
+  return _internal_size();
+}
+inline void AttestationMessage::_internal_set_size(uint32_t value) {
+  
+  size_ = value;
+}
+inline void AttestationMessage::set_size(uint32_t value) {
+  _internal_set_size(value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.size)
+}
+
+// optional uint32 epid_group_status = 3;
+inline bool AttestationMessage::_internal_has_epid_group_status() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool AttestationMessage::has_epid_group_status() const {
+  return _internal_has_epid_group_status();
+}
+inline void AttestationMessage::clear_epid_group_status() {
+  epid_group_status_ = 0u;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline uint32_t AttestationMessage::_internal_epid_group_status() const {
+  return epid_group_status_;
+}
+inline uint32_t AttestationMessage::epid_group_status() const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.epid_group_status)
+  return _internal_epid_group_status();
+}
+inline void AttestationMessage::_internal_set_epid_group_status(uint32_t value) {
+  _has_bits_[0] |= 0x00000001u;
+  epid_group_status_ = value;
+}
+inline void AttestationMessage::set_epid_group_status(uint32_t value) {
+  _internal_set_epid_group_status(value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.epid_group_status)
+}
+
+// optional uint32 tcb_evaluation_status = 4;
+inline bool AttestationMessage::_internal_has_tcb_evaluation_status() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool AttestationMessage::has_tcb_evaluation_status() const {
+  return _internal_has_tcb_evaluation_status();
+}
+inline void AttestationMessage::clear_tcb_evaluation_status() {
+  tcb_evaluation_status_ = 0u;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline uint32_t AttestationMessage::_internal_tcb_evaluation_status() const {
+  return tcb_evaluation_status_;
+}
+inline uint32_t AttestationMessage::tcb_evaluation_status() const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.tcb_evaluation_status)
+  return _internal_tcb_evaluation_status();
+}
+inline void AttestationMessage::_internal_set_tcb_evaluation_status(uint32_t value) {
+  _has_bits_[0] |= 0x00000002u;
+  tcb_evaluation_status_ = value;
+}
+inline void AttestationMessage::set_tcb_evaluation_status(uint32_t value) {
+  _internal_set_tcb_evaluation_status(value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.tcb_evaluation_status)
+}
+
+// optional uint32 pse_evaluation_status = 5;
+inline bool AttestationMessage::_internal_has_pse_evaluation_status() const {
+  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+  return value;
+}
+inline bool AttestationMessage::has_pse_evaluation_status() const {
+  return _internal_has_pse_evaluation_status();
+}
+inline void AttestationMessage::clear_pse_evaluation_status() {
+  pse_evaluation_status_ = 0u;
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline uint32_t AttestationMessage::_internal_pse_evaluation_status() const {
+  return pse_evaluation_status_;
+}
+inline uint32_t AttestationMessage::pse_evaluation_status() const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.pse_evaluation_status)
+  return _internal_pse_evaluation_status();
+}
+inline void AttestationMessage::_internal_set_pse_evaluation_status(uint32_t value) {
+  _has_bits_[0] |= 0x00000004u;
+  pse_evaluation_status_ = value;
+}
+inline void AttestationMessage::set_pse_evaluation_status(uint32_t value) {
+  _internal_set_pse_evaluation_status(value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.pse_evaluation_status)
+}
+
+// repeated uint32 latest_equivalent_tcb_psvn = 6 [packed = true];
+inline int AttestationMessage::_internal_latest_equivalent_tcb_psvn_size() const {
+  return latest_equivalent_tcb_psvn_.size();
+}
+inline int AttestationMessage::latest_equivalent_tcb_psvn_size() const {
+  return _internal_latest_equivalent_tcb_psvn_size();
+}
+inline void AttestationMessage::clear_latest_equivalent_tcb_psvn() {
+  latest_equivalent_tcb_psvn_.Clear();
+}
+inline uint32_t AttestationMessage::_internal_latest_equivalent_tcb_psvn(int index) const {
+  return latest_equivalent_tcb_psvn_.Get(index);
+}
+inline uint32_t AttestationMessage::latest_equivalent_tcb_psvn(int index) const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.latest_equivalent_tcb_psvn)
+  return _internal_latest_equivalent_tcb_psvn(index);
+}
+inline void AttestationMessage::set_latest_equivalent_tcb_psvn(int index, uint32_t value) {
+  latest_equivalent_tcb_psvn_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.latest_equivalent_tcb_psvn)
+}
+inline void AttestationMessage::_internal_add_latest_equivalent_tcb_psvn(uint32_t value) {
+  latest_equivalent_tcb_psvn_.Add(value);
+}
+inline void AttestationMessage::add_latest_equivalent_tcb_psvn(uint32_t value) {
+  _internal_add_latest_equivalent_tcb_psvn(value);
+  // @@protoc_insertion_point(field_add:oram.AttestationMessage.latest_equivalent_tcb_psvn)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::_internal_latest_equivalent_tcb_psvn() const {
+  return latest_equivalent_tcb_psvn_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::latest_equivalent_tcb_psvn() const {
+  // @@protoc_insertion_point(field_list:oram.AttestationMessage.latest_equivalent_tcb_psvn)
+  return _internal_latest_equivalent_tcb_psvn();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::_internal_mutable_latest_equivalent_tcb_psvn() {
+  return &latest_equivalent_tcb_psvn_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::mutable_latest_equivalent_tcb_psvn() {
+  // @@protoc_insertion_point(field_mutable_list:oram.AttestationMessage.latest_equivalent_tcb_psvn)
+  return _internal_mutable_latest_equivalent_tcb_psvn();
+}
+
+// repeated uint32 latest_pse_isvsvn = 7 [packed = true];
+inline int AttestationMessage::_internal_latest_pse_isvsvn_size() const {
+  return latest_pse_isvsvn_.size();
+}
+inline int AttestationMessage::latest_pse_isvsvn_size() const {
+  return _internal_latest_pse_isvsvn_size();
+}
+inline void AttestationMessage::clear_latest_pse_isvsvn() {
+  latest_pse_isvsvn_.Clear();
+}
+inline uint32_t AttestationMessage::_internal_latest_pse_isvsvn(int index) const {
+  return latest_pse_isvsvn_.Get(index);
+}
+inline uint32_t AttestationMessage::latest_pse_isvsvn(int index) const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.latest_pse_isvsvn)
+  return _internal_latest_pse_isvsvn(index);
+}
+inline void AttestationMessage::set_latest_pse_isvsvn(int index, uint32_t value) {
+  latest_pse_isvsvn_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.latest_pse_isvsvn)
+}
+inline void AttestationMessage::_internal_add_latest_pse_isvsvn(uint32_t value) {
+  latest_pse_isvsvn_.Add(value);
+}
+inline void AttestationMessage::add_latest_pse_isvsvn(uint32_t value) {
+  _internal_add_latest_pse_isvsvn(value);
+  // @@protoc_insertion_point(field_add:oram.AttestationMessage.latest_pse_isvsvn)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::_internal_latest_pse_isvsvn() const {
+  return latest_pse_isvsvn_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::latest_pse_isvsvn() const {
+  // @@protoc_insertion_point(field_list:oram.AttestationMessage.latest_pse_isvsvn)
+  return _internal_latest_pse_isvsvn();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::_internal_mutable_latest_pse_isvsvn() {
+  return &latest_pse_isvsvn_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::mutable_latest_pse_isvsvn() {
+  // @@protoc_insertion_point(field_mutable_list:oram.AttestationMessage.latest_pse_isvsvn)
+  return _internal_mutable_latest_pse_isvsvn();
+}
+
+// repeated uint32 latest_psda_svn = 8 [packed = true];
+inline int AttestationMessage::_internal_latest_psda_svn_size() const {
+  return latest_psda_svn_.size();
+}
+inline int AttestationMessage::latest_psda_svn_size() const {
+  return _internal_latest_psda_svn_size();
+}
+inline void AttestationMessage::clear_latest_psda_svn() {
+  latest_psda_svn_.Clear();
+}
+inline uint32_t AttestationMessage::_internal_latest_psda_svn(int index) const {
+  return latest_psda_svn_.Get(index);
+}
+inline uint32_t AttestationMessage::latest_psda_svn(int index) const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.latest_psda_svn)
+  return _internal_latest_psda_svn(index);
+}
+inline void AttestationMessage::set_latest_psda_svn(int index, uint32_t value) {
+  latest_psda_svn_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.latest_psda_svn)
+}
+inline void AttestationMessage::_internal_add_latest_psda_svn(uint32_t value) {
+  latest_psda_svn_.Add(value);
+}
+inline void AttestationMessage::add_latest_psda_svn(uint32_t value) {
+  _internal_add_latest_psda_svn(value);
+  // @@protoc_insertion_point(field_add:oram.AttestationMessage.latest_psda_svn)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::_internal_latest_psda_svn() const {
+  return latest_psda_svn_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::latest_psda_svn() const {
+  // @@protoc_insertion_point(field_list:oram.AttestationMessage.latest_psda_svn)
+  return _internal_latest_psda_svn();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::_internal_mutable_latest_psda_svn() {
+  return &latest_psda_svn_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::mutable_latest_psda_svn() {
+  // @@protoc_insertion_point(field_mutable_list:oram.AttestationMessage.latest_psda_svn)
+  return _internal_mutable_latest_psda_svn();
+}
+
+// repeated uint32 performance_rekey_gid = 9 [packed = true];
+inline int AttestationMessage::_internal_performance_rekey_gid_size() const {
+  return performance_rekey_gid_.size();
+}
+inline int AttestationMessage::performance_rekey_gid_size() const {
+  return _internal_performance_rekey_gid_size();
+}
+inline void AttestationMessage::clear_performance_rekey_gid() {
+  performance_rekey_gid_.Clear();
+}
+inline uint32_t AttestationMessage::_internal_performance_rekey_gid(int index) const {
+  return performance_rekey_gid_.Get(index);
+}
+inline uint32_t AttestationMessage::performance_rekey_gid(int index) const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.performance_rekey_gid)
+  return _internal_performance_rekey_gid(index);
+}
+inline void AttestationMessage::set_performance_rekey_gid(int index, uint32_t value) {
+  performance_rekey_gid_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.performance_rekey_gid)
+}
+inline void AttestationMessage::_internal_add_performance_rekey_gid(uint32_t value) {
+  performance_rekey_gid_.Add(value);
+}
+inline void AttestationMessage::add_performance_rekey_gid(uint32_t value) {
+  _internal_add_performance_rekey_gid(value);
+  // @@protoc_insertion_point(field_add:oram.AttestationMessage.performance_rekey_gid)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::_internal_performance_rekey_gid() const {
+  return performance_rekey_gid_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::performance_rekey_gid() const {
+  // @@protoc_insertion_point(field_list:oram.AttestationMessage.performance_rekey_gid)
+  return _internal_performance_rekey_gid();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::_internal_mutable_performance_rekey_gid() {
+  return &performance_rekey_gid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::mutable_performance_rekey_gid() {
+  // @@protoc_insertion_point(field_mutable_list:oram.AttestationMessage.performance_rekey_gid)
+  return _internal_mutable_performance_rekey_gid();
+}
+
+// repeated uint32 ec_sign256_x = 10 [packed = true];
+inline int AttestationMessage::_internal_ec_sign256_x_size() const {
+  return ec_sign256_x_.size();
+}
+inline int AttestationMessage::ec_sign256_x_size() const {
+  return _internal_ec_sign256_x_size();
+}
+inline void AttestationMessage::clear_ec_sign256_x() {
+  ec_sign256_x_.Clear();
+}
+inline uint32_t AttestationMessage::_internal_ec_sign256_x(int index) const {
+  return ec_sign256_x_.Get(index);
+}
+inline uint32_t AttestationMessage::ec_sign256_x(int index) const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.ec_sign256_x)
+  return _internal_ec_sign256_x(index);
+}
+inline void AttestationMessage::set_ec_sign256_x(int index, uint32_t value) {
+  ec_sign256_x_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.ec_sign256_x)
+}
+inline void AttestationMessage::_internal_add_ec_sign256_x(uint32_t value) {
+  ec_sign256_x_.Add(value);
+}
+inline void AttestationMessage::add_ec_sign256_x(uint32_t value) {
+  _internal_add_ec_sign256_x(value);
+  // @@protoc_insertion_point(field_add:oram.AttestationMessage.ec_sign256_x)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::_internal_ec_sign256_x() const {
+  return ec_sign256_x_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::ec_sign256_x() const {
+  // @@protoc_insertion_point(field_list:oram.AttestationMessage.ec_sign256_x)
+  return _internal_ec_sign256_x();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::_internal_mutable_ec_sign256_x() {
+  return &ec_sign256_x_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::mutable_ec_sign256_x() {
+  // @@protoc_insertion_point(field_mutable_list:oram.AttestationMessage.ec_sign256_x)
+  return _internal_mutable_ec_sign256_x();
+}
+
+// repeated uint32 ec_sign256_y = 11 [packed = true];
+inline int AttestationMessage::_internal_ec_sign256_y_size() const {
+  return ec_sign256_y_.size();
+}
+inline int AttestationMessage::ec_sign256_y_size() const {
+  return _internal_ec_sign256_y_size();
+}
+inline void AttestationMessage::clear_ec_sign256_y() {
+  ec_sign256_y_.Clear();
+}
+inline uint32_t AttestationMessage::_internal_ec_sign256_y(int index) const {
+  return ec_sign256_y_.Get(index);
+}
+inline uint32_t AttestationMessage::ec_sign256_y(int index) const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.ec_sign256_y)
+  return _internal_ec_sign256_y(index);
+}
+inline void AttestationMessage::set_ec_sign256_y(int index, uint32_t value) {
+  ec_sign256_y_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.ec_sign256_y)
+}
+inline void AttestationMessage::_internal_add_ec_sign256_y(uint32_t value) {
+  ec_sign256_y_.Add(value);
+}
+inline void AttestationMessage::add_ec_sign256_y(uint32_t value) {
+  _internal_add_ec_sign256_y(value);
+  // @@protoc_insertion_point(field_add:oram.AttestationMessage.ec_sign256_y)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::_internal_ec_sign256_y() const {
+  return ec_sign256_y_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::ec_sign256_y() const {
+  // @@protoc_insertion_point(field_list:oram.AttestationMessage.ec_sign256_y)
+  return _internal_ec_sign256_y();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::_internal_mutable_ec_sign256_y() {
+  return &ec_sign256_y_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::mutable_ec_sign256_y() {
+  // @@protoc_insertion_point(field_mutable_list:oram.AttestationMessage.ec_sign256_y)
+  return _internal_mutable_ec_sign256_y();
+}
+
+// repeated uint32 mac_smk = 12 [packed = true];
+inline int AttestationMessage::_internal_mac_smk_size() const {
+  return mac_smk_.size();
+}
+inline int AttestationMessage::mac_smk_size() const {
+  return _internal_mac_smk_size();
+}
+inline void AttestationMessage::clear_mac_smk() {
+  mac_smk_.Clear();
+}
+inline uint32_t AttestationMessage::_internal_mac_smk(int index) const {
+  return mac_smk_.Get(index);
+}
+inline uint32_t AttestationMessage::mac_smk(int index) const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.mac_smk)
+  return _internal_mac_smk(index);
+}
+inline void AttestationMessage::set_mac_smk(int index, uint32_t value) {
+  mac_smk_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.mac_smk)
+}
+inline void AttestationMessage::_internal_add_mac_smk(uint32_t value) {
+  mac_smk_.Add(value);
+}
+inline void AttestationMessage::add_mac_smk(uint32_t value) {
+  _internal_add_mac_smk(value);
+  // @@protoc_insertion_point(field_add:oram.AttestationMessage.mac_smk)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::_internal_mac_smk() const {
+  return mac_smk_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::mac_smk() const {
+  // @@protoc_insertion_point(field_list:oram.AttestationMessage.mac_smk)
+  return _internal_mac_smk();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::_internal_mutable_mac_smk() {
+  return &mac_smk_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::mutable_mac_smk() {
+  // @@protoc_insertion_point(field_mutable_list:oram.AttestationMessage.mac_smk)
+  return _internal_mutable_mac_smk();
+}
+
+// optional uint32 result_size = 13;
+inline bool AttestationMessage::_internal_has_result_size() const {
+  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+  return value;
+}
+inline bool AttestationMessage::has_result_size() const {
+  return _internal_has_result_size();
+}
+inline void AttestationMessage::clear_result_size() {
+  result_size_ = 0u;
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline uint32_t AttestationMessage::_internal_result_size() const {
+  return result_size_;
+}
+inline uint32_t AttestationMessage::result_size() const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.result_size)
+  return _internal_result_size();
+}
+inline void AttestationMessage::_internal_set_result_size(uint32_t value) {
+  _has_bits_[0] |= 0x00000008u;
+  result_size_ = value;
+}
+inline void AttestationMessage::set_result_size(uint32_t value) {
+  _internal_set_result_size(value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.result_size)
+}
+
+// repeated uint32 reserved = 14 [packed = true];
+inline int AttestationMessage::_internal_reserved_size() const {
+  return reserved_.size();
+}
+inline int AttestationMessage::reserved_size() const {
+  return _internal_reserved_size();
+}
+inline void AttestationMessage::clear_reserved() {
+  reserved_.Clear();
+}
+inline uint32_t AttestationMessage::_internal_reserved(int index) const {
+  return reserved_.Get(index);
+}
+inline uint32_t AttestationMessage::reserved(int index) const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.reserved)
+  return _internal_reserved(index);
+}
+inline void AttestationMessage::set_reserved(int index, uint32_t value) {
+  reserved_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.reserved)
+}
+inline void AttestationMessage::_internal_add_reserved(uint32_t value) {
+  reserved_.Add(value);
+}
+inline void AttestationMessage::add_reserved(uint32_t value) {
+  _internal_add_reserved(value);
+  // @@protoc_insertion_point(field_add:oram.AttestationMessage.reserved)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::_internal_reserved() const {
+  return reserved_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::reserved() const {
+  // @@protoc_insertion_point(field_list:oram.AttestationMessage.reserved)
+  return _internal_reserved();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::_internal_mutable_reserved() {
+  return &reserved_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::mutable_reserved() {
+  // @@protoc_insertion_point(field_mutable_list:oram.AttestationMessage.reserved)
+  return _internal_mutable_reserved();
+}
+
+// repeated uint32 payload_tag = 15 [packed = true];
+inline int AttestationMessage::_internal_payload_tag_size() const {
+  return payload_tag_.size();
+}
+inline int AttestationMessage::payload_tag_size() const {
+  return _internal_payload_tag_size();
+}
+inline void AttestationMessage::clear_payload_tag() {
+  payload_tag_.Clear();
+}
+inline uint32_t AttestationMessage::_internal_payload_tag(int index) const {
+  return payload_tag_.Get(index);
+}
+inline uint32_t AttestationMessage::payload_tag(int index) const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.payload_tag)
+  return _internal_payload_tag(index);
+}
+inline void AttestationMessage::set_payload_tag(int index, uint32_t value) {
+  payload_tag_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.payload_tag)
+}
+inline void AttestationMessage::_internal_add_payload_tag(uint32_t value) {
+  payload_tag_.Add(value);
+}
+inline void AttestationMessage::add_payload_tag(uint32_t value) {
+  _internal_add_payload_tag(value);
+  // @@protoc_insertion_point(field_add:oram.AttestationMessage.payload_tag)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::_internal_payload_tag() const {
+  return payload_tag_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::payload_tag() const {
+  // @@protoc_insertion_point(field_list:oram.AttestationMessage.payload_tag)
+  return _internal_payload_tag();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::_internal_mutable_payload_tag() {
+  return &payload_tag_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::mutable_payload_tag() {
+  // @@protoc_insertion_point(field_mutable_list:oram.AttestationMessage.payload_tag)
+  return _internal_mutable_payload_tag();
+}
+
+// repeated uint32 payload = 16 [packed = true];
+inline int AttestationMessage::_internal_payload_size() const {
+  return payload_.size();
+}
+inline int AttestationMessage::payload_size() const {
+  return _internal_payload_size();
+}
+inline void AttestationMessage::clear_payload() {
+  payload_.Clear();
+}
+inline uint32_t AttestationMessage::_internal_payload(int index) const {
+  return payload_.Get(index);
+}
+inline uint32_t AttestationMessage::payload(int index) const {
+  // @@protoc_insertion_point(field_get:oram.AttestationMessage.payload)
+  return _internal_payload(index);
+}
+inline void AttestationMessage::set_payload(int index, uint32_t value) {
+  payload_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.AttestationMessage.payload)
+}
+inline void AttestationMessage::_internal_add_payload(uint32_t value) {
+  payload_.Add(value);
+}
+inline void AttestationMessage::add_payload(uint32_t value) {
+  _internal_add_payload(value);
+  // @@protoc_insertion_point(field_add:oram.AttestationMessage.payload)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::_internal_payload() const {
+  return payload_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+AttestationMessage::payload() const {
+  // @@protoc_insertion_point(field_list:oram.AttestationMessage.payload)
+  return _internal_payload();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::_internal_mutable_payload() {
+  return &payload_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+AttestationMessage::mutable_payload() {
+  // @@protoc_insertion_point(field_mutable_list:oram.AttestationMessage.payload)
+  return _internal_mutable_payload();
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

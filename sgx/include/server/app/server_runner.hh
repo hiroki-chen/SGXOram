@@ -54,9 +54,21 @@ class SGXORAMService final : public oram::sgx_oram::Service {
 
   sgx_enclave_id_t* const global_eid;
 
+  sgx_ra_context_t context;
+
   OramConfiguration oram_config;
 
   friend class Server;
+
+  // Message dispatchers.
+  sgx_status_t message_handler_round_one(const std::string& message,
+                                         oram::InitReply* reply);
+
+  sgx_status_t message_handler_round_two(const std::string& message,
+                                         oram::InitReply* reply);
+
+  sgx_status_t message_handler_round_three(const std::string& message,
+                                           oram::InitReply* reply);
 
  public:
   SGXORAMService() = delete;
@@ -88,6 +100,37 @@ class SGXORAMService final : public oram::sgx_oram::Service {
   grpc::Status init_oram(grpc::ServerContext* server_context,
                          const oram::OramInitRequest* oram_init_request,
                          google::protobuf::Empty* empty) override;
+
+  // ===================================================== //
+  // Functions for remote attestation.
+  grpc::Status remote_attestation_begin(
+      grpc::ServerContext* server_context,
+      const oram::InitialMessage* initial_message,
+      oram::Message0* reply) override;
+
+  grpc::Status remote_attestation_msg0(
+      grpc::ServerContext* server_context,
+      const oram::Message0* message0,
+      oram::Message1* reply) override;
+
+  grpc::Status remote_attestation_msg2(
+      grpc::ServerContext* server_context,
+      const oram::Message2* message2,
+      oram::Message3* reply) override;
+
+  grpc::Status remote_attestation_final(
+      grpc::ServerContext* server_context,
+      const oram::AttestationMessage* message,
+      google::protobuf::Empty* empty) override;
+
+  // ===================================================== //
+
+  // grpc::Status remote_attestation(
+  //     grpc::ServerContext* server_context,
+  //     const oram::InitRequest* remote_attestation_request,
+  //     oram::InitReply* remote_attestation_reply) override;
+
+  sgx_status_t generate_epid(uint32_t* extended_epid_group_id);
 };
 
 class Server final {
@@ -106,5 +149,9 @@ class Server final {
 
   std::string get_compressed_slot(const char* const fingerprint) {
     return service->storage[fingerprint];
+  }
+
+  bool is_in_storage(const char* const fingerprint) {
+    return service->storage.count(fingerprint) > 0;
   }
 };

@@ -24,7 +24,6 @@
 #include <sgx_trts.h> /* For sgx_read_random. */
 #include <sgx_tseal.h>
 
-#include <app/basic_models.hh>
 #include <enclave/enclave_crypto_manager.hh>
 #include <enclave/enclave_init.hh>
 #include <enclave/enclave_utils.hh>
@@ -284,6 +283,41 @@ sgx_status_t put_secret_data(sgx_ra_context_t context, uint8_t* p_secret,
   return ret;
 }
 
+sgx_status_t verify_secret_data(sgx_ra_context_t context, uint8_t* p_secret,
+                                uint32_t secret_size, uint8_t* p_gcm_mac,
+                                uint32_t max_verification_length,
+                                uint8_t* p_ret) {
+  sgx_status_t ret = SGX_SUCCESS;
+  sgx_ec_key_128bit_t sk_key;
+
+  do {
+    ret = sgx_ra_get_keys(context, SGX_RA_KEY_SK, &sk_key);
+    if (SGX_SUCCESS != ret) {
+      break;
+    }
+
+    uint8_t* decrypted = (uint8_t*)malloc(sizeof(uint8_t) * secret_size);
+    uint8_t aes_gcm_iv[12] = {0};
+
+    ret = sgx_rijndael128GCM_decrypt(
+        &sk_key, p_secret, secret_size, decrypted, &aes_gcm_iv[0], 12, NULL, 0,
+        (const sgx_aes_gcm_128bit_tag_t*)(p_gcm_mac));
+
+    if (SGX_SUCCESS == ret) {
+      if (decrypted[0] == 0) {
+        if (decrypted[1] != 1) {
+          ret = SGX_ERROR_INVALID_SIGNATURE;
+        }
+      } else {
+        ret = SGX_ERROR_UNEXPECTED;
+      }
+    }
+
+  } while (0);
+
+  return ret;
+}
+
 /* Hidden functions */
 /**
  * @brief Since enclave only allowes for a relatively restricted library which
@@ -308,30 +342,36 @@ uint32_t uniform_random(uint32_t lower, uint32_t upper) {
 }
 
 int ecall_init_oram_controller() {
+  // Test if bit operation works in parallel.
+  std::string lhs = "0123456789abcdef1234567890abcdef";
+  std::string rhs = "0123456789abcdef1234567890abcdef";
+  uint8_t out[32] = {0};
+  band((uint8_t*)(lhs.data()), (uint8_t*)(rhs.data()), out);
+
+  sprintf(std::string(reinterpret_cast<char*>(out), 32), false);
+
   crypto_manager = new EnclaveCryptoManager();
   // Test compression.
-  ocall_write_slot("testtttestejijsijfis", (uint8_t*)("testtttestejijsijfis"),
-                   strlen("testtttestejijsijfis"));
+  sgx_oram::oram_slot_t* slot =
+      (sgx_oram::oram_slot_t*)malloc(sizeof(sgx_oram::oram_slot_t));
+  slot->header.dummy_number = 123;
+  const std::string slot_hash = crypto_manager->enclave_sha_256("123");
+  ocall_write_slot(slot_hash.data(), (uint8_t*)(slot), sizeof(sgx_oram::oram_slot_t));
   // Test decompression.
-  uint8_t buf[4096];
+  uint8_t buf[sizeof(sgx_oram::oram_slot_t)] = {0};
   size_t size;
   // The size should be pre-defined.
-  ocall_read_slot(&size, "testtttestejijsijfis", buf, 4096);
-  printf("%s\n", std::string((char*)buf, size).data());
+  ocall_read_slot(&size, slot_hash.data(), buf, sizeof(sgx_oram::oram_slot_t));
+  printf("The dummy number is: %d\n", ((sgx_oram::oram_slot_t*)buf)->header.dummy_number);
   // printf("%s", crypto_manager->enclave_sha256("Hello World!").data());
   const std::string cipher = crypto_manager->enclave_aes_128_gcm_encrypt(
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eget ");
   sprintf(cipher, true);
   sprintf(crypto_manager->enclave_aes_128_gcm_decrypt(cipher));
 
-  // Test if json works.
-  sgx_oram::Block block;
-  block.address = 2;
-  block.bid = 44;
-  block.data = "Lorem ipsum dolor sit amet.";
-  block.is_dummy = true;
-  sprintf(block.to_json());
-  return 0;
+  // Test read_slot?
+
+  return SGX_SUCCESS;
 }
 
 /**

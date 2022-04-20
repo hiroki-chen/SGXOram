@@ -16,7 +16,11 @@
  */
 
 enclave {
+  // Some necessary function interfaces.
   from "sgx_tkey_exchange.edl" import *;
+  from "sgx_pthread.edl" import *;
+  from "sgx_tstdc.edl" import *;
+
   include "sgx_key_exchange.h"
   include "sgx_trts.h"
   include "sgx_tseal.h"
@@ -29,6 +33,9 @@ enclave {
   trusted {
 		// Invoked by the client to intialize the inner oram controller.
 		public int ecall_init_oram_controller();
+
+    // Data access interface provided by the SGX-based ORAM.
+    public sgx_status_t ecall_access_data(int op_type, [ in, out, size = data_len ] uint8_t* data, size_t data_len);
 
     // Interfaces for sealing and unsealing data on the disk (if needed).
     public sgx_status_t ecall_seal([ in, size = plaintext_len ] const uint8_t *plaintext,
@@ -74,6 +81,14 @@ enclave {
                                               size_t message_size, 
                                               [ in,size = mac_size ] uint8_t *mac, 
                                               size_t mac_size);
+
+    public sgx_status_t verify_secret_data(sgx_ra_context_t context,
+                                          [in,size=secret_size] uint8_t* p_secret,
+                                          uint32_t secret_size,
+                                          [in,count=16] uint8_t* gcm_mac,
+                                          uint32_t max_verification_length,
+                                          [out, count=16] uint8_t *p_ret);
+
     public sgx_status_t put_secret_data(sgx_ra_context_t context,  
                                         [ in,size = secret_size ] uint8_t *p_secret,
                                         uint32_t secret_size,

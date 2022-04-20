@@ -19,6 +19,12 @@
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_u.h>
 
+void safe_free(void* ptr) {
+  if (ptr != nullptr) {
+    free(ptr);
+  }
+}
+
 std::string hex_to_string(const uint8_t* array, const size_t& len) {
   std::string ans;
 
@@ -68,6 +74,24 @@ void sprintf(const std::string& str, bool hex) {
   }
 }
 
-long get_current_timestamp(void) {
- 
+void band(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out) {
+  for (size_t i = 0; i < 32; i++) {
+    out[i] = lhs[i] & rhs[i];
+  }
+}
+
+void bor(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out) {
+  for (size_t i = 0; i < 32; i++) {
+    out[i] = lhs[i] | rhs[i];
+  }
+}
+
+size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint) {
+  const size_t size = ocall_read_slot(fingerprint, (uint8_t*)(slot), sizeof(sgx_oram::oram_slot_t));
+  
+  if (size == 0) {
+    // The slot is not found or something went wrong.
+    printf("033[31m The slot for %s is not found.\n033[0m", fingerprint);
+  }
+  return size;
 }

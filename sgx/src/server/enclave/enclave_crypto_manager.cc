@@ -52,7 +52,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
   // is easy to be discarded.
   sgx_read_rand(ciphertext + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE);
 
-  // Encrypt the data and MAC it.
+  // Encrypt the data and then MAC it.
   sgx_status_t ret = sgx_rijndael128GCM_encrypt(
       &aes_key, plaintext, message.size(),
       ciphertext + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,
@@ -83,8 +83,9 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
       message_len, plaintext, ciphertext + SGX_AESGCM_MAC_SIZE,
       SGX_AESGCM_IV_SIZE, NULL, 0, (const sgx_aes_gcm_128bit_tag_t*)ciphertext);
 
-  // If the message is possibly forged, we abort and throw an exception to
-  // indicate that the malicious party may be interfering with the enclave.
+  // Check the integrity of the message.
+  // If sanity check fails, we throw an exception, indicating that the message
+  // is corrupted, and the client should end the connection.
   if (ret != SGX_SUCCESS) {
     ocall_exception_handler("AES integrity check failed.");
   }
@@ -94,6 +95,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
 
 void EnclaveCryptoManager::set_shared_key(
     const sgx_ec_key_128bit_t* shared_key) {
+  // Copy the shared key into the enclave.
   memset(&shared_secret_key, 0, sizeof(sgx_ec_key_128bit_t));
   memcpy(&shared_secret_key, shared_key, sizeof(sgx_ec_key_128bit_t));
 }

@@ -43,7 +43,9 @@ mkdir -p cmake/build
 pushd cmake/build
 cmake -DgRPC_INSTALL=ON \                
       -DgRPC_BUILD_TESTS=OFF \
+      -DgRPC_SSL_PROVIDER=package \ # Do not link to libssl provided by the system.
       -DCMAKE_INSTALL_PREFIX=/usr/local \ # Change it to your own preferred directory, but better not install globally.
+      -DBUILD_SHARED_LIBS=ON \
       ../..
 make -j
 sudo make install
@@ -54,7 +56,11 @@ For more information, interested readers are referred to [this](https://grpc.io)
 
 ## Build our project
 
-To build our project, you may need to first install Intel SGX SDK for Linux system, and you also need to install gRPC framework for the connection between the client and the server, and we strongly recommend that one should install gRPC via source rather than package manager. Finally, we will use the gFlag library for command line argument parsing.
+To build our project, you may need to first install Intel SGX SDK for Linux system, and you also need to install gRPC framework for the connection between the client and the server, and we strongly recommend that one should install gRPC via source rather than package manager. Finally, we will use the gFlag library for command line argument parsing, and you can install it by
+
+```shell
+sudo apt install -y libgflags-dev
+```
 
 Also, you may also need to set the environment for the SGX SDK so that you can properly build the enclave:
 
@@ -84,10 +90,11 @@ make -j all
 
 ## Run the project
 
-Extra care must be paid when one tries to properly run the server and the client. Before running, please make sure that the path of loaded libraries is correctly set:
+Extra care must be paid when one tries to properly run the server and the client. Before running, please make sure that the path of loaded libraries is correctly set, and the ssl key is generated:
 
 ```shell
-export LD_LIBRARY_PATH="$(pwd)/lib:/usr/lib:/usr/local/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$(pwd)/lib:$LD_LIBRARY_PATH"
+sh -c ./keygen.sh
 ```
 
 Otherwise, the system will throw an exception indicating the `libsample_libcrypto` and `libservice_provider` cannot be found.

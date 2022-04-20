@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2021 Haobin Chen
+ Copyright (c) 2022 Haobin Chen and Siyi Lv
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -14,24 +14,20 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <app/basic_models.hh>
+#ifndef RA_MESSAGES_HH
+#define RA_MESSAGES_HH
 
-sgx_oram::Position::Position(
-    const uint32_t& level_cur,
-    const uint32_t& offset,
-    const uint32_t& bid_cur,
-    const uint32_t& bid_dst)
-    : level_cur(level_cur)
-    , offset(offset)
-    , bid_cur(bid_cur)
-    , bid_dst(bid_dst)
-{
-} 
+#include <stdint.h>
 
-sgx_oram::Block::Block(const bool& is_dummy, const std::string& data, const uint32_t& bid, const uint32_t& address)
-    : is_dummy(is_dummy)
-    , data(data)
-    , bid(bid)
-    , address(address)
-{
-}
+// This is the initial message sent by the server to the client.
+// It only contains the the type of the message as well as the server's epid.
+// This is serialized to byte array and sent via the network using gRPC.
+typedef struct _ra_samp_response_header_t{
+    uint8_t  type;      /* set to one of ra_msg_type_t*/
+    uint8_t  status[2];
+    uint32_t size;      /*size of the response body*/
+    uint8_t  align[1];
+    uint8_t  body[];
+}ra_samp_response_header_t;
+
+#endif

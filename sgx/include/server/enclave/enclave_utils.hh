@@ -21,6 +21,8 @@
 #include <type_traits>
 #include <string>
 
+#include <server/app/basic_models.hh>
+
 static const std::string digits = "0123456789abcdef";
 /** @addtogroup String concatenation helpers with arbitrary elements.
  *
@@ -37,6 +39,8 @@ inline std::string to_string(T&& val) {
 
 inline std::string strcat_helper(const std::string& string) { return string; }
 
+// Concatenate a list of strings into a single string.
+// Example: strcat({"hello", "world"}) -> "helloworld"
 template <class T, class... Args>
 inline std::string strcat_helper(const std::string& string, T&& val,
                                  Args&&... args) {
@@ -86,10 +90,25 @@ void printf(const char* fmt, ...);
 void sprintf(const std::string& str, bool hex = false);
 
 /**
- * @brief Get the current timestamp.
+ * @brief Safe free the memory.
  * 
- * @return long 
+ * @param ptr 
  */
-long get_current_timestamp(void);
+void safe_free(void* ptr);
+
+void band(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out);
+
+void bor(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out);
+
+void bneg(const uint8_t* lhs, uint8_t* out);
+
+/**
+ * @brief Read the slot using ocall.
+ * 
+ * @param slot 
+ * @param fingerprint the fingerprint is the sha-256 hash of the path (floor(bid / p^level)) + level.
+ * @return size_t 
+ */
+size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint);
 
 #endif

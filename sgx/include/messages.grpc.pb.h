@@ -38,20 +38,14 @@ class sgx_oram final {
   class StubInterface {
    public:
     virtual ~StubInterface() {}
-    // Initialize the enclave and starts to negotiate a shared session key.
+    // ===================================================== //
+    // Enclave-related remote process calls.
     virtual ::grpc::Status init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::oram::InitReply* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>> Asyncinit_enclave(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>>(Asyncinit_enclaveRaw(context, request, cq));
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>> PrepareAsyncinit_enclave(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>>(PrepareAsyncinit_enclaveRaw(context, request, cq));
-    }
-    virtual ::grpc::Status generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::oram::InitReply* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>> Asyncgenerate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>>(Asyncgenerate_session_keyRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>> PrepareAsyncgenerate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>>(PrepareAsyncgenerate_session_keyRaw(context, request, cq));
     }
     virtual ::grpc::Status init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::google::protobuf::Empty* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> Asyncinit_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
@@ -60,13 +54,44 @@ class sgx_oram final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncinit_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncinit_oramRaw(context, request, cq));
     }
+    // FIXME: possibly deprecated.
+    virtual ::grpc::Status generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::oram::InitReply* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>> Asyncgenerate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>>(Asyncgenerate_session_keyRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>> PrepareAsyncgenerate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>>(PrepareAsyncgenerate_session_keyRaw(context, request, cq));
+    }
     // ===================================================== //
     // Functions for remote attestation and key derivation.
-    // rpc send_message1(MessageMSG1) returns (MessageMSG2) {}
-    //
-    // rpc send_message3(MessageMSG3) returns (AttestationMessage) {}
-    // ===================================================== //
-    //
+    virtual ::grpc::Status remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::oram::Message0* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message0>> Asyncremote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message0>>(Asyncremote_attestation_beginRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message0>> PrepareAsyncremote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message0>>(PrepareAsyncremote_attestation_beginRaw(context, request, cq));
+    }
+    virtual ::grpc::Status remote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0& request, ::oram::Message1* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message1>> Asyncremote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message1>>(Asyncremote_attestation_msg0Raw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message1>> PrepareAsyncremote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message1>>(PrepareAsyncremote_attestation_msg0Raw(context, request, cq));
+    }
+    virtual ::grpc::Status remote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2& request, ::oram::Message3* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message3>> Asyncremote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message3>>(Asyncremote_attestation_msg2Raw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message3>> PrepareAsyncremote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message3>>(PrepareAsyncremote_attestation_msg2Raw(context, request, cq));
+    }
+    virtual ::grpc::Status remote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::google::protobuf::Empty* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> Asyncremote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(Asyncremote_attestation_finalRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncremote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncremote_attestation_finalRaw(context, request, cq));
+    }
     virtual ::grpc::Status read_block(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::oram::ReadReply* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::ReadReply>> Asyncread_block(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::ReadReply>>(Asyncread_blockRaw(context, request, cq));
@@ -91,20 +116,25 @@ class sgx_oram final {
     class async_interface {
      public:
       virtual ~async_interface() {}
-      // Initialize the enclave and starts to negotiate a shared session key.
+      // ===================================================== //
+      // Enclave-related remote process calls.
       virtual void init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, std::function<void(::grpc::Status)>) = 0;
       virtual void init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
       virtual void init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      // FIXME: possibly deprecated.
+      virtual void generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       // ===================================================== //
       // Functions for remote attestation and key derivation.
-      // rpc send_message1(MessageMSG1) returns (MessageMSG2) {}
-      //
-      // rpc send_message3(MessageMSG3) returns (AttestationMessage) {}
-      // ===================================================== //
-      //
+      virtual void remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void remote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0* request, ::oram::Message1* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void remote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0* request, ::oram::Message1* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void remote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2* request, ::oram::Message3* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void remote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2* request, ::oram::Message3* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void remote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void remote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void read_block(::grpc::ClientContext* context, const ::oram::ReadRequest* request, ::oram::ReadReply* response, std::function<void(::grpc::Status)>) = 0;
       virtual void read_block(::grpc::ClientContext* context, const ::oram::ReadRequest* request, ::oram::ReadReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void write_block(::grpc::ClientContext* context, const ::oram::WriteRequest* request, ::oram::WriteReply* response, std::function<void(::grpc::Status)>) = 0;
@@ -118,10 +148,18 @@ class sgx_oram final {
    private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>* Asyncinit_enclaveRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>* PrepareAsyncinit_enclaveRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>* Asyncgenerate_session_keyRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>* PrepareAsyncgenerate_session_keyRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* Asyncinit_oramRaw(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncinit_oramRaw(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>* Asyncgenerate_session_keyRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>* PrepareAsyncgenerate_session_keyRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message0>* Asyncremote_attestation_beginRaw(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message0>* PrepareAsyncremote_attestation_beginRaw(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message1>* Asyncremote_attestation_msg0Raw(::grpc::ClientContext* context, const ::oram::Message0& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message1>* PrepareAsyncremote_attestation_msg0Raw(::grpc::ClientContext* context, const ::oram::Message0& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message3>* Asyncremote_attestation_msg2Raw(::grpc::ClientContext* context, const ::oram::Message2& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message3>* PrepareAsyncremote_attestation_msg2Raw(::grpc::ClientContext* context, const ::oram::Message2& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* Asyncremote_attestation_finalRaw(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncremote_attestation_finalRaw(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::ReadReply>* Asyncread_blockRaw(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::ReadReply>* PrepareAsyncread_blockRaw(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::oram::WriteReply>* Asyncwrite_blockRaw(::grpc::ClientContext* context, const ::oram::WriteRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -139,6 +177,13 @@ class sgx_oram final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::InitReply>> PrepareAsyncinit_enclave(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::InitReply>>(PrepareAsyncinit_enclaveRaw(context, request, cq));
     }
+    ::grpc::Status init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::google::protobuf::Empty* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> Asyncinit_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(Asyncinit_oramRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncinit_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncinit_oramRaw(context, request, cq));
+    }
     ::grpc::Status generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::oram::InitReply* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::InitReply>> Asyncgenerate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::InitReply>>(Asyncgenerate_session_keyRaw(context, request, cq));
@@ -146,12 +191,33 @@ class sgx_oram final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::InitReply>> PrepareAsyncgenerate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::InitReply>>(PrepareAsyncgenerate_session_keyRaw(context, request, cq));
     }
-    ::grpc::Status init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::google::protobuf::Empty* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> Asyncinit_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(Asyncinit_oramRaw(context, request, cq));
+    ::grpc::Status remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::oram::Message0* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message0>> Asyncremote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message0>>(Asyncremote_attestation_beginRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncinit_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncinit_oramRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message0>> PrepareAsyncremote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message0>>(PrepareAsyncremote_attestation_beginRaw(context, request, cq));
+    }
+    ::grpc::Status remote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0& request, ::oram::Message1* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message1>> Asyncremote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message1>>(Asyncremote_attestation_msg0Raw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message1>> PrepareAsyncremote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message1>>(PrepareAsyncremote_attestation_msg0Raw(context, request, cq));
+    }
+    ::grpc::Status remote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2& request, ::oram::Message3* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message3>> Asyncremote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message3>>(Asyncremote_attestation_msg2Raw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message3>> PrepareAsyncremote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::Message3>>(PrepareAsyncremote_attestation_msg2Raw(context, request, cq));
+    }
+    ::grpc::Status remote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::google::protobuf::Empty* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> Asyncremote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(Asyncremote_attestation_finalRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncremote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncremote_attestation_finalRaw(context, request, cq));
     }
     ::grpc::Status read_block(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::oram::ReadReply* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::oram::ReadReply>> Asyncread_block(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::grpc::CompletionQueue* cq) {
@@ -179,10 +245,18 @@ class sgx_oram final {
      public:
       void init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, std::function<void(::grpc::Status)>) override;
       void init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, std::function<void(::grpc::Status)>) override;
-      void generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, ::grpc::ClientUnaryReactor* reactor) override;
       void init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
       void init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, std::function<void(::grpc::Status)>) override;
+      void generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response, std::function<void(::grpc::Status)>) override;
+      void remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void remote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0* request, ::oram::Message1* response, std::function<void(::grpc::Status)>) override;
+      void remote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0* request, ::oram::Message1* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void remote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2* request, ::oram::Message3* response, std::function<void(::grpc::Status)>) override;
+      void remote_attestation_msg2(::grpc::ClientContext* context, const ::oram::Message2* request, ::oram::Message3* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void remote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
+      void remote_attestation_final(::grpc::ClientContext* context, const ::oram::AttestationMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
       void read_block(::grpc::ClientContext* context, const ::oram::ReadRequest* request, ::oram::ReadReply* response, std::function<void(::grpc::Status)>) override;
       void read_block(::grpc::ClientContext* context, const ::oram::ReadRequest* request, ::oram::ReadReply* response, ::grpc::ClientUnaryReactor* reactor) override;
       void write_block(::grpc::ClientContext* context, const ::oram::WriteRequest* request, ::oram::WriteReply* response, std::function<void(::grpc::Status)>) override;
@@ -202,10 +276,18 @@ class sgx_oram final {
     class async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::oram::InitReply>* Asyncinit_enclaveRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::oram::InitReply>* PrepareAsyncinit_enclaveRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::oram::InitReply>* Asyncgenerate_session_keyRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::oram::InitReply>* PrepareAsyncgenerate_session_keyRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* Asyncinit_oramRaw(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncinit_oramRaw(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::oram::InitReply>* Asyncgenerate_session_keyRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::oram::InitReply>* PrepareAsyncgenerate_session_keyRaw(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::oram::Message0>* Asyncremote_attestation_beginRaw(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::oram::Message0>* PrepareAsyncremote_attestation_beginRaw(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::oram::Message1>* Asyncremote_attestation_msg0Raw(::grpc::ClientContext* context, const ::oram::Message0& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::oram::Message1>* PrepareAsyncremote_attestation_msg0Raw(::grpc::ClientContext* context, const ::oram::Message0& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::oram::Message3>* Asyncremote_attestation_msg2Raw(::grpc::ClientContext* context, const ::oram::Message2& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::oram::Message3>* PrepareAsyncremote_attestation_msg2Raw(::grpc::ClientContext* context, const ::oram::Message2& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* Asyncremote_attestation_finalRaw(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncremote_attestation_finalRaw(::grpc::ClientContext* context, const ::oram::AttestationMessage& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::oram::ReadReply>* Asyncread_blockRaw(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::oram::ReadReply>* PrepareAsyncread_blockRaw(::grpc::ClientContext* context, const ::oram::ReadRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::oram::WriteReply>* Asyncwrite_blockRaw(::grpc::ClientContext* context, const ::oram::WriteRequest& request, ::grpc::CompletionQueue* cq) override;
@@ -213,8 +295,12 @@ class sgx_oram final {
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* Asyncclose_connectionRaw(::grpc::ClientContext* context, const ::oram::CloseRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncclose_connectionRaw(::grpc::ClientContext* context, const ::oram::CloseRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_init_enclave_;
-    const ::grpc::internal::RpcMethod rpcmethod_generate_session_key_;
     const ::grpc::internal::RpcMethod rpcmethod_init_oram_;
+    const ::grpc::internal::RpcMethod rpcmethod_generate_session_key_;
+    const ::grpc::internal::RpcMethod rpcmethod_remote_attestation_begin_;
+    const ::grpc::internal::RpcMethod rpcmethod_remote_attestation_msg0_;
+    const ::grpc::internal::RpcMethod rpcmethod_remote_attestation_msg2_;
+    const ::grpc::internal::RpcMethod rpcmethod_remote_attestation_final_;
     const ::grpc::internal::RpcMethod rpcmethod_read_block_;
     const ::grpc::internal::RpcMethod rpcmethod_write_block_;
     const ::grpc::internal::RpcMethod rpcmethod_close_connection_;
@@ -225,17 +311,18 @@ class sgx_oram final {
    public:
     Service();
     virtual ~Service();
-    // Initialize the enclave and starts to negotiate a shared session key.
+    // ===================================================== //
+    // Enclave-related remote process calls.
     virtual ::grpc::Status init_enclave(::grpc::ServerContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response);
-    virtual ::grpc::Status generate_session_key(::grpc::ServerContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response);
     virtual ::grpc::Status init_oram(::grpc::ServerContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response);
+    // FIXME: possibly deprecated.
+    virtual ::grpc::Status generate_session_key(::grpc::ServerContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response);
     // ===================================================== //
     // Functions for remote attestation and key derivation.
-    // rpc send_message1(MessageMSG1) returns (MessageMSG2) {}
-    //
-    // rpc send_message3(MessageMSG3) returns (AttestationMessage) {}
-    // ===================================================== //
-    //
+    virtual ::grpc::Status remote_attestation_begin(::grpc::ServerContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response);
+    virtual ::grpc::Status remote_attestation_msg0(::grpc::ServerContext* context, const ::oram::Message0* request, ::oram::Message1* response);
+    virtual ::grpc::Status remote_attestation_msg2(::grpc::ServerContext* context, const ::oram::Message2* request, ::oram::Message3* response);
+    virtual ::grpc::Status remote_attestation_final(::grpc::ServerContext* context, const ::oram::AttestationMessage* request, ::google::protobuf::Empty* response);
     virtual ::grpc::Status read_block(::grpc::ServerContext* context, const ::oram::ReadRequest* request, ::oram::ReadReply* response);
     virtual ::grpc::Status write_block(::grpc::ServerContext* context, const ::oram::WriteRequest* request, ::oram::WriteReply* response);
     virtual ::grpc::Status close_connection(::grpc::ServerContext* context, const ::oram::CloseRequest* request, ::google::protobuf::Empty* response);
@@ -261,32 +348,12 @@ class sgx_oram final {
     }
   };
   template <class BaseClass>
-  class WithAsyncMethod_generate_session_key : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithAsyncMethod_generate_session_key() {
-      ::grpc::Service::MarkMethodAsync(1);
-    }
-    ~WithAsyncMethod_generate_session_key() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void Requestgenerate_session_key(::grpc::ServerContext* context, ::oram::InitRequest* request, ::grpc::ServerAsyncResponseWriter< ::oram::InitReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
   class WithAsyncMethod_init_oram : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_init_oram() {
-      ::grpc::Service::MarkMethodAsync(2);
+      ::grpc::Service::MarkMethodAsync(1);
     }
     ~WithAsyncMethod_init_oram() override {
       BaseClassMustBeDerivedFromService(this);
@@ -297,7 +364,107 @@ class sgx_oram final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestinit_oram(::grpc::ServerContext* context, ::oram::OramInitRequest* request, ::grpc::ServerAsyncResponseWriter< ::google::protobuf::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_generate_session_key : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_generate_session_key() {
+      ::grpc::Service::MarkMethodAsync(2);
+    }
+    ~WithAsyncMethod_generate_session_key() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestgenerate_session_key(::grpc::ServerContext* context, ::oram::InitRequest* request, ::grpc::ServerAsyncResponseWriter< ::oram::InitReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_remote_attestation_begin : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_remote_attestation_begin() {
+      ::grpc::Service::MarkMethodAsync(3);
+    }
+    ~WithAsyncMethod_remote_attestation_begin() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_begin(::grpc::ServerContext* /*context*/, const ::oram::InitialMessage* /*request*/, ::oram::Message0* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestremote_attestation_begin(::grpc::ServerContext* context, ::oram::InitialMessage* request, ::grpc::ServerAsyncResponseWriter< ::oram::Message0>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_remote_attestation_msg0 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_remote_attestation_msg0() {
+      ::grpc::Service::MarkMethodAsync(4);
+    }
+    ~WithAsyncMethod_remote_attestation_msg0() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_msg0(::grpc::ServerContext* /*context*/, const ::oram::Message0* /*request*/, ::oram::Message1* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestremote_attestation_msg0(::grpc::ServerContext* context, ::oram::Message0* request, ::grpc::ServerAsyncResponseWriter< ::oram::Message1>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_remote_attestation_msg2 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_remote_attestation_msg2() {
+      ::grpc::Service::MarkMethodAsync(5);
+    }
+    ~WithAsyncMethod_remote_attestation_msg2() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_msg2(::grpc::ServerContext* /*context*/, const ::oram::Message2* /*request*/, ::oram::Message3* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestremote_attestation_msg2(::grpc::ServerContext* context, ::oram::Message2* request, ::grpc::ServerAsyncResponseWriter< ::oram::Message3>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_remote_attestation_final : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_remote_attestation_final() {
+      ::grpc::Service::MarkMethodAsync(6);
+    }
+    ~WithAsyncMethod_remote_attestation_final() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_final(::grpc::ServerContext* /*context*/, const ::oram::AttestationMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestremote_attestation_final(::grpc::ServerContext* context, ::oram::AttestationMessage* request, ::grpc::ServerAsyncResponseWriter< ::google::protobuf::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -306,7 +473,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_read_block() {
-      ::grpc::Service::MarkMethodAsync(3);
+      ::grpc::Service::MarkMethodAsync(7);
     }
     ~WithAsyncMethod_read_block() override {
       BaseClassMustBeDerivedFromService(this);
@@ -317,7 +484,7 @@ class sgx_oram final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestread_block(::grpc::ServerContext* context, ::oram::ReadRequest* request, ::grpc::ServerAsyncResponseWriter< ::oram::ReadReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -326,7 +493,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_write_block() {
-      ::grpc::Service::MarkMethodAsync(4);
+      ::grpc::Service::MarkMethodAsync(8);
     }
     ~WithAsyncMethod_write_block() override {
       BaseClassMustBeDerivedFromService(this);
@@ -337,7 +504,7 @@ class sgx_oram final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestwrite_block(::grpc::ServerContext* context, ::oram::WriteRequest* request, ::grpc::ServerAsyncResponseWriter< ::oram::WriteReply>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -346,7 +513,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_close_connection() {
-      ::grpc::Service::MarkMethodAsync(5);
+      ::grpc::Service::MarkMethodAsync(9);
     }
     ~WithAsyncMethod_close_connection() override {
       BaseClassMustBeDerivedFromService(this);
@@ -357,10 +524,10 @@ class sgx_oram final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestclose_connection(::grpc::ServerContext* context, ::oram::CloseRequest* request, ::grpc::ServerAsyncResponseWriter< ::google::protobuf::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_init_enclave<WithAsyncMethod_generate_session_key<WithAsyncMethod_init_oram<WithAsyncMethod_read_block<WithAsyncMethod_write_block<WithAsyncMethod_close_connection<Service > > > > > > AsyncService;
+  typedef WithAsyncMethod_init_enclave<WithAsyncMethod_init_oram<WithAsyncMethod_generate_session_key<WithAsyncMethod_remote_attestation_begin<WithAsyncMethod_remote_attestation_msg0<WithAsyncMethod_remote_attestation_msg2<WithAsyncMethod_remote_attestation_final<WithAsyncMethod_read_block<WithAsyncMethod_write_block<WithAsyncMethod_close_connection<Service > > > > > > > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_init_enclave : public BaseClass {
    private:
@@ -389,45 +556,18 @@ class sgx_oram final {
       ::grpc::CallbackServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class WithCallbackMethod_generate_session_key : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithCallbackMethod_generate_session_key() {
-      ::grpc::Service::MarkMethodCallback(1,
-          new ::grpc::internal::CallbackUnaryHandler< ::oram::InitRequest, ::oram::InitReply>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response) { return this->generate_session_key(context, request, response); }));}
-    void SetMessageAllocatorFor_generate_session_key(
-        ::grpc::MessageAllocator< ::oram::InitRequest, ::oram::InitReply>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::oram::InitRequest, ::oram::InitReply>*>(handler)
-              ->SetMessageAllocator(allocator);
-    }
-    ~WithCallbackMethod_generate_session_key() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* generate_session_key(
-      ::grpc::CallbackServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/)  { return nullptr; }
-  };
-  template <class BaseClass>
   class WithCallbackMethod_init_oram : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_init_oram() {
-      ::grpc::Service::MarkMethodCallback(2,
+      ::grpc::Service::MarkMethodCallback(1,
           new ::grpc::internal::CallbackUnaryHandler< ::oram::OramInitRequest, ::google::protobuf::Empty>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response) { return this->init_oram(context, request, response); }));}
     void SetMessageAllocatorFor_init_oram(
         ::grpc::MessageAllocator< ::oram::OramInitRequest, ::google::protobuf::Empty>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::oram::OramInitRequest, ::google::protobuf::Empty>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -443,18 +583,153 @@ class sgx_oram final {
       ::grpc::CallbackServerContext* /*context*/, const ::oram::OramInitRequest* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
+  class WithCallbackMethod_generate_session_key : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_generate_session_key() {
+      ::grpc::Service::MarkMethodCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::oram::InitRequest, ::oram::InitReply>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response) { return this->generate_session_key(context, request, response); }));}
+    void SetMessageAllocatorFor_generate_session_key(
+        ::grpc::MessageAllocator< ::oram::InitRequest, ::oram::InitReply>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::oram::InitRequest, ::oram::InitReply>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_generate_session_key() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* generate_session_key(
+      ::grpc::CallbackServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_remote_attestation_begin : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_remote_attestation_begin() {
+      ::grpc::Service::MarkMethodCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::oram::InitialMessage, ::oram::Message0>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response) { return this->remote_attestation_begin(context, request, response); }));}
+    void SetMessageAllocatorFor_remote_attestation_begin(
+        ::grpc::MessageAllocator< ::oram::InitialMessage, ::oram::Message0>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::oram::InitialMessage, ::oram::Message0>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_remote_attestation_begin() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_begin(::grpc::ServerContext* /*context*/, const ::oram::InitialMessage* /*request*/, ::oram::Message0* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* remote_attestation_begin(
+      ::grpc::CallbackServerContext* /*context*/, const ::oram::InitialMessage* /*request*/, ::oram::Message0* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_remote_attestation_msg0 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_remote_attestation_msg0() {
+      ::grpc::Service::MarkMethodCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::oram::Message0, ::oram::Message1>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::oram::Message0* request, ::oram::Message1* response) { return this->remote_attestation_msg0(context, request, response); }));}
+    void SetMessageAllocatorFor_remote_attestation_msg0(
+        ::grpc::MessageAllocator< ::oram::Message0, ::oram::Message1>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(4);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::oram::Message0, ::oram::Message1>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_remote_attestation_msg0() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_msg0(::grpc::ServerContext* /*context*/, const ::oram::Message0* /*request*/, ::oram::Message1* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* remote_attestation_msg0(
+      ::grpc::CallbackServerContext* /*context*/, const ::oram::Message0* /*request*/, ::oram::Message1* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_remote_attestation_msg2 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_remote_attestation_msg2() {
+      ::grpc::Service::MarkMethodCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::oram::Message2, ::oram::Message3>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::oram::Message2* request, ::oram::Message3* response) { return this->remote_attestation_msg2(context, request, response); }));}
+    void SetMessageAllocatorFor_remote_attestation_msg2(
+        ::grpc::MessageAllocator< ::oram::Message2, ::oram::Message3>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(5);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::oram::Message2, ::oram::Message3>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_remote_attestation_msg2() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_msg2(::grpc::ServerContext* /*context*/, const ::oram::Message2* /*request*/, ::oram::Message3* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* remote_attestation_msg2(
+      ::grpc::CallbackServerContext* /*context*/, const ::oram::Message2* /*request*/, ::oram::Message3* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_remote_attestation_final : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_remote_attestation_final() {
+      ::grpc::Service::MarkMethodCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::oram::AttestationMessage, ::google::protobuf::Empty>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::oram::AttestationMessage* request, ::google::protobuf::Empty* response) { return this->remote_attestation_final(context, request, response); }));}
+    void SetMessageAllocatorFor_remote_attestation_final(
+        ::grpc::MessageAllocator< ::oram::AttestationMessage, ::google::protobuf::Empty>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(6);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::oram::AttestationMessage, ::google::protobuf::Empty>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_remote_attestation_final() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_final(::grpc::ServerContext* /*context*/, const ::oram::AttestationMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* remote_attestation_final(
+      ::grpc::CallbackServerContext* /*context*/, const ::oram::AttestationMessage* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
   class WithCallbackMethod_read_block : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_read_block() {
-      ::grpc::Service::MarkMethodCallback(3,
+      ::grpc::Service::MarkMethodCallback(7,
           new ::grpc::internal::CallbackUnaryHandler< ::oram::ReadRequest, ::oram::ReadReply>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::oram::ReadRequest* request, ::oram::ReadReply* response) { return this->read_block(context, request, response); }));}
     void SetMessageAllocatorFor_read_block(
         ::grpc::MessageAllocator< ::oram::ReadRequest, ::oram::ReadReply>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(7);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::oram::ReadRequest, ::oram::ReadReply>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -475,13 +750,13 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_write_block() {
-      ::grpc::Service::MarkMethodCallback(4,
+      ::grpc::Service::MarkMethodCallback(8,
           new ::grpc::internal::CallbackUnaryHandler< ::oram::WriteRequest, ::oram::WriteReply>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::oram::WriteRequest* request, ::oram::WriteReply* response) { return this->write_block(context, request, response); }));}
     void SetMessageAllocatorFor_write_block(
         ::grpc::MessageAllocator< ::oram::WriteRequest, ::oram::WriteReply>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(4);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(8);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::oram::WriteRequest, ::oram::WriteReply>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -502,13 +777,13 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_close_connection() {
-      ::grpc::Service::MarkMethodCallback(5,
+      ::grpc::Service::MarkMethodCallback(9,
           new ::grpc::internal::CallbackUnaryHandler< ::oram::CloseRequest, ::google::protobuf::Empty>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::oram::CloseRequest* request, ::google::protobuf::Empty* response) { return this->close_connection(context, request, response); }));}
     void SetMessageAllocatorFor_close_connection(
         ::grpc::MessageAllocator< ::oram::CloseRequest, ::google::protobuf::Empty>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(5);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(9);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::oram::CloseRequest, ::google::protobuf::Empty>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -523,7 +798,7 @@ class sgx_oram final {
     virtual ::grpc::ServerUnaryReactor* close_connection(
       ::grpc::CallbackServerContext* /*context*/, const ::oram::CloseRequest* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_init_enclave<WithCallbackMethod_generate_session_key<WithCallbackMethod_init_oram<WithCallbackMethod_read_block<WithCallbackMethod_write_block<WithCallbackMethod_close_connection<Service > > > > > > CallbackService;
+  typedef WithCallbackMethod_init_enclave<WithCallbackMethod_init_oram<WithCallbackMethod_generate_session_key<WithCallbackMethod_remote_attestation_begin<WithCallbackMethod_remote_attestation_msg0<WithCallbackMethod_remote_attestation_msg2<WithCallbackMethod_remote_attestation_final<WithCallbackMethod_read_block<WithCallbackMethod_write_block<WithCallbackMethod_close_connection<Service > > > > > > > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_init_enclave : public BaseClass {
@@ -543,29 +818,12 @@ class sgx_oram final {
     }
   };
   template <class BaseClass>
-  class WithGenericMethod_generate_session_key : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithGenericMethod_generate_session_key() {
-      ::grpc::Service::MarkMethodGeneric(1);
-    }
-    ~WithGenericMethod_generate_session_key() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
   class WithGenericMethod_init_oram : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_init_oram() {
-      ::grpc::Service::MarkMethodGeneric(2);
+      ::grpc::Service::MarkMethodGeneric(1);
     }
     ~WithGenericMethod_init_oram() override {
       BaseClassMustBeDerivedFromService(this);
@@ -577,12 +835,97 @@ class sgx_oram final {
     }
   };
   template <class BaseClass>
+  class WithGenericMethod_generate_session_key : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_generate_session_key() {
+      ::grpc::Service::MarkMethodGeneric(2);
+    }
+    ~WithGenericMethod_generate_session_key() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_remote_attestation_begin : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_remote_attestation_begin() {
+      ::grpc::Service::MarkMethodGeneric(3);
+    }
+    ~WithGenericMethod_remote_attestation_begin() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_begin(::grpc::ServerContext* /*context*/, const ::oram::InitialMessage* /*request*/, ::oram::Message0* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_remote_attestation_msg0 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_remote_attestation_msg0() {
+      ::grpc::Service::MarkMethodGeneric(4);
+    }
+    ~WithGenericMethod_remote_attestation_msg0() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_msg0(::grpc::ServerContext* /*context*/, const ::oram::Message0* /*request*/, ::oram::Message1* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_remote_attestation_msg2 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_remote_attestation_msg2() {
+      ::grpc::Service::MarkMethodGeneric(5);
+    }
+    ~WithGenericMethod_remote_attestation_msg2() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_msg2(::grpc::ServerContext* /*context*/, const ::oram::Message2* /*request*/, ::oram::Message3* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_remote_attestation_final : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_remote_attestation_final() {
+      ::grpc::Service::MarkMethodGeneric(6);
+    }
+    ~WithGenericMethod_remote_attestation_final() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_final(::grpc::ServerContext* /*context*/, const ::oram::AttestationMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
   class WithGenericMethod_read_block : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_read_block() {
-      ::grpc::Service::MarkMethodGeneric(3);
+      ::grpc::Service::MarkMethodGeneric(7);
     }
     ~WithGenericMethod_read_block() override {
       BaseClassMustBeDerivedFromService(this);
@@ -599,7 +942,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_write_block() {
-      ::grpc::Service::MarkMethodGeneric(4);
+      ::grpc::Service::MarkMethodGeneric(8);
     }
     ~WithGenericMethod_write_block() override {
       BaseClassMustBeDerivedFromService(this);
@@ -616,7 +959,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_close_connection() {
-      ::grpc::Service::MarkMethodGeneric(5);
+      ::grpc::Service::MarkMethodGeneric(9);
     }
     ~WithGenericMethod_close_connection() override {
       BaseClassMustBeDerivedFromService(this);
@@ -648,32 +991,12 @@ class sgx_oram final {
     }
   };
   template <class BaseClass>
-  class WithRawMethod_generate_session_key : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawMethod_generate_session_key() {
-      ::grpc::Service::MarkMethodRaw(1);
-    }
-    ~WithRawMethod_generate_session_key() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void Requestgenerate_session_key(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
   class WithRawMethod_init_oram : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_init_oram() {
-      ::grpc::Service::MarkMethodRaw(2);
+      ::grpc::Service::MarkMethodRaw(1);
     }
     ~WithRawMethod_init_oram() override {
       BaseClassMustBeDerivedFromService(this);
@@ -684,7 +1007,107 @@ class sgx_oram final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestinit_oram(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_generate_session_key : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_generate_session_key() {
+      ::grpc::Service::MarkMethodRaw(2);
+    }
+    ~WithRawMethod_generate_session_key() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestgenerate_session_key(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_remote_attestation_begin : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_remote_attestation_begin() {
+      ::grpc::Service::MarkMethodRaw(3);
+    }
+    ~WithRawMethod_remote_attestation_begin() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_begin(::grpc::ServerContext* /*context*/, const ::oram::InitialMessage* /*request*/, ::oram::Message0* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestremote_attestation_begin(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_remote_attestation_msg0 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_remote_attestation_msg0() {
+      ::grpc::Service::MarkMethodRaw(4);
+    }
+    ~WithRawMethod_remote_attestation_msg0() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_msg0(::grpc::ServerContext* /*context*/, const ::oram::Message0* /*request*/, ::oram::Message1* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestremote_attestation_msg0(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_remote_attestation_msg2 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_remote_attestation_msg2() {
+      ::grpc::Service::MarkMethodRaw(5);
+    }
+    ~WithRawMethod_remote_attestation_msg2() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_msg2(::grpc::ServerContext* /*context*/, const ::oram::Message2* /*request*/, ::oram::Message3* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestremote_attestation_msg2(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_remote_attestation_final : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_remote_attestation_final() {
+      ::grpc::Service::MarkMethodRaw(6);
+    }
+    ~WithRawMethod_remote_attestation_final() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_final(::grpc::ServerContext* /*context*/, const ::oram::AttestationMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestremote_attestation_final(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -693,7 +1116,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_read_block() {
-      ::grpc::Service::MarkMethodRaw(3);
+      ::grpc::Service::MarkMethodRaw(7);
     }
     ~WithRawMethod_read_block() override {
       BaseClassMustBeDerivedFromService(this);
@@ -704,7 +1127,7 @@ class sgx_oram final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestread_block(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -713,7 +1136,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_write_block() {
-      ::grpc::Service::MarkMethodRaw(4);
+      ::grpc::Service::MarkMethodRaw(8);
     }
     ~WithRawMethod_write_block() override {
       BaseClassMustBeDerivedFromService(this);
@@ -724,7 +1147,7 @@ class sgx_oram final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestwrite_block(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -733,7 +1156,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_close_connection() {
-      ::grpc::Service::MarkMethodRaw(5);
+      ::grpc::Service::MarkMethodRaw(9);
     }
     ~WithRawMethod_close_connection() override {
       BaseClassMustBeDerivedFromService(this);
@@ -744,7 +1167,7 @@ class sgx_oram final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestclose_connection(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -770,34 +1193,12 @@ class sgx_oram final {
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class WithRawCallbackMethod_generate_session_key : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithRawCallbackMethod_generate_session_key() {
-      ::grpc::Service::MarkMethodRawCallback(1,
-          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-            [this](
-                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->generate_session_key(context, request, response); }));
-    }
-    ~WithRawCallbackMethod_generate_session_key() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual ::grpc::ServerUnaryReactor* generate_session_key(
-      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
-  };
-  template <class BaseClass>
   class WithRawCallbackMethod_init_oram : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_init_oram() {
-      ::grpc::Service::MarkMethodRawCallback(2,
+      ::grpc::Service::MarkMethodRawCallback(1,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->init_oram(context, request, response); }));
@@ -814,12 +1215,122 @@ class sgx_oram final {
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
+  class WithRawCallbackMethod_generate_session_key : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_generate_session_key() {
+      ::grpc::Service::MarkMethodRawCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->generate_session_key(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_generate_session_key() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* generate_session_key(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_remote_attestation_begin : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_remote_attestation_begin() {
+      ::grpc::Service::MarkMethodRawCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->remote_attestation_begin(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_remote_attestation_begin() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_begin(::grpc::ServerContext* /*context*/, const ::oram::InitialMessage* /*request*/, ::oram::Message0* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* remote_attestation_begin(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_remote_attestation_msg0 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_remote_attestation_msg0() {
+      ::grpc::Service::MarkMethodRawCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->remote_attestation_msg0(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_remote_attestation_msg0() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_msg0(::grpc::ServerContext* /*context*/, const ::oram::Message0* /*request*/, ::oram::Message1* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* remote_attestation_msg0(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_remote_attestation_msg2 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_remote_attestation_msg2() {
+      ::grpc::Service::MarkMethodRawCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->remote_attestation_msg2(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_remote_attestation_msg2() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_msg2(::grpc::ServerContext* /*context*/, const ::oram::Message2* /*request*/, ::oram::Message3* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* remote_attestation_msg2(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_remote_attestation_final : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_remote_attestation_final() {
+      ::grpc::Service::MarkMethodRawCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->remote_attestation_final(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_remote_attestation_final() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status remote_attestation_final(::grpc::ServerContext* /*context*/, const ::oram::AttestationMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* remote_attestation_final(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
   class WithRawCallbackMethod_read_block : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_read_block() {
-      ::grpc::Service::MarkMethodRawCallback(3,
+      ::grpc::Service::MarkMethodRawCallback(7,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->read_block(context, request, response); }));
@@ -841,7 +1352,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_write_block() {
-      ::grpc::Service::MarkMethodRawCallback(4,
+      ::grpc::Service::MarkMethodRawCallback(8,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->write_block(context, request, response); }));
@@ -863,7 +1374,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_close_connection() {
-      ::grpc::Service::MarkMethodRawCallback(5,
+      ::grpc::Service::MarkMethodRawCallback(9,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->close_connection(context, request, response); }));
@@ -907,39 +1418,12 @@ class sgx_oram final {
     virtual ::grpc::Status Streamedinit_enclave(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::oram::InitRequest,::oram::InitReply>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
-  class WithStreamedUnaryMethod_generate_session_key : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
-   public:
-    WithStreamedUnaryMethod_generate_session_key() {
-      ::grpc::Service::MarkMethodStreamed(1,
-        new ::grpc::internal::StreamedUnaryHandler<
-          ::oram::InitRequest, ::oram::InitReply>(
-            [this](::grpc::ServerContext* context,
-                   ::grpc::ServerUnaryStreamer<
-                     ::oram::InitRequest, ::oram::InitReply>* streamer) {
-                       return this->Streamedgenerate_session_key(context,
-                         streamer);
-                  }));
-    }
-    ~WithStreamedUnaryMethod_generate_session_key() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status Streamedgenerate_session_key(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::oram::InitRequest,::oram::InitReply>* server_unary_streamer) = 0;
-  };
-  template <class BaseClass>
   class WithStreamedUnaryMethod_init_oram : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_init_oram() {
-      ::grpc::Service::MarkMethodStreamed(2,
+      ::grpc::Service::MarkMethodStreamed(1,
         new ::grpc::internal::StreamedUnaryHandler<
           ::oram::OramInitRequest, ::google::protobuf::Empty>(
             [this](::grpc::ServerContext* context,
@@ -961,12 +1445,147 @@ class sgx_oram final {
     virtual ::grpc::Status Streamedinit_oram(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::oram::OramInitRequest,::google::protobuf::Empty>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
+  class WithStreamedUnaryMethod_generate_session_key : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_generate_session_key() {
+      ::grpc::Service::MarkMethodStreamed(2,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::oram::InitRequest, ::oram::InitReply>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::oram::InitRequest, ::oram::InitReply>* streamer) {
+                       return this->Streamedgenerate_session_key(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_generate_session_key() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status generate_session_key(::grpc::ServerContext* /*context*/, const ::oram::InitRequest* /*request*/, ::oram::InitReply* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status Streamedgenerate_session_key(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::oram::InitRequest,::oram::InitReply>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_remote_attestation_begin : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_remote_attestation_begin() {
+      ::grpc::Service::MarkMethodStreamed(3,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::oram::InitialMessage, ::oram::Message0>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::oram::InitialMessage, ::oram::Message0>* streamer) {
+                       return this->Streamedremote_attestation_begin(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_remote_attestation_begin() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status remote_attestation_begin(::grpc::ServerContext* /*context*/, const ::oram::InitialMessage* /*request*/, ::oram::Message0* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status Streamedremote_attestation_begin(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::oram::InitialMessage,::oram::Message0>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_remote_attestation_msg0 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_remote_attestation_msg0() {
+      ::grpc::Service::MarkMethodStreamed(4,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::oram::Message0, ::oram::Message1>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::oram::Message0, ::oram::Message1>* streamer) {
+                       return this->Streamedremote_attestation_msg0(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_remote_attestation_msg0() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status remote_attestation_msg0(::grpc::ServerContext* /*context*/, const ::oram::Message0* /*request*/, ::oram::Message1* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status Streamedremote_attestation_msg0(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::oram::Message0,::oram::Message1>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_remote_attestation_msg2 : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_remote_attestation_msg2() {
+      ::grpc::Service::MarkMethodStreamed(5,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::oram::Message2, ::oram::Message3>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::oram::Message2, ::oram::Message3>* streamer) {
+                       return this->Streamedremote_attestation_msg2(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_remote_attestation_msg2() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status remote_attestation_msg2(::grpc::ServerContext* /*context*/, const ::oram::Message2* /*request*/, ::oram::Message3* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status Streamedremote_attestation_msg2(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::oram::Message2,::oram::Message3>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_remote_attestation_final : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_remote_attestation_final() {
+      ::grpc::Service::MarkMethodStreamed(6,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::oram::AttestationMessage, ::google::protobuf::Empty>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::oram::AttestationMessage, ::google::protobuf::Empty>* streamer) {
+                       return this->Streamedremote_attestation_final(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_remote_attestation_final() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status remote_attestation_final(::grpc::ServerContext* /*context*/, const ::oram::AttestationMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status Streamedremote_attestation_final(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::oram::AttestationMessage,::google::protobuf::Empty>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_read_block : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_read_block() {
-      ::grpc::Service::MarkMethodStreamed(3,
+      ::grpc::Service::MarkMethodStreamed(7,
         new ::grpc::internal::StreamedUnaryHandler<
           ::oram::ReadRequest, ::oram::ReadReply>(
             [this](::grpc::ServerContext* context,
@@ -993,7 +1612,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_write_block() {
-      ::grpc::Service::MarkMethodStreamed(4,
+      ::grpc::Service::MarkMethodStreamed(8,
         new ::grpc::internal::StreamedUnaryHandler<
           ::oram::WriteRequest, ::oram::WriteReply>(
             [this](::grpc::ServerContext* context,
@@ -1020,7 +1639,7 @@ class sgx_oram final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_close_connection() {
-      ::grpc::Service::MarkMethodStreamed(5,
+      ::grpc::Service::MarkMethodStreamed(9,
         new ::grpc::internal::StreamedUnaryHandler<
           ::oram::CloseRequest, ::google::protobuf::Empty>(
             [this](::grpc::ServerContext* context,
@@ -1041,9 +1660,9 @@ class sgx_oram final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status Streamedclose_connection(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::oram::CloseRequest,::google::protobuf::Empty>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_init_enclave<WithStreamedUnaryMethod_generate_session_key<WithStreamedUnaryMethod_init_oram<WithStreamedUnaryMethod_read_block<WithStreamedUnaryMethod_write_block<WithStreamedUnaryMethod_close_connection<Service > > > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_init_enclave<WithStreamedUnaryMethod_init_oram<WithStreamedUnaryMethod_generate_session_key<WithStreamedUnaryMethod_remote_attestation_begin<WithStreamedUnaryMethod_remote_attestation_msg0<WithStreamedUnaryMethod_remote_attestation_msg2<WithStreamedUnaryMethod_remote_attestation_final<WithStreamedUnaryMethod_read_block<WithStreamedUnaryMethod_write_block<WithStreamedUnaryMethod_close_connection<Service > > > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_init_enclave<WithStreamedUnaryMethod_generate_session_key<WithStreamedUnaryMethod_init_oram<WithStreamedUnaryMethod_read_block<WithStreamedUnaryMethod_write_block<WithStreamedUnaryMethod_close_connection<Service > > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_init_enclave<WithStreamedUnaryMethod_init_oram<WithStreamedUnaryMethod_generate_session_key<WithStreamedUnaryMethod_remote_attestation_begin<WithStreamedUnaryMethod_remote_attestation_msg0<WithStreamedUnaryMethod_remote_attestation_msg2<WithStreamedUnaryMethod_remote_attestation_final<WithStreamedUnaryMethod_read_block<WithStreamedUnaryMethod_write_block<WithStreamedUnaryMethod_close_connection<Service > > > > > > > > > > StreamedService;
 };
 
 }  // namespace oram

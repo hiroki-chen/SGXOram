@@ -60,7 +60,7 @@ ifeq ($(SUPPLIED_KEY_DERIVATION), 1)
   SGX_COMMON_FLAGS += -DSUPPLIED_KEY_DERIVATION
 endif
 
-App_C_Flags := -fPIC -Wno-attributes -I$(INCLUDE_PATH)
+App_C_Flags := -fPIC -Wno-attributes -fopenmp -I$(INCLUDE_PATH)
 
 ifeq ($(SGX_DEBUG), 1)
     App_C_Flags += -DDEBUG -UNDEBUG -UEDEBUG
@@ -70,11 +70,13 @@ PROTO_OBJ := $(wildcard ../../build/proto/*.o)
 
 App_Cpp_Files := $(wildcard $(SRC_PATH)/app/*.cc)
 App_Cpp_Flags := $(App_C_Flags)
-App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lsgx_ukey_exchange -lservice_provider\
+App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread -lsgx_pthread\
+								  -lsgx_ukey_exchange -lservice_provider\
 									-L$(GRPC_PATH)/lib `pkg-config --libs protobuf grpc++`\
            				-lpthread\
            				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           				-ldl -lgflags
+           				-ldl -lgflags -lsnappy
+
 App_Cpp_Objects := $(patsubst $(SRC_PATH)/app/%.cc, $(BUILD_PATH)/app/%.o, $(App_Cpp_Files))
 App_Name := $(BUILD_PATH)/../bin/server.bin
 
@@ -97,10 +99,10 @@ Enclave_Cpp_Objects := $(patsubst $(SRC_PATH)/enclave/%.cc, $(BUILD_PATH)/enclav
 Enclave_Include_Paths := -I$(INCLUDE_PATH) -I$(INCLUDE_PATH)/enclave -I$(SGX_SDK)/include \
 						 -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/libcxx
 
-Enclave_C_Flags := $(Enclave_Include_Paths) -nostdinc \
+Enclave_C_Flags := $(Enclave_Include_Paths) -nostdinc\
 					-fvisibility=hidden -fpie -ffunction-sections \
 					-fdata-sections $(MITIGATION_CFLAGS) \
-					-fstack-protector-strong
+					-fstack-protector-strong -fopenmp
 
 Enclave_Cpp_Flags := $(Enclave_C_Flags) -nostdinc++
 Enclave_Security_Link_Flags := -Wl,-z,relro,-z,now,-z,noexecstack
@@ -108,7 +110,8 @@ Enclave_Security_Link_Flags := -Wl,-z,relro,-z,now,-z,noexecstack
 Enclave_Link_Flags := $(MITIGATION_LDFLAGS) $(Enclave_Security_Link_Flags) \
     -Wl,--no-undefined -nostdlib -nodefaultlibs -nostartfiles -L$(SGX_TRUSTED_LIBRARY_PATH) \
 	-Wl,--whole-archive -l$(Trts_Library_Name) -Wl,--no-whole-archive \
-	-Wl,--start-group -lsgx_tstdc -lsgx_tcxx -lsgx_tkey_exchange -l$(Crypto_Library_Name) -l$(Service_Library_Name) -Wl,--end-group \
+	-Wl,--start-group -lsgx_tstdc -lsgx_pthread -lsgx_omp -lsgx_tcxx  -lsgx_tkey_exchange \
+		   -l$(Crypto_Library_Name) -l$(Service_Library_Name) -Wl,--end-group \
 	-Wl,-Bstatic -Wl,-Bsymbolic -Wl,--no-undefined \
 	-Wl,-pie,-eenclave_entry -Wl,--export-dynamic  \
 	-Wl,--defsym,__ImageBase=0 -Wl,--gc-sections   \
@@ -186,7 +189,7 @@ create_proxy: $(SRC_PATH)/enclave/enclave.edl
 
 # Compile proxy functions.
 $(BUILD_PATH)/enclave/enclave_t.o: $(SRC_PATH)/enclave/enclave_t.c
-	@$(CC) $(Enclave_C_Flags) $(SGX_COMMON_CFLAGS) -c $< -o $@
+	$(CC) $(Enclave_C_Flags) $(SGX_COMMON_CFLAGS) -c $< -o $@
 	@printf "\033[1;93;49mCC  =>  $@\033[0m\n"
 
 $(BUILD_PATH)/enclave/enclave_u.o: $(SRC_PATH)/enclave/enclave_u.c
