@@ -26,6 +26,7 @@
 
 #include <enclave/enclave_crypto_manager.hh>
 #include <enclave/enclave_init.hh>
+#include <enclave/enclave_oram.hh>
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_t.h>
 
@@ -155,7 +156,7 @@ sgx_status_t enclave_init_ra(int b_pse, sgx_ra_context_t* p_context) {
 #else
   ret = sgx_ra_init(&g_sp_pub_key, b_pse, p_context);
 #endif
-  printf("In enclave: Initializing the remote attestation context...");
+  printf("[enclave] Initializing the remote attestation context...");
   return ret;
 }
 
@@ -341,7 +342,14 @@ uint32_t uniform_random(uint32_t lower, uint32_t upper) {
   return uniform_random_helper(lower, upper);
 }
 
-int ecall_init_oram_controller() {
+sgx_status_t ecall_init_crypto_manager() {
+  printf("[enclave] Initializing crypto manager\n");
+  crypto_manager = new EnclaveCryptoManager();
+}
+
+sgx_status_t ecall_init_oram_controller(uint8_t* oram_config,
+                                        size_t oram_config_size) {
+  // Some toy functions.....
   // Test if bit operation works in parallel.
   std::string lhs = "0123456789abcdef1234567890abcdef";
   std::string rhs = "0123456789abcdef1234567890abcdef";
@@ -350,19 +358,20 @@ int ecall_init_oram_controller() {
 
   sprintf(std::string(reinterpret_cast<char*>(out), 32), false);
 
-  crypto_manager = new EnclaveCryptoManager();
   // Test compression.
   sgx_oram::oram_slot_t* slot =
       (sgx_oram::oram_slot_t*)malloc(sizeof(sgx_oram::oram_slot_t));
   slot->header.dummy_number = 123;
   const std::string slot_hash = crypto_manager->enclave_sha_256("123");
-  ocall_write_slot(slot_hash.data(), (uint8_t*)(slot), sizeof(sgx_oram::oram_slot_t));
+  ocall_write_slot(slot_hash.data(), (uint8_t*)(slot),
+                   sizeof(sgx_oram::oram_slot_t));
   // Test decompression.
   uint8_t buf[sizeof(sgx_oram::oram_slot_t)] = {0};
   size_t size;
   // The size should be pre-defined.
   ocall_read_slot(&size, slot_hash.data(), buf, sizeof(sgx_oram::oram_slot_t));
-  printf("The dummy number is: %d\n", ((sgx_oram::oram_slot_t*)buf)->header.dummy_number);
+  printf("[enclave] The dummy number is: %d\n",
+         ((sgx_oram::oram_slot_t*)buf)->header.dummy_number);
   // printf("%s", crypto_manager->enclave_sha256("Hello World!").data());
   const std::string cipher = crypto_manager->enclave_aes_128_gcm_encrypt(
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eget ");
@@ -371,7 +380,10 @@ int ecall_init_oram_controller() {
 
   // Test read_slot?
 
-  return SGX_SUCCESS;
+  // Begin initialize the slot...
+  printf("[enclave] Initializing the slot...");
+  printf("[enclave] oram_type is %d\n", *((uint32_t*)(oram_config) + 7));
+  return init_oram((sgx_oram::oram_configuration_t*)oram_config);
 }
 
 /**
@@ -432,6 +444,7 @@ sgx_status_t ecall_unseal(const sgx_sealed_data_t* sealed_data,
  */
 sgx_status_t ecall_begin_DHKE() {
   // Create a ecc system for this session.
+  printf("[enclave] Creating a new ECC system...\n");
   sgx_status_t status =
       sgx_ecc256_open_context(crypto_manager->get_state_handle());
   return status;
@@ -459,7 +472,7 @@ sgx_status_t ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
                               sizeof(sgx_ec256_public_t)));
   std::string sk = std::move(hex_to_string(
       (uint8_t*)(crypto_manager->get_secret_key()), SGX_ECP256_KEY_SIZE));
-  printf("Key pair sampled! PK: %s, SK: %s", pk.data(), sk.data());
+  printf("[enclave] Key pair sampled! PK: %s, SK: %s", pk.data(), sk.data());
 
   return status;
 }
@@ -472,14 +485,14 @@ sgx_status_t ecall_compute_shared_key(const uint8_t* pubkey,
 
   std::string pub = std::move(hex_to_string((uint8_t*)(&client_public_key),
                                             sizeof(sgx_ec256_public_t)));
-  printf("Client public key: %s", pub.data());
+  printf("[enclave] Client public key: %s", pub.data());
 
   sgx_status_t status = sgx_ecc256_compute_shared_dhkey(
       crypto_manager->get_secret_key(), &client_public_key, &shared_key,
       *crypto_manager->get_state_handle());
   std::string shared =
       std::move(hex_to_string((uint8_t*)(&shared_key), SGX_ECP256_KEY_SIZE));
-  printf("Shared key computed: %s", shared.data());
+  printf("[enclave] Shared key computed: %s", shared.data());
 
   // Derive secret keys from the shared key.
   // The first key is used to MAC the message while the second key is used for
@@ -488,13 +501,30 @@ sgx_status_t ecall_compute_shared_key(const uint8_t* pubkey,
   sgx_ec_key_128bit_t second_derived_key;
 
   if (!derive_key(&shared_key, 0u, &first_derived_key, &second_derived_key)) {
-    printf("Cannot derive the session key!");
+    printf("[enclave] Cannot derive the session key!");
     return SGX_ERROR_UNEXPECTED;
   }
 
   crypto_manager->set_shared_key(&second_derived_key);
-  printf("The session key is established! The key is %s",
+  printf("[enclave] The session key is established! The key is %s",
          hex_to_string((uint8_t*)(&second_derived_key),
                        sizeof(sgx_ec_key_128bit_t))
              .data());
+}
+
+sgx_status_t ecall_check_verification_message(uint8_t* message,
+                                              size_t message_size) {
+  const std::string decrypted_message =
+      crypto_manager->enclave_aes_128_gcm_decrypt(
+          std::string((char*)message, message_size));
+
+  printf("[enclave] Decrypted message: %s", decrypted_message.data());
+
+  if (decrypted_message.compare("Hello!") != 0) {
+    printf("[enclave] The verification message is not correct!");
+    return SGX_ERROR_UNEXPECTED;
+  } else {
+    printf("[enclave] The verification message is correct!");
+    return SGX_SUCCESS;
+  }
 }

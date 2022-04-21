@@ -15,11 +15,11 @@ service sgx_oram {
   rpc init_oram(OramInitRequest) returns (google.protobuf.Empty) {}
   // ===================================================== //
 
-  // FIXME: possibly deprecated.
   rpc generate_session_key(InitRequest) returns (InitReply) {}
 
   // ===================================================== //
   // Functions for remote attestation and key derivation.
+  // FIXME: possibly error-prone :(.
   rpc remote_attestation_begin(InitialMessage) returns (Message0) {}
 
   rpc remote_attestation_msg0(Message0) returns (Message1) {}
@@ -59,6 +59,10 @@ message OramInitRequest {
   uint32 type = 4;
   uint32 constant = 5;
   uint32 round = 6;
+  // If oram_type = 1, then the server should initialize SO2 (by default);
+  // otherwise it should initialize the TPORAM.
+  optional uint32 oram_type = 7;
+  optional bytes verification = 8;
 }
 
 message ReadRequest {
@@ -66,13 +70,13 @@ message ReadRequest {
 }
 
 message ReadReply {
-  string block = 1;
+  bytes block = 1;
   bool success = 2;
 }
 
 message WriteRequest {
   uint32 address = 1;
-  string data = 2;
+  bytes data = 2;
 }
 
 message WriteReply {

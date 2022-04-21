@@ -28,7 +28,9 @@
 
 
 typedef struct ms_ecall_init_oram_controller_t {
-	int ms_retval;
+	sgx_status_t ms_retval;
+	uint8_t* ms_oram_config;
+	size_t ms_oram_config_size;
 } ms_ecall_init_oram_controller_t;
 
 typedef struct ms_ecall_access_data_t {
@@ -37,6 +39,12 @@ typedef struct ms_ecall_access_data_t {
 	uint8_t* ms_data;
 	size_t ms_data_len;
 } ms_ecall_access_data_t;
+
+typedef struct ms_ecall_check_verification_message_t {
+	sgx_status_t ms_retval;
+	uint8_t* ms_message;
+	size_t ms_message_size;
+} ms_ecall_check_verification_message_t;
 
 typedef struct ms_ecall_seal_t {
 	sgx_status_t ms_retval;
@@ -53,6 +61,10 @@ typedef struct ms_ecall_unseal_t {
 	uint8_t* ms_plaintext;
 	size_t ms_plaintext_len;
 } ms_ecall_unseal_t;
+
+typedef struct ms_ecall_init_crypto_manager_t {
+	sgx_status_t ms_retval;
+} ms_ecall_init_crypto_manager_t;
 
 typedef struct ms_ecall_begin_DHKE_t {
 	sgx_status_t ms_retval;
@@ -206,12 +218,41 @@ static sgx_status_t SGX_CDECL sgx_ecall_init_oram_controller(void* pms)
 	sgx_lfence();
 	ms_ecall_init_oram_controller_t* ms = SGX_CAST(ms_ecall_init_oram_controller_t*, pms);
 	sgx_status_t status = SGX_SUCCESS;
+	uint8_t* _tmp_oram_config = ms->ms_oram_config;
+	size_t _tmp_oram_config_size = ms->ms_oram_config_size;
+	size_t _len_oram_config = _tmp_oram_config_size;
+	uint8_t* _in_oram_config = NULL;
 
+	CHECK_UNIQUE_POINTER(_tmp_oram_config, _len_oram_config);
 
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
 
-	ms->ms_retval = ecall_init_oram_controller();
+	if (_tmp_oram_config != NULL && _len_oram_config != 0) {
+		if ( _len_oram_config % sizeof(*_tmp_oram_config) != 0)
+		{
+			status = SGX_ERROR_INVALID_PARAMETER;
+			goto err;
+		}
+		_in_oram_config = (uint8_t*)malloc(_len_oram_config);
+		if (_in_oram_config == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
 
+		if (memcpy_s(_in_oram_config, _len_oram_config, _tmp_oram_config, _len_oram_config)) {
+			status = SGX_ERROR_UNEXPECTED;
+			goto err;
+		}
 
+	}
+
+	ms->ms_retval = ecall_init_oram_controller(_in_oram_config, _tmp_oram_config_size);
+
+err:
+	if (_in_oram_config) free(_in_oram_config);
 	return status;
 }
 
@@ -265,6 +306,53 @@ static sgx_status_t SGX_CDECL sgx_ecall_access_data(void* pms)
 
 err:
 	if (_in_data) free(_in_data);
+	return status;
+}
+
+static sgx_status_t SGX_CDECL sgx_ecall_check_verification_message(void* pms)
+{
+	CHECK_REF_POINTER(pms, sizeof(ms_ecall_check_verification_message_t));
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
+	ms_ecall_check_verification_message_t* ms = SGX_CAST(ms_ecall_check_verification_message_t*, pms);
+	sgx_status_t status = SGX_SUCCESS;
+	uint8_t* _tmp_message = ms->ms_message;
+	size_t _tmp_message_size = ms->ms_message_size;
+	size_t _len_message = _tmp_message_size;
+	uint8_t* _in_message = NULL;
+
+	CHECK_UNIQUE_POINTER(_tmp_message, _len_message);
+
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
+
+	if (_tmp_message != NULL && _len_message != 0) {
+		if ( _len_message % sizeof(*_tmp_message) != 0)
+		{
+			status = SGX_ERROR_INVALID_PARAMETER;
+			goto err;
+		}
+		_in_message = (uint8_t*)malloc(_len_message);
+		if (_in_message == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		if (memcpy_s(_in_message, _len_message, _tmp_message, _len_message)) {
+			status = SGX_ERROR_UNEXPECTED;
+			goto err;
+		}
+
+	}
+
+	ms->ms_retval = ecall_check_verification_message(_in_message, _tmp_message_size);
+
+err:
+	if (_in_message) free(_in_message);
 	return status;
 }
 
@@ -399,6 +487,24 @@ static sgx_status_t SGX_CDECL sgx_ecall_unseal(void* pms)
 err:
 	if (_in_sealed_data) free(_in_sealed_data);
 	if (_in_plaintext) free(_in_plaintext);
+	return status;
+}
+
+static sgx_status_t SGX_CDECL sgx_ecall_init_crypto_manager(void* pms)
+{
+	CHECK_REF_POINTER(pms, sizeof(ms_ecall_init_crypto_manager_t));
+	//
+	// fence after pointer checks
+	//
+	sgx_lfence();
+	ms_ecall_init_crypto_manager_t* ms = SGX_CAST(ms_ecall_init_crypto_manager_t*, pms);
+	sgx_status_t status = SGX_SUCCESS;
+
+
+
+	ms->ms_retval = ecall_init_crypto_manager();
+
+
 	return status;
 }
 
@@ -1008,14 +1114,16 @@ err:
 
 SGX_EXTERNC const struct {
 	size_t nr_ecall;
-	struct {void* ecall_addr; uint8_t is_priv; uint8_t is_switchless;} ecall_table[15];
+	struct {void* ecall_addr; uint8_t is_priv; uint8_t is_switchless;} ecall_table[17];
 } g_ecall_table = {
-	15,
+	17,
 	{
 		{(void*)(uintptr_t)sgx_ecall_init_oram_controller, 0, 0},
 		{(void*)(uintptr_t)sgx_ecall_access_data, 0, 0},
+		{(void*)(uintptr_t)sgx_ecall_check_verification_message, 0, 0},
 		{(void*)(uintptr_t)sgx_ecall_seal, 0, 0},
 		{(void*)(uintptr_t)sgx_ecall_unseal, 0, 0},
+		{(void*)(uintptr_t)sgx_ecall_init_crypto_manager, 0, 0},
 		{(void*)(uintptr_t)sgx_ecall_begin_DHKE, 0, 0},
 		{(void*)(uintptr_t)sgx_ecall_sample_key_pair, 0, 0},
 		{(void*)(uintptr_t)sgx_ecall_compute_shared_key, 0, 0},
@@ -1032,22 +1140,22 @@ SGX_EXTERNC const struct {
 
 SGX_EXTERNC const struct {
 	size_t nr_ocall;
-	uint8_t entry_table[12][15];
+	uint8_t entry_table[12][17];
 } g_dyn_entry_table = {
 	12,
 	{
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
-		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+		{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
 	}
 };
 

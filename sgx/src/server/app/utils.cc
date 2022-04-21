@@ -43,7 +43,7 @@ void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
 
 // Debug function.
 void ocall_printf(const char* message) {
-  LOG(plog::debug) << "The fingerprint for the slot is: " << message;
+  LOG(plog::debug) << message;
 }
 
 // Exception handler.

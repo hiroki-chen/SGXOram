@@ -54,7 +54,6 @@ class sgx_oram final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncinit_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncinit_oramRaw(context, request, cq));
     }
-    // FIXME: possibly deprecated.
     virtual ::grpc::Status generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::oram::InitReply* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>> Asyncgenerate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::InitReply>>(Asyncgenerate_session_keyRaw(context, request, cq));
@@ -64,6 +63,7 @@ class sgx_oram final {
     }
     // ===================================================== //
     // Functions for remote attestation and key derivation.
+    // FIXME: possibly error-prone :(.
     virtual ::grpc::Status remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::oram::Message0* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message0>> Asyncremote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::oram::Message0>>(Asyncremote_attestation_beginRaw(context, request, cq));
@@ -122,11 +122,11 @@ class sgx_oram final {
       virtual void init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
       virtual void init_oram(::grpc::ClientContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      // FIXME: possibly deprecated.
       virtual void generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, std::function<void(::grpc::Status)>) = 0;
       virtual void generate_session_key(::grpc::ClientContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       // ===================================================== //
       // Functions for remote attestation and key derivation.
+      // FIXME: possibly error-prone :(.
       virtual void remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response, std::function<void(::grpc::Status)>) = 0;
       virtual void remote_attestation_begin(::grpc::ClientContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void remote_attestation_msg0(::grpc::ClientContext* context, const ::oram::Message0* request, ::oram::Message1* response, std::function<void(::grpc::Status)>) = 0;
@@ -315,10 +315,10 @@ class sgx_oram final {
     // Enclave-related remote process calls.
     virtual ::grpc::Status init_enclave(::grpc::ServerContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response);
     virtual ::grpc::Status init_oram(::grpc::ServerContext* context, const ::oram::OramInitRequest* request, ::google::protobuf::Empty* response);
-    // FIXME: possibly deprecated.
     virtual ::grpc::Status generate_session_key(::grpc::ServerContext* context, const ::oram::InitRequest* request, ::oram::InitReply* response);
     // ===================================================== //
     // Functions for remote attestation and key derivation.
+    // FIXME: possibly error-prone :(.
     virtual ::grpc::Status remote_attestation_begin(::grpc::ServerContext* context, const ::oram::InitialMessage* request, ::oram::Message0* response);
     virtual ::grpc::Status remote_attestation_msg0(::grpc::ServerContext* context, const ::oram::Message0* request, ::oram::Message1* response);
     virtual ::grpc::Status remote_attestation_msg2(::grpc::ServerContext* context, const ::oram::Message2* request, ::oram::Message3* response);

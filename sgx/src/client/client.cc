@@ -21,6 +21,7 @@
 #include <grpc++/create_channel.h>
 #include <grpc++/security/credentials.h>
 #include <gflags/gflags.h>
+#include <sodium.h>
 
 #include <plog/Log.h>
 #include <configs.hh>
@@ -34,6 +35,7 @@ DECLARE_uint32(bucket_size);
 DECLARE_uint32(type);
 DECLARE_double(constant);
 DECLARE_uint32(round);
+DECLARE_uint32(oram_type);
 
 static std::string read_keycert(const std::string& path) {
   std::ifstream file(path, std::ifstream::in);
@@ -48,6 +50,7 @@ static std::string read_keycert(const std::string& path) {
 
 // Initialize a secure channel based on the SSL protocol.
 Client::Client(const std::string& address, const std::string& port) {
+  is_initialized = false;
   // Read the certificate of the server.
   const std::string cacert = read_keycert(key_path + "/" + "sslcred.crt");
 
@@ -94,6 +97,7 @@ int Client::init_oram(void) {
   grpc::ClientContext context;
   oram::OramInitRequest request;
 
+  const std::string encrypted_verification_message = encrypt("Hello");
   // Set the parameters of the ORAM in the request.
   request.set_way(FLAGS_way);
   request.set_number(FLAGS_number);
@@ -101,7 +105,13 @@ int Client::init_oram(void) {
   request.set_type(FLAGS_type);
   request.set_constant(FLAGS_constant);
   request.set_round(FLAGS_round);
-
+  request.set_oram_type(FLAGS_oram_type);
+  request.set_verification(encrypted_verification_message);
+  
+  // Prin the encrypted verification message.
+  LOG(plog::info) << "The encrypted verification message is: "
+                  << hex_to_string((uint8_t*)encrypted_verification_message.c_str(),
+                                   encrypted_verification_message.size());
   // Print the log.
   LOG(plog::info) << "Sending parameters of the ORAM to the server!";
 
@@ -167,8 +177,64 @@ int Client::generate_session_key(void) {
     LOG(plog::info) << "The session key is established! The key is "
                     << hex_to_string((uint8_t*)(&secret_key_session),
                                      sizeof(sample_ec_key_128bit_t));
-
+    is_initialized = true;
     sample_ecc256_close_context(state_handle);
   }
+
   return 0;
+}
+
+std::string Client::encrypt(const std::string& plaintext) {
+  if (!is_initialized) {
+    LOG(plog::fatal) << "The client is not initialized!";
+    return "";
+  }
+
+  const uint8_t* plaintext_ptr = (uint8_t*)plaintext.c_str();
+  size_t ciphertext_length =
+      plaintext.size() + SAMPLE_AESGCM_MAC_SIZE + SAMPLE_AESGCM_IV_SIZE;
+  uint8_t* ciphertext = (uint8_t*)malloc(ciphertext_length);
+  randombytes(ciphertext + SAMPLE_AESGCM_MAC_SIZE, SAMPLE_AESGCM_IV_SIZE);
+
+  // Encrypt the data and then MAC it.
+  sample_status_t ret = sample_rijndael128GCM_encrypt(
+      (sample_aes_gcm_128bit_key_t*)&secret_key_session, plaintext_ptr,
+      plaintext.size(),
+      ciphertext + SAMPLE_AESGCM_MAC_SIZE + SAMPLE_AESGCM_IV_SIZE,
+      ciphertext + SAMPLE_AESGCM_MAC_SIZE, SAMPLE_AESGCM_IV_SIZE, NULL, 0,
+      (sample_aes_gcm_128bit_tag_t*)ciphertext);
+
+  if (ret != SAMPLE_SUCCESS) {
+    LOG(plog::fatal) << "Cannot encrypt the data!";
+    return "";
+  }
+
+  return std::string((char*)ciphertext, ciphertext_length);
+}
+
+std::string Client::decrypt(const std::string& ciphertext) {
+  if (!is_initialized) {
+    LOG(plog::fatal) << "The client is not initialized!";
+    return "";
+  }
+
+  const uint8_t* ciphertext_ptr = (uint8_t*)ciphertext.c_str();
+  size_t plaintext_length =
+      ciphertext.size() - SAMPLE_AESGCM_MAC_SIZE - SAMPLE_AESGCM_IV_SIZE;
+  uint8_t* plaintext = (uint8_t*)malloc(plaintext_length);
+
+  // Decrypt the data and then verify the MAC.
+  sample_status_t ret = sample_rijndael128GCM_encrypt(
+      (sample_aes_gcm_128bit_key_t*)&secret_key_session,
+      ciphertext_ptr + SAMPLE_AESGCM_MAC_SIZE + SAMPLE_AESGCM_IV_SIZE,
+      ciphertext.size(), plaintext, ciphertext_ptr + SAMPLE_AESGCM_MAC_SIZE,
+      SAMPLE_AESGCM_IV_SIZE, NULL, 0,
+      (sample_aes_gcm_128bit_tag_t*)ciphertext_ptr);
+
+  if (ret != SAMPLE_SUCCESS) {
+    LOG(plog::fatal) << "Cannot decrypt the data!";
+    return "";
+  }
+
+  return std::string((char*)plaintext, plaintext_length);
 }

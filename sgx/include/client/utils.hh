@@ -25,4 +25,7 @@ std::string hex_to_string(const uint8_t* array, const size_t& len = 32);
 
 void convert_endian(uint8_t* array, const size_t& len = 32);
 
+// safe free.
+void safe_free(void* ptr);
+
 #endif

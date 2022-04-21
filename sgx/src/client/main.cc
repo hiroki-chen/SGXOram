@@ -33,6 +33,7 @@ DEFINE_uint32(bucket_size, 128, "The number of blocks in each bucket");
 DEFINE_uint32(type, 0, "The type of the ORAM tree");
 DEFINE_double(constant, 1.0, "A special constant for the ORAM tree");
 DEFINE_uint32(round, 1, "The number of rounds of the ORAM access");
+DEFINE_uint32(oram_type, 1, "The type of the ORAM used by the client.");
 
 static plog::RollingFileAppender<plog::TxtFormatter> file_appender(
     "./log/oram.log");  // Create the 1st appender.

@@ -29,10 +29,8 @@
  */
 class EnclaveCryptoManager final {
  private:
-  sgx_aes_gcm_128bit_key_t aes_key;
-
   // This key is derived after Diffie-Hellman Key Exchange procedure.
-  sgx_ec_key_128bit_t shared_secret_key;
+  sgx_aes_gcm_128bit_key_t shared_secret_key;
 
   // This key is randomly generated as secret key.
   sgx_ec256_private_t secret_key;
@@ -41,6 +39,9 @@ class EnclaveCryptoManager final {
 
   // ECC handle.
   sgx_ecc_state_handle_t state_handle;
+
+  // Is fully initialized
+  bool is_initialized;
 
  public:
   /**

@@ -1,5 +1,5 @@
 /*
- Copyright (c) 2021 Haobin Chen
+ Copyright (c) 2022 Haobin Chen
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -14,33 +14,16 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <utils.hh>
 
-std::string hex_to_string(const uint8_t* array, const size_t& len) {
-  std::string ans;
+#ifndef ENCLAVE_ORAM_HH
+#define ENCLAVE_ORAM_HH
 
-  for (size_t i = 0; i < len; i++) {
-    // To hex.
-    uint8_t num = array[i];
-    ans += digits[num & 0xf];
-    ans += digits[num >> 4];
-  }
+#include <sgx_urts.h>
 
-  return ans;
+namespace sgx_oram {
+  typedef struct _oram_configuration_t oram_configuration_t;
 }
 
-void convert_endian(uint8_t* array, const size_t& len) {
-  for (size_t i = 0; i < len; i++) {
-    // To hex.
-    uint8_t num = array[i];
-    array[i] = 0;
-    array[i] |= (num & 0xf0);
-    array[i] |= (num & 0x0f) << 4;
-  }
-}
+sgx_status_t init_oram(sgx_oram::oram_configuration_t* oram_config);
 
-void safe_free(void* ptr) {
-  if (ptr != nullptr) {
-    free(ptr);
-  }
-}
+#endif

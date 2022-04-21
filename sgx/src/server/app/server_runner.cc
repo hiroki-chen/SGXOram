@@ -17,7 +17,9 @@
 #include <sstream>
 #include <cmath>
 
-#include <sgx_uae_service.h>
+#include <sgx_uae_launch.h>
+#include <sgx_uae_epid.h>
+#include <sgx_uae_quote_ex.h>
 #include <sgx_ukey_exchange.h>
 
 #include <configs.hh>
@@ -50,6 +52,7 @@ static void print_oram_config(const OramConfiguration& oram_config) {
   LOG(plog::info) << "  constant: " << oram_config.constant;
   LOG(plog::info) << "  round: " << oram_config.round;
   LOG(plog::info) << "  level: " << oram_config.level;
+  LOG(plog::info) << "  oram_type: " << oram_config.oram_type;
 }
 
 // This function is dedicated to the assembly of message 2!!!
@@ -260,19 +263,20 @@ grpc::Status SGXORAMService::generate_session_key(
 grpc::Status SGXORAMService::read_block(grpc::ServerContext* server_context,
                                         const oram::ReadRequest* read_request,
                                         oram::ReadReply* read_reply) {
-  ;
+  return grpc::Status::OK;
 }
 
 grpc::Status SGXORAMService::write_block(
     grpc::ServerContext* server_context,
     const oram::WriteRequest* write_request, oram::WriteReply* write_reply) {
-  ;
+  return grpc::Status::OK;
 }
 
 grpc::Status SGXORAMService::close_connection(
     grpc::ServerContext* server_context,
     const oram::CloseRequest* close_request, google::protobuf::Empty* empty) {
-  LOG(plog::info) << server_context->peer() << " - Closing connection... Goodbye!";
+  LOG(plog::info) << server_context->peer()
+                  << " - Closing connection... Goodbye!";
   server_running = false;
   return grpc::Status::OK;
 }
@@ -431,7 +435,8 @@ grpc::Status SGXORAMService::remote_attestation_final(
       LOG(plog::error) << error_message;
       return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
     } else {
-      LOG(plog::info) << "The server has successfully verified the secret data. Local attestation OK.";
+      LOG(plog::info) << "The server has successfully verified the secret "
+                         "data. Local attestation OK.";
     }
   }
 
@@ -451,6 +456,16 @@ grpc::Status SGXORAMService::init_oram(
   oram_config.round = oram_init_request->round();
   oram_config.type = oram_init_request->type();
   oram_config.bucket_size = oram_init_request->bucket_size();
+  oram_config.oram_type = oram_init_request->oram_type();
+
+  const std::string verification_message = oram_init_request->verification();
+
+  if (!check_verification_message(verification_message)) {
+    const std::string error_message = "Failed to verify the message!";
+    LOG(plog::error) << error_message;
+    server_running = false;
+    return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
+  }
 
   // Calculate the level of the ORAM tree.
   oram_config.level =
@@ -460,7 +475,17 @@ grpc::Status SGXORAMService::init_oram(
   print_oram_config(oram_config);
 
   LOG(plog::debug) << "The server has properly configured the ORAM.";
-  return grpc::Status::OK;
+
+  status = ecall_init_oram_controller(
+      *global_eid, &status, (uint8_t*)&oram_config, sizeof(oram_config));
+  if (status != SGX_SUCCESS) {
+    const std::string error_message = "Failed to initialize the ORAM!";
+    LOG(plog::error) << error_message;
+    return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
+  } else {
+    LOG(plog::info) << "The server has successfully initialized the ORAM.";
+    return grpc::Status::OK;
+  }
 }
 
 void Server::store_compressed_slot(const char* const fingerprint,
@@ -505,7 +530,8 @@ void Server::run(const std::string& address,
 
   // Start a monitor thread.
   std::thread monitor_thread([&, this]() {
-    while (server_running);
+    while (server_running)
+      ;
     server->Shutdown();
   });
   monitor_thread.detach();
@@ -515,11 +541,31 @@ void Server::run(const std::string& address,
 sgx_status_t SGXORAMService::init_enclave(sgx_enclave_id_t* const global_eid) {
   // Initialize the enclave by loading into the signed shared object into the
   // main memory.
-  if (sgx_oram::init_enclave(global_eid) != 0) {
+  if (sgx_oram::init_enclave(global_eid) != SGX_SUCCESS) {
     LOG(plog::error) << "Cannot initialize the enclave!";
+    return SGX_ERROR_UNEXPECTED;
   }
 
-  sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-  ecall_init_oram_controller(*global_eid, (int*)&ret);
-  return ret;
+  // Initialize the cryptomanager in the enclave.
+  if (ecall_init_crypto_manager(*global_eid, &status) != SGX_SUCCESS) {
+    LOG(plog::error) << "Cannot initialize the cryptomanager!";
+    return SGX_ERROR_UNEXPECTED;
+  }
+
+  return SGX_SUCCESS;
+}
+
+bool SGXORAMService::check_verification_message(const std::string& message) {
+  LOG(plog::debug) << "The verification message is "
+                   << sgx_oram::hex_to_string((uint8_t*)message.c_str(),
+                                              message.size());
+  if (ecall_check_verification_message(*global_eid, &status,
+                                       (uint8_t*)message.c_str(),
+                                       message.size()) != SGX_SUCCESS) {
+    LOG(plog::error) << "Cannot check the verification message!";
+    return false;
+  } else {
+    LOG(plog::info) << "The server has successfully verified the secret data.";
+    return true;
+  }
 }

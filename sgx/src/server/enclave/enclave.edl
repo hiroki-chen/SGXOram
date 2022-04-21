@@ -32,10 +32,12 @@ enclave {
 
   trusted {
 		// Invoked by the client to intialize the inner oram controller.
-		public int ecall_init_oram_controller();
+		public sgx_status_t ecall_init_oram_controller([ in, size = oram_config_size ] uint8_t*             oram_config, size_t oram_config_size);
 
     // Data access interface provided by the SGX-based ORAM.
     public sgx_status_t ecall_access_data(int op_type, [ in, out, size = data_len ] uint8_t* data, size_t data_len);
+
+    public sgx_status_t ecall_check_verification_message([ in, size = message_size ] uint8_t* message, size_t message_size);
 
     // Interfaces for sealing and unsealing data on the disk (if needed).
     public sgx_status_t ecall_seal([ in, size = plaintext_len ] const uint8_t *plaintext,
@@ -47,6 +49,7 @@ enclave {
                                      size_t sealed_size,
                                      [ out, size = plaintext_len ] uint8_t *plaintext,
                                      size_t plaintext_len);
+    public sgx_status_t ecall_init_crypto_manager();
 
     public sgx_status_t ecall_begin_DHKE();
 

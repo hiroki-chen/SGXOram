@@ -21,7 +21,6 @@
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Initializers/RollingFileInitializer.h>
-#include <app/models.hh>
 #include <app/server_runner.hh>
 
 // Configurations for the server.

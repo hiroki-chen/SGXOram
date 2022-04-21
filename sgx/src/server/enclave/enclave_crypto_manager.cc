@@ -25,10 +25,8 @@
 #include <enclave/enclave_t.h>
 
 EnclaveCryptoManager::EnclaveCryptoManager() {
-  memset(aes_key, 0, SGX_AESGCM_KEY_SIZE);
-  // Randomly generate an AES key.
-  sgx_read_rand(aes_key, SGX_AESGCM_KEY_SIZE);
-  sprintf(std::string((char*)aes_key, SGX_AESCTR_KEY_SIZE), true);
+  memset(shared_secret_key, 0, SGX_AESGCM_KEY_SIZE);
+  is_initialized = false;
 }
 
 std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
@@ -43,6 +41,11 @@ std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
 
 std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
     const std::string& message) {
+  if (!is_initialized) {
+    printf("[enclave] Crypto manager is not initialized.\n");
+    return "";
+  }
+
   const uint8_t* plaintext = reinterpret_cast<const uint8_t*>(message.data());
 
   // Prepare a buffer for receiving the ciphertext.
@@ -54,7 +57,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
 
   // Encrypt the data and then MAC it.
   sgx_status_t ret = sgx_rijndael128GCM_encrypt(
-      &aes_key, plaintext, message.size(),
+      &shared_secret_key, plaintext, message.size(),
       ciphertext + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,
       ciphertext + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE, NULL, 0,
       (sgx_aes_gcm_128bit_tag_t*)(ciphertext));
@@ -71,6 +74,11 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
 
 std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
     const std::string& message) {
+  if (!is_initialized) {
+    printf("[enclave] Crypto manager is not initialized.\n");
+    return "";
+  }
+
   const uint8_t* ciphertext = reinterpret_cast<const uint8_t*>(message.data());
 
   // Prepare the buffer for storing the plaintext.
@@ -79,7 +87,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
   uint8_t* plaintext = (uint8_t*)(malloc(message_len));
 
   sgx_status_t ret = sgx_rijndael128GCM_decrypt(
-      &aes_key, ciphertext + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,
+      &shared_secret_key, ciphertext + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,
       message_len, plaintext, ciphertext + SGX_AESGCM_MAC_SIZE,
       SGX_AESGCM_IV_SIZE, NULL, 0, (const sgx_aes_gcm_128bit_tag_t*)ciphertext);
 
@@ -98,4 +106,6 @@ void EnclaveCryptoManager::set_shared_key(
   // Copy the shared key into the enclave.
   memset(&shared_secret_key, 0, sizeof(sgx_ec_key_128bit_t));
   memcpy(&shared_secret_key, shared_key, sizeof(sgx_ec_key_128bit_t));
+  // Only if the shared key is set, we can set the flag to true.
+  is_initialized = true;
 }

@@ -22,7 +22,8 @@
 
 // Fixed.
 #define DEFAULT_ORAM_DATA_SIZE 4096
-#define DEFAULT_ORAM_BLOCK_SIZE 4160
+// How many blocks a slot can hold.
+// Note that the block size is 4160 bytes (including the header).
 #define DEFAULT_SLOT_SIZE 32
 
 namespace sgx_oram {
@@ -66,7 +67,19 @@ typedef struct _oram_position_t {
   uint32_t level;
   // The current bid.
   uint32_t bid;
-  // The address. 
+  // The address.
   uint32_t address;
 } oram_position_t;
+
+typedef struct _oram_configuration_t {
+  uint32_t way;
+  uint32_t number;
+  uint32_t bucket_size;
+  uint32_t type;
+  uint32_t constant;
+  uint32_t round;
+  uint32_t level;
+  uint32_t oram_type;
+} oram_configuration_t;
+
 }  // namespace sgx_oram

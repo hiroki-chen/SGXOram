@@ -565,13 +565,33 @@ class OramInitRequest final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kVerificationFieldNumber = 8,
     kWayFieldNumber = 1,
     kNumberFieldNumber = 2,
     kBucketSizeFieldNumber = 3,
     kTypeFieldNumber = 4,
     kConstantFieldNumber = 5,
     kRoundFieldNumber = 6,
+    kOramTypeFieldNumber = 7,
   };
+  // optional bytes verification = 8;
+  bool has_verification() const;
+  private:
+  bool _internal_has_verification() const;
+  public:
+  void clear_verification();
+  const std::string& verification() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_verification(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_verification();
+  PROTOBUF_NODISCARD std::string* release_verification();
+  void set_allocated_verification(std::string* verification);
+  private:
+  const std::string& _internal_verification() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_verification(const std::string& value);
+  std::string* _internal_mutable_verification();
+  public:
+
   // uint32 way = 1;
   void clear_way();
   uint32_t way() const;
@@ -626,6 +646,19 @@ class OramInitRequest final :
   void _internal_set_round(uint32_t value);
   public:
 
+  // optional uint32 oram_type = 7;
+  bool has_oram_type() const;
+  private:
+  bool _internal_has_oram_type() const;
+  public:
+  void clear_oram_type();
+  uint32_t oram_type() const;
+  void set_oram_type(uint32_t value);
+  private:
+  uint32_t _internal_oram_type() const;
+  void _internal_set_oram_type(uint32_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:oram.OramInitRequest)
  private:
   class _Internal;
@@ -633,13 +666,16 @@ class OramInitRequest final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr verification_;
   uint32_t way_;
   uint32_t number_;
   uint32_t bucket_size_;
   uint32_t type_;
   uint32_t constant_;
   uint32_t round_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  uint32_t oram_type_;
   friend struct ::TableStruct_messages_2eproto;
 };
 // -------------------------------------------------------------------
@@ -915,7 +951,7 @@ class ReadReply final :
     kBlockFieldNumber = 1,
     kSuccessFieldNumber = 2,
   };
-  // string block = 1;
+  // bytes block = 1;
   void clear_block();
   const std::string& block() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -1077,7 +1113,7 @@ class WriteRequest final :
     kDataFieldNumber = 2,
     kAddressFieldNumber = 1,
   };
-  // string data = 2;
+  // bytes data = 2;
   void clear_data();
   const std::string& data() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
@@ -3350,6 +3386,103 @@ inline void OramInitRequest::set_round(uint32_t value) {
   // @@protoc_insertion_point(field_set:oram.OramInitRequest.round)
 }
 
+// optional uint32 oram_type = 7;
+inline bool OramInitRequest::_internal_has_oram_type() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool OramInitRequest::has_oram_type() const {
+  return _internal_has_oram_type();
+}
+inline void OramInitRequest::clear_oram_type() {
+  oram_type_ = 0u;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline uint32_t OramInitRequest::_internal_oram_type() const {
+  return oram_type_;
+}
+inline uint32_t OramInitRequest::oram_type() const {
+  // @@protoc_insertion_point(field_get:oram.OramInitRequest.oram_type)
+  return _internal_oram_type();
+}
+inline void OramInitRequest::_internal_set_oram_type(uint32_t value) {
+  _has_bits_[0] |= 0x00000002u;
+  oram_type_ = value;
+}
+inline void OramInitRequest::set_oram_type(uint32_t value) {
+  _internal_set_oram_type(value);
+  // @@protoc_insertion_point(field_set:oram.OramInitRequest.oram_type)
+}
+
+// optional bytes verification = 8;
+inline bool OramInitRequest::_internal_has_verification() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool OramInitRequest::has_verification() const {
+  return _internal_has_verification();
+}
+inline void OramInitRequest::clear_verification() {
+  verification_.ClearToEmpty();
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline const std::string& OramInitRequest::verification() const {
+  // @@protoc_insertion_point(field_get:oram.OramInitRequest.verification)
+  return _internal_verification();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void OramInitRequest::set_verification(ArgT0&& arg0, ArgT... args) {
+ _has_bits_[0] |= 0x00000001u;
+ verification_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:oram.OramInitRequest.verification)
+}
+inline std::string* OramInitRequest::mutable_verification() {
+  std::string* _s = _internal_mutable_verification();
+  // @@protoc_insertion_point(field_mutable:oram.OramInitRequest.verification)
+  return _s;
+}
+inline const std::string& OramInitRequest::_internal_verification() const {
+  return verification_.Get();
+}
+inline void OramInitRequest::_internal_set_verification(const std::string& value) {
+  _has_bits_[0] |= 0x00000001u;
+  verification_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* OramInitRequest::_internal_mutable_verification() {
+  _has_bits_[0] |= 0x00000001u;
+  return verification_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* OramInitRequest::release_verification() {
+  // @@protoc_insertion_point(field_release:oram.OramInitRequest.verification)
+  if (!_internal_has_verification()) {
+    return nullptr;
+  }
+  _has_bits_[0] &= ~0x00000001u;
+  auto* p = verification_.ReleaseNonDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (verification_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    verification_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  return p;
+}
+inline void OramInitRequest::set_allocated_verification(std::string* verification) {
+  if (verification != nullptr) {
+    _has_bits_[0] |= 0x00000001u;
+  } else {
+    _has_bits_[0] &= ~0x00000001u;
+  }
+  verification_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), verification,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (verification_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    verification_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:oram.OramInitRequest.verification)
+}
+
 // -------------------------------------------------------------------
 
 // ReadRequest
@@ -3378,7 +3511,7 @@ inline void ReadRequest::set_address(uint32_t value) {
 
 // ReadReply
 
-// string block = 1;
+// bytes block = 1;
 inline void ReadReply::clear_block() {
   block_.ClearToEmpty();
 }
@@ -3390,7 +3523,7 @@ template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
 void ReadReply::set_block(ArgT0&& arg0, ArgT... args) {
  
- block_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+ block_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:oram.ReadReply.block)
 }
 inline std::string* ReadReply::mutable_block() {
@@ -3473,7 +3606,7 @@ inline void WriteRequest::set_address(uint32_t value) {
   // @@protoc_insertion_point(field_set:oram.WriteRequest.address)
 }
 
-// string data = 2;
+// bytes data = 2;
 inline void WriteRequest::clear_data() {
   data_.ClearToEmpty();
 }
@@ -3485,7 +3618,7 @@ template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
 void WriteRequest::set_data(ArgT0&& arg0, ArgT... args) {
  
- data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+ data_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:oram.WriteRequest.data)
 }
 inline std::string* WriteRequest::mutable_data() {

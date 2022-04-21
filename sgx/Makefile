@@ -15,7 +15,7 @@
 .PHONY: client server clean protobuf all
 
 PROTO_PATH := $(CURDIR)/protos
-PROTO_SRC := $(wildcard $(PROTO_PATH)/*.proto)
+PROTO_SRC := $(wildcard $(PROTO_PATH)/messages.proto)
 INCLUDE_PATH := $(CURDIR)/include
 BUILD_PATH := $(CURDIR)/build
 PROTOC := $(shell which protoc)
@@ -32,15 +32,15 @@ else
 	CXX_FLAGS += -O2 -g
 endif
 
+all: mkdir protobuf server client
+	@printf "\033[1;93;49mCreated server and client.\033[0m\n"
+
 mkdir:
 ifeq ("$(wildcard $(BUILD_PATH))", "")
 	@mkdir -p $(BUILD_PATH)/bin
 	@mkdir -p $(BUILD_PATH)/proto
 	@printf "\033[1;93;49mMAKE DIRECTORY => $(BUILD_PATH)\033[0m\n"
 endif
-
-all: mkdir server client
-	@printf "\033[1;93;49mCreated server and client.\033[0m\n"
 
 protobuf: $(PROTO_SRC)
 	@$(PROTOC) --cpp_out=$(PROTO_PATH) -I $(PROTO_PATH) $(PROTO_SRC)
@@ -53,14 +53,18 @@ $(BUILD_PATH)/%.o: $(PROTO_PATH)/%.cc
 	@printf "\033[1;93;49mCXX => $@\033[0m\n"
 	@mv $@ $(BUILD_PATH)/proto
 
-server: mkdir protobuf $(OBJ_FILE)
+server: mkdir $(OBJ_FILE)
 	@$(MAKE) -C $(CURDIR)/src/server -f server.mk all
 
-client: mkdir protobuf $(OBJ_FILE)
+client: mkdir $(OBJ_FILE)
 	@$(MAKE) -C $(CURDIR)/src/client -f client.mk all
 
 clean:
-	@rm -r $(CURDIR)/build
+	@rm -r $(CURDIR)/build 2> /dev/null || true
 	@printf "\033[1;93;49mBuild folders cleared.\033[0m\n"
-	@rm $(CURDIR)/protos/messages.grpc.pb.cc $(CURDIR)/protos/messages.pb.cc
-	@rm $(CURDIR)/include/server/messages.grpc.pb.hh $(CURDIR)/server/include/messages.pb.hh
+	@rm $(CURDIR)/protos/*.cc 2> /dev/null || true
+	@rm $(CURDIR)/include/messages.grpc.pb.h $(CURDIR)/include/messages.pb.h 2> /dev/null || true
+	@printf "\033[1;93;49mProtobuf auto-generated files cleared.\033[0m\n"
+
+create_proxy:
+	@$(MAKE) -f $(CURDIR)/src/server/server.mk -C $(CURDIR)/src/server create_proxy

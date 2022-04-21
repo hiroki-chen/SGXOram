@@ -47,6 +47,14 @@ class Client final : public oram::sgx_oram::Service {
   // The secrey key.
   sample_ec_key_128bit_t secret_key_session;
 
+  // Is initialized
+  bool is_initialized;
+
+  std::string encrypt(const std::string& plaintext);
+
+  std::string decrypt(const std::string& ciphertext);
+  
+
  public:
   Client(const std::string& address, const std::string& port);
 

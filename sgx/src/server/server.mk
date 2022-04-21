@@ -43,9 +43,9 @@ endif
 SGX_COMMON_FLAGS += -Wall -Wextra -Winit-self -Wpointer-arith -Wreturn-type \
                     -Waddress -Wsequence-point -Wformat-security \
                     -Wmissing-include-dirs -Wfloat-equal -Wundef \
-                    -Wcast-align -Wcast-qual \
-					-Wno-unused-parameter \
-					-I$(INCLUDE_PATH) -I$(COMMON_INCLUDE_PATH) -DSUPPLIED_KEY_DERIVATION
+                    -Wcast-align -Wno-cast-qual -Wno-unused-variable \
+										-Wno-unused-parameter \
+										-I$(INCLUDE_PATH) -I$(COMMON_INCLUDE_PATH) -DSUPPLIED_KEY_DERIVATION
 SGX_COMMON_CFLAGS := $(SGX_COMMON_FLAGS) -Wjump-misses-init -Wstrict-prototypes -Wunsuffixed-float-constants
 SGX_COMMON_CXXFLAGS := $(SGX_COMMON_FLAGS) -Wnon-virtual-dtor -std=c++1z
 
@@ -189,7 +189,7 @@ create_proxy: $(SRC_PATH)/enclave/enclave.edl
 
 # Compile proxy functions.
 $(BUILD_PATH)/enclave/enclave_t.o: $(SRC_PATH)/enclave/enclave_t.c
-	$(CC) $(Enclave_C_Flags) $(SGX_COMMON_CFLAGS) -c $< -o $@
+	@$(CC) $(Enclave_C_Flags) $(SGX_COMMON_CFLAGS) -c $< -o $@
 	@printf "\033[1;93;49mCC  =>  $@\033[0m\n"
 
 $(BUILD_PATH)/enclave/enclave_u.o: $(SRC_PATH)/enclave/enclave_u.c

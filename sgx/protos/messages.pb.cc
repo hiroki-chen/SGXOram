@@ -45,12 +45,14 @@ struct InitReplyDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT InitReplyDefaultTypeInternal _InitReply_default_instance_;
 constexpr OramInitRequest::OramInitRequest(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : way_(0u)
+  : verification_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , way_(0u)
   , number_(0u)
   , bucket_size_(0u)
   , type_(0u)
   , constant_(0u)
-  , round_(0u){}
+  , round_(0u)
+  , oram_type_(0u){}
 struct OramInitRequestDefaultTypeInternal {
   constexpr OramInitRequestDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -278,7 +280,7 @@ const uint32_t TableStruct_messages_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::oram::InitReply, success_),
   PROTOBUF_FIELD_OFFSET(::oram::InitReply, content_),
-  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::oram::OramInitRequest, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::oram::OramInitRequest, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -290,6 +292,16 @@ const uint32_t TableStruct_messages_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   PROTOBUF_FIELD_OFFSET(::oram::OramInitRequest, type_),
   PROTOBUF_FIELD_OFFSET(::oram::OramInitRequest, constant_),
   PROTOBUF_FIELD_OFFSET(::oram::OramInitRequest, round_),
+  PROTOBUF_FIELD_OFFSET(::oram::OramInitRequest, oram_type_),
+  PROTOBUF_FIELD_OFFSET(::oram::OramInitRequest, verification_),
+  ~0u,
+  ~0u,
+  ~0u,
+  ~0u,
+  ~0u,
+  ~0u,
+  1,
+  0,
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::oram::ReadRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -450,18 +462,18 @@ const uint32_t TableStruct_messages_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::oram::InitRequest)},
   { 8, -1, -1, sizeof(::oram::InitReply)},
-  { 16, -1, -1, sizeof(::oram::OramInitRequest)},
-  { 28, -1, -1, sizeof(::oram::ReadRequest)},
-  { 35, -1, -1, sizeof(::oram::ReadReply)},
-  { 43, -1, -1, sizeof(::oram::WriteRequest)},
-  { 51, -1, -1, sizeof(::oram::WriteReply)},
-  { 58, -1, -1, sizeof(::oram::CloseRequest)},
-  { 64, 72, -1, sizeof(::oram::InitialMessage)},
-  { 74, 83, -1, sizeof(::oram::Message0)},
-  { 86, -1, -1, sizeof(::oram::Message1)},
-  { 96, 114, -1, sizeof(::oram::Message2)},
-  { 126, 139, -1, sizeof(::oram::Message3)},
-  { 146, 168, -1, sizeof(::oram::AttestationMessage)},
+  { 16, 30, -1, sizeof(::oram::OramInitRequest)},
+  { 38, -1, -1, sizeof(::oram::ReadRequest)},
+  { 45, -1, -1, sizeof(::oram::ReadReply)},
+  { 53, -1, -1, sizeof(::oram::WriteRequest)},
+  { 61, -1, -1, sizeof(::oram::WriteReply)},
+  { 68, -1, -1, sizeof(::oram::CloseRequest)},
+  { 74, 82, -1, sizeof(::oram::InitialMessage)},
+  { 84, 93, -1, sizeof(::oram::Message0)},
+  { 96, -1, -1, sizeof(::oram::Message1)},
+  { 106, 124, -1, sizeof(::oram::Message2)},
+  { 136, 149, -1, sizeof(::oram::Message3)},
+  { 156, 178, -1, sizeof(::oram::AttestationMessage)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -485,69 +497,71 @@ const char descriptor_table_protodef_messages_2eproto[] PROTOBUF_SECTION_VARIABL
   "\n\016messages.proto\022\004oram\032\033google/protobuf/"
   "empty.proto\"-\n\013InitRequest\022\r\n\005round\030\001 \001("
   "\005\022\017\n\007content\030\002 \001(\014\"-\n\tInitReply\022\017\n\007succe"
-  "ss\030\001 \001(\010\022\017\n\007content\030\002 \001(\014\"r\n\017OramInitReq"
-  "uest\022\013\n\003way\030\001 \001(\r\022\016\n\006number\030\002 \001(\r\022\023\n\013buc"
-  "ket_size\030\003 \001(\r\022\014\n\004type\030\004 \001(\r\022\020\n\010constant"
-  "\030\005 \001(\r\022\r\n\005round\030\006 \001(\r\"\036\n\013ReadRequest\022\017\n\007"
-  "address\030\001 \001(\r\"+\n\tReadReply\022\r\n\005block\030\001 \001("
-  "\t\022\017\n\007success\030\002 \001(\010\"-\n\014WriteRequest\022\017\n\007ad"
-  "dress\030\001 \001(\r\022\014\n\004data\030\002 \001(\t\"\035\n\nWriteReply\022"
-  "\017\n\007success\030\001 \001(\010\"\016\n\014CloseRequest\":\n\016Init"
-  "ialMessage\022\014\n\004type\030\001 \001(\r\022\021\n\004size\030\002 \001(\rH\000"
-  "\210\001\001B\007\n\005_size\"F\n\010Message0\022\014\n\004type\030\001 \001(\r\022\014"
-  "\n\004epid\030\002 \001(\r\022\023\n\006status\030\003 \001(\rH\000\210\001\001B\t\n\007_st"
-  "atus\"K\n\010Message1\022\014\n\004type\030\001 \001(\r\022\017\n\003GaX\030\002 "
-  "\003(\rB\002\020\001\022\017\n\003GaY\030\003 \003(\rB\002\020\001\022\017\n\003GID\030\004 \003(\rB\002\020"
-  "\001\"\315\002\n\010Message2\022\014\n\004type\030\001 \001(\r\022\021\n\004size\030\002 \001"
-  "(\rH\000\210\001\001\022\031\n\rpublic_key_gx\030\003 \003(\rB\002\020\001\022\031\n\rpu"
-  "blic_key_gy\030\004 \003(\rB\002\020\001\022\027\n\nquote_type\030\005 \001("
-  "\rH\001\210\001\001\022\020\n\004spid\030\006 \003(\rB\002\020\001\022\030\n\013cmac_kdf_id\030"
-  "\007 \001(\rH\002\210\001\001\022\027\n\013signature_x\030\010 \003(\rB\002\020\001\022\027\n\013s"
-  "ignature_y\030\t \003(\rB\002\020\001\022\020\n\004smac\030\n \003(\rB\002\020\001\022\027"
-  "\n\nsize_sigrl\030\013 \001(\rH\003\210\001\001\022\021\n\005sigrl\030\014 \003(\rB\002"
-  "\020\001B\007\n\005_sizeB\r\n\013_quote_typeB\016\n\014_cmac_kdf_"
-  "idB\r\n\013_size_sigrl\"\242\001\n\010Message3\022\014\n\004type\030\001"
-  " \001(\r\022\021\n\004size\030\002 \001(\rH\000\210\001\001\022\023\n\007sgx_mac\030\003 \003(\r"
-  "B\002\020\001\022\024\n\010gax_msg3\030\004 \003(\rB\002\020\001\022\024\n\010gay_msg3\030\005"
-  " \003(\rB\002\020\001\022\030\n\014sec_property\030\006 \003(\rB\002\020\001\022\021\n\005qu"
-  "ote\030\007 \003(\rB\002\020\001B\007\n\005_size\"\240\004\n\022AttestationMe"
-  "ssage\022\014\n\004type\030\001 \001(\r\022\014\n\004size\030\002 \001(\r\022\036\n\021epi"
-  "d_group_status\030\003 \001(\rH\000\210\001\001\022\"\n\025tcb_evaluat"
-  "ion_status\030\004 \001(\rH\001\210\001\001\022\"\n\025pse_evaluation_"
-  "status\030\005 \001(\rH\002\210\001\001\022&\n\032latest_equivalent_t"
-  "cb_psvn\030\006 \003(\rB\002\020\001\022\035\n\021latest_pse_isvsvn\030\007"
-  " \003(\rB\002\020\001\022\033\n\017latest_psda_svn\030\010 \003(\rB\002\020\001\022!\n"
-  "\025performance_rekey_gid\030\t \003(\rB\002\020\001\022\030\n\014ec_s"
-  "ign256_x\030\n \003(\rB\002\020\001\022\030\n\014ec_sign256_y\030\013 \003(\r"
-  "B\002\020\001\022\023\n\007mac_smk\030\014 \003(\rB\002\020\001\022\030\n\013result_size"
-  "\030\r \001(\rH\003\210\001\001\022\024\n\010reserved\030\016 \003(\rB\002\020\001\022\027\n\013pay"
-  "load_tag\030\017 \003(\rB\002\020\001\022\023\n\007payload\030\020 \003(\rB\002\020\001B"
-  "\024\n\022_epid_group_statusB\030\n\026_tcb_evaluation"
-  "_statusB\030\n\026_pse_evaluation_statusB\016\n\014_re"
-  "sult_size2\367\004\n\010sgx_oram\0224\n\014init_enclave\022\021"
-  ".oram.InitRequest\032\017.oram.InitReply\"\000\022<\n\t"
-  "init_oram\022\025.oram.OramInitRequest\032\026.googl"
-  "e.protobuf.Empty\"\000\022<\n\024generate_session_k"
-  "ey\022\021.oram.InitRequest\032\017.oram.InitReply\"\000"
-  "\022B\n\030remote_attestation_begin\022\024.oram.Init"
-  "ialMessage\032\016.oram.Message0\"\000\022;\n\027remote_a"
-  "ttestation_msg0\022\016.oram.Message0\032\016.oram.M"
-  "essage1\"\000\022;\n\027remote_attestation_msg2\022\016.o"
-  "ram.Message2\032\016.oram.Message3\"\000\022N\n\030remote"
-  "_attestation_final\022\030.oram.AttestationMes"
-  "sage\032\026.google.protobuf.Empty\"\000\0222\n\nread_b"
-  "lock\022\021.oram.ReadRequest\032\017.oram.ReadReply"
-  "\"\000\0225\n\013write_block\022\022.oram.WriteRequest\032\020."
-  "oram.WriteReply\"\000\022@\n\020close_connection\022\022."
-  "oram.CloseRequest\032\026.google.protobuf.Empt"
-  "y\"\000b\006proto3"
+  "ss\030\001 \001(\010\022\017\n\007content\030\002 \001(\014\"\304\001\n\017OramInitRe"
+  "quest\022\013\n\003way\030\001 \001(\r\022\016\n\006number\030\002 \001(\r\022\023\n\013bu"
+  "cket_size\030\003 \001(\r\022\014\n\004type\030\004 \001(\r\022\020\n\010constan"
+  "t\030\005 \001(\r\022\r\n\005round\030\006 \001(\r\022\026\n\toram_type\030\007 \001("
+  "\rH\000\210\001\001\022\031\n\014verification\030\010 \001(\014H\001\210\001\001B\014\n\n_or"
+  "am_typeB\017\n\r_verification\"\036\n\013ReadRequest\022"
+  "\017\n\007address\030\001 \001(\r\"+\n\tReadReply\022\r\n\005block\030\001"
+  " \001(\014\022\017\n\007success\030\002 \001(\010\"-\n\014WriteRequest\022\017\n"
+  "\007address\030\001 \001(\r\022\014\n\004data\030\002 \001(\014\"\035\n\nWriteRep"
+  "ly\022\017\n\007success\030\001 \001(\010\"\016\n\014CloseRequest\":\n\016I"
+  "nitialMessage\022\014\n\004type\030\001 \001(\r\022\021\n\004size\030\002 \001("
+  "\rH\000\210\001\001B\007\n\005_size\"F\n\010Message0\022\014\n\004type\030\001 \001("
+  "\r\022\014\n\004epid\030\002 \001(\r\022\023\n\006status\030\003 \001(\rH\000\210\001\001B\t\n\007"
+  "_status\"K\n\010Message1\022\014\n\004type\030\001 \001(\r\022\017\n\003GaX"
+  "\030\002 \003(\rB\002\020\001\022\017\n\003GaY\030\003 \003(\rB\002\020\001\022\017\n\003GID\030\004 \003(\r"
+  "B\002\020\001\"\315\002\n\010Message2\022\014\n\004type\030\001 \001(\r\022\021\n\004size\030"
+  "\002 \001(\rH\000\210\001\001\022\031\n\rpublic_key_gx\030\003 \003(\rB\002\020\001\022\031\n"
+  "\rpublic_key_gy\030\004 \003(\rB\002\020\001\022\027\n\nquote_type\030\005"
+  " \001(\rH\001\210\001\001\022\020\n\004spid\030\006 \003(\rB\002\020\001\022\030\n\013cmac_kdf_"
+  "id\030\007 \001(\rH\002\210\001\001\022\027\n\013signature_x\030\010 \003(\rB\002\020\001\022\027"
+  "\n\013signature_y\030\t \003(\rB\002\020\001\022\020\n\004smac\030\n \003(\rB\002\020"
+  "\001\022\027\n\nsize_sigrl\030\013 \001(\rH\003\210\001\001\022\021\n\005sigrl\030\014 \003("
+  "\rB\002\020\001B\007\n\005_sizeB\r\n\013_quote_typeB\016\n\014_cmac_k"
+  "df_idB\r\n\013_size_sigrl\"\242\001\n\010Message3\022\014\n\004typ"
+  "e\030\001 \001(\r\022\021\n\004size\030\002 \001(\rH\000\210\001\001\022\023\n\007sgx_mac\030\003 "
+  "\003(\rB\002\020\001\022\024\n\010gax_msg3\030\004 \003(\rB\002\020\001\022\024\n\010gay_msg"
+  "3\030\005 \003(\rB\002\020\001\022\030\n\014sec_property\030\006 \003(\rB\002\020\001\022\021\n"
+  "\005quote\030\007 \003(\rB\002\020\001B\007\n\005_size\"\240\004\n\022Attestatio"
+  "nMessage\022\014\n\004type\030\001 \001(\r\022\014\n\004size\030\002 \001(\r\022\036\n\021"
+  "epid_group_status\030\003 \001(\rH\000\210\001\001\022\"\n\025tcb_eval"
+  "uation_status\030\004 \001(\rH\001\210\001\001\022\"\n\025pse_evaluati"
+  "on_status\030\005 \001(\rH\002\210\001\001\022&\n\032latest_equivalen"
+  "t_tcb_psvn\030\006 \003(\rB\002\020\001\022\035\n\021latest_pse_isvsv"
+  "n\030\007 \003(\rB\002\020\001\022\033\n\017latest_psda_svn\030\010 \003(\rB\002\020\001"
+  "\022!\n\025performance_rekey_gid\030\t \003(\rB\002\020\001\022\030\n\014e"
+  "c_sign256_x\030\n \003(\rB\002\020\001\022\030\n\014ec_sign256_y\030\013 "
+  "\003(\rB\002\020\001\022\023\n\007mac_smk\030\014 \003(\rB\002\020\001\022\030\n\013result_s"
+  "ize\030\r \001(\rH\003\210\001\001\022\024\n\010reserved\030\016 \003(\rB\002\020\001\022\027\n\013"
+  "payload_tag\030\017 \003(\rB\002\020\001\022\023\n\007payload\030\020 \003(\rB\002"
+  "\020\001B\024\n\022_epid_group_statusB\030\n\026_tcb_evaluat"
+  "ion_statusB\030\n\026_pse_evaluation_statusB\016\n\014"
+  "_result_size2\367\004\n\010sgx_oram\0224\n\014init_enclav"
+  "e\022\021.oram.InitRequest\032\017.oram.InitReply\"\000\022"
+  "<\n\tinit_oram\022\025.oram.OramInitRequest\032\026.go"
+  "ogle.protobuf.Empty\"\000\022<\n\024generate_sessio"
+  "n_key\022\021.oram.InitRequest\032\017.oram.InitRepl"
+  "y\"\000\022B\n\030remote_attestation_begin\022\024.oram.I"
+  "nitialMessage\032\016.oram.Message0\"\000\022;\n\027remot"
+  "e_attestation_msg0\022\016.oram.Message0\032\016.ora"
+  "m.Message1\"\000\022;\n\027remote_attestation_msg2\022"
+  "\016.oram.Message2\032\016.oram.Message3\"\000\022N\n\030rem"
+  "ote_attestation_final\022\030.oram.Attestation"
+  "Message\032\026.google.protobuf.Empty\"\000\0222\n\nrea"
+  "d_block\022\021.oram.ReadRequest\032\017.oram.ReadRe"
+  "ply\"\000\0225\n\013write_block\022\022.oram.WriteRequest"
+  "\032\020.oram.WriteReply\"\000\022@\n\020close_connection"
+  "\022\022.oram.CloseRequest\032\026.google.protobuf.E"
+  "mpty\"\000b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_messages_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2fempty_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_messages_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_messages_2eproto = {
-  false, false, 2331, descriptor_table_protodef_messages_2eproto, "messages.proto", 
+  false, false, 2414, descriptor_table_protodef_messages_2eproto, "messages.proto", 
   &descriptor_table_messages_2eproto_once, descriptor_table_messages_2eproto_deps, 1, 14,
   schemas, file_default_instances, TableStruct_messages_2eproto::offsets,
   file_level_metadata_messages_2eproto, file_level_enum_descriptors_messages_2eproto, file_level_service_descriptors_messages_2eproto,
@@ -1012,6 +1026,13 @@ void InitReply::InternalSwap(InitReply* other) {
 
 class OramInitRequest::_Internal {
  public:
+  using HasBits = decltype(std::declval<OramInitRequest>()._has_bits_);
+  static void set_has_oram_type(HasBits* has_bits) {
+    (*has_bits)[0] |= 2u;
+  }
+  static void set_has_verification(HasBits* has_bits) {
+    (*has_bits)[0] |= 1u;
+  }
 };
 
 OramInitRequest::OramInitRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
@@ -1024,19 +1045,32 @@ OramInitRequest::OramInitRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
   // @@protoc_insertion_point(arena_constructor:oram.OramInitRequest)
 }
 OramInitRequest::OramInitRequest(const OramInitRequest& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      _has_bits_(from._has_bits_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  verification_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    verification_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (from._internal_has_verification()) {
+    verification_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_verification(), 
+      GetArenaForAllocation());
+  }
   ::memcpy(&way_, &from.way_,
-    static_cast<size_t>(reinterpret_cast<char*>(&round_) -
-    reinterpret_cast<char*>(&way_)) + sizeof(round_));
+    static_cast<size_t>(reinterpret_cast<char*>(&oram_type_) -
+    reinterpret_cast<char*>(&way_)) + sizeof(oram_type_));
   // @@protoc_insertion_point(copy_constructor:oram.OramInitRequest)
 }
 
 inline void OramInitRequest::SharedCtor() {
+verification_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  verification_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&way_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&round_) -
-    reinterpret_cast<char*>(&way_)) + sizeof(round_));
+    0, static_cast<size_t>(reinterpret_cast<char*>(&oram_type_) -
+    reinterpret_cast<char*>(&way_)) + sizeof(oram_type_));
 }
 
 OramInitRequest::~OramInitRequest() {
@@ -1048,6 +1082,7 @@ OramInitRequest::~OramInitRequest() {
 
 inline void OramInitRequest::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  verification_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void OramInitRequest::ArenaDtor(void* object) {
@@ -1066,14 +1101,21 @@ void OramInitRequest::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    verification_.ClearNonDefaultToEmpty();
+  }
   ::memset(&way_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&round_) -
       reinterpret_cast<char*>(&way_)) + sizeof(round_));
+  oram_type_ = 0u;
+  _has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
 const char* OramInitRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
     uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
@@ -1126,6 +1168,24 @@ const char* OramInitRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
         } else
           goto handle_unusual;
         continue;
+      // optional uint32 oram_type = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
+          _Internal::set_has_oram_type(&has_bits);
+          oram_type_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // optional bytes verification = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 66)) {
+          auto str = _internal_mutable_verification();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
       default:
         goto handle_unusual;
     }  // switch
@@ -1142,6 +1202,7 @@ const char* OramInitRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
     CHK_(ptr != nullptr);
   }  // while
 message_done:
+  _has_bits_.Or(has_bits);
   return ptr;
 failure:
   ptr = nullptr;
@@ -1191,6 +1252,18 @@ uint8_t* OramInitRequest::_InternalSerialize(
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(6, this->_internal_round(), target);
   }
 
+  // optional uint32 oram_type = 7;
+  if (_internal_has_oram_type()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(7, this->_internal_oram_type(), target);
+  }
+
+  // optional bytes verification = 8;
+  if (_internal_has_verification()) {
+    target = stream->WriteBytesMaybeAliased(
+        8, this->_internal_verification(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1206,6 +1279,14 @@ size_t OramInitRequest::ByteSizeLong() const {
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // optional bytes verification = 8;
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+        this->_internal_verification());
+  }
 
   // uint32 way = 1;
   if (this->_internal_way() != 0) {
@@ -1237,6 +1318,11 @@ size_t OramInitRequest::ByteSizeLong() const {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_round());
   }
 
+  // optional uint32 oram_type = 7;
+  if (cached_has_bits & 0x00000002u) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_oram_type());
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
@@ -1259,6 +1345,9 @@ void OramInitRequest::MergeFrom(const OramInitRequest& from) {
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from._internal_has_verification()) {
+    _internal_set_verification(from._internal_verification());
+  }
   if (from._internal_way() != 0) {
     _internal_set_way(from._internal_way());
   }
@@ -1277,6 +1366,9 @@ void OramInitRequest::MergeFrom(const OramInitRequest& from) {
   if (from._internal_round() != 0) {
     _internal_set_round(from._internal_round());
   }
+  if (from._internal_has_oram_type()) {
+    _internal_set_oram_type(from._internal_oram_type());
+  }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -1293,10 +1385,18 @@ bool OramInitRequest::IsInitialized() const {
 
 void OramInitRequest::InternalSwap(OramInitRequest* other) {
   using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_has_bits_[0], other->_has_bits_[0]);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &verification_, lhs_arena,
+      &other->verification_, rhs_arena
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(OramInitRequest, round_)
-      + sizeof(OramInitRequest::round_)
+      PROTOBUF_FIELD_OFFSET(OramInitRequest, oram_type_)
+      + sizeof(OramInitRequest::oram_type_)
       - PROTOBUF_FIELD_OFFSET(OramInitRequest, way_)>(
           reinterpret_cast<char*>(&way_),
           reinterpret_cast<char*>(&other->way_));
@@ -1563,12 +1663,11 @@ const char* ReadReply::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
     uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // string block = 1;
+      // bytes block = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           auto str = _internal_mutable_block();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "oram.ReadReply.block"));
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1610,13 +1709,9 @@ uint8_t* ReadReply::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string block = 1;
+  // bytes block = 1;
   if (!this->_internal_block().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_block().data(), static_cast<int>(this->_internal_block().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "oram.ReadReply.block");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         1, this->_internal_block(), target);
   }
 
@@ -1642,10 +1737,10 @@ size_t ReadReply::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string block = 1;
+  // bytes block = 1;
   if (!this->_internal_block().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_block());
   }
 
@@ -1800,12 +1895,11 @@ const char* WriteRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_I
         } else
           goto handle_unusual;
         continue;
-      // string data = 2;
+      // bytes data = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
           auto str = _internal_mutable_data();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "oram.WriteRequest.data"));
           CHK_(ptr);
         } else
           goto handle_unusual;
@@ -1845,13 +1939,9 @@ uint8_t* WriteRequest::_InternalSerialize(
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(1, this->_internal_address(), target);
   }
 
-  // string data = 2;
+  // bytes data = 2;
   if (!this->_internal_data().empty()) {
-    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_data().data(), static_cast<int>(this->_internal_data().length()),
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "oram.WriteRequest.data");
-    target = stream->WriteStringMaybeAliased(
+    target = stream->WriteBytesMaybeAliased(
         2, this->_internal_data(), target);
   }
 
@@ -1871,10 +1961,10 @@ size_t WriteRequest::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string data = 2;
+  // bytes data = 2;
   if (!this->_internal_data().empty()) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
         this->_internal_data());
   }
 

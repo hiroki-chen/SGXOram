@@ -68,10 +68,12 @@ int SGX_UBRIDGE(SGX_CDECL, sgx_thread_setwait_untrusted_events_ocall, (const voi
 int SGX_UBRIDGE(SGX_CDECL, sgx_thread_set_multiple_untrusted_events_ocall, (const void** waiters, size_t total));
 #endif
 
-sgx_status_t ecall_init_oram_controller(sgx_enclave_id_t eid, int* retval);
+sgx_status_t ecall_init_oram_controller(sgx_enclave_id_t eid, sgx_status_t* retval, uint8_t* oram_config, size_t oram_config_size);
 sgx_status_t ecall_access_data(sgx_enclave_id_t eid, sgx_status_t* retval, int op_type, uint8_t* data, size_t data_len);
+sgx_status_t ecall_check_verification_message(sgx_enclave_id_t eid, sgx_status_t* retval, uint8_t* message, size_t message_size);
 sgx_status_t ecall_seal(sgx_enclave_id_t eid, sgx_status_t* retval, const uint8_t* plaintext, size_t plaintext_len, sgx_sealed_data_t* sealed_data, size_t sealed_size);
 sgx_status_t ecall_unseal(sgx_enclave_id_t eid, sgx_status_t* retval, const sgx_sealed_data_t* sealed_data, size_t sealed_size, uint8_t* plaintext, size_t plaintext_len);
+sgx_status_t ecall_init_crypto_manager(sgx_enclave_id_t eid, sgx_status_t* retval);
 sgx_status_t ecall_begin_DHKE(sgx_enclave_id_t eid, sgx_status_t* retval);
 sgx_status_t ecall_sample_key_pair(sgx_enclave_id_t eid, sgx_status_t* retval, uint8_t* pub_key, size_t pubkey_size);
 sgx_status_t ecall_compute_shared_key(sgx_enclave_id_t eid, sgx_status_t* retval, const uint8_t* pub_key, size_t pubkey_size);

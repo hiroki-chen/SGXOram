@@ -39,6 +39,7 @@ struct OramConfiguration {
   uint32_t constant;
   uint32_t round;
   uint32_t level;
+  uint32_t oram_type;
 };
 
 class SGXORAMService final : public oram::sgx_oram::Service {
@@ -69,6 +70,8 @@ class SGXORAMService final : public oram::sgx_oram::Service {
 
   sgx_status_t message_handler_round_three(const std::string& message,
                                            oram::InitReply* reply);
+                                           
+  bool check_verification_message(const std::string& message);
 
  public:
   SGXORAMService() = delete;
@@ -108,15 +111,13 @@ class SGXORAMService final : public oram::sgx_oram::Service {
       const oram::InitialMessage* initial_message,
       oram::Message0* reply) override;
 
-  grpc::Status remote_attestation_msg0(
-      grpc::ServerContext* server_context,
-      const oram::Message0* message0,
-      oram::Message1* reply) override;
+  grpc::Status remote_attestation_msg0(grpc::ServerContext* server_context,
+                                       const oram::Message0* message0,
+                                       oram::Message1* reply) override;
 
-  grpc::Status remote_attestation_msg2(
-      grpc::ServerContext* server_context,
-      const oram::Message2* message2,
-      oram::Message3* reply) override;
+  grpc::Status remote_attestation_msg2(grpc::ServerContext* server_context,
+                                       const oram::Message2* message2,
+                                       oram::Message3* reply) override;
 
   grpc::Status remote_attestation_final(
       grpc::ServerContext* server_context,
