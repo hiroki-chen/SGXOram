@@ -35,20 +35,24 @@ void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
   const char* data_ptr = reinterpret_cast<const char*>(data);
   std::string compressed_data = gzip::compress(data_ptr, data_len);
   server_runner->store_compressed_slot(slot_finger_print, compressed_data);
-
-  LOG(plog::debug) << "Compressed: "
-                   << sgx_oram::hex_to_string((uint8_t*)compressed_data.data(),
-                                              compressed_data.size());
 }
 
 // Debug function.
-void ocall_printf(const char* message) {
-  LOG(plog::debug) << message;
-}
+void ocall_printf(const char* message) { LOG(plog::debug) << message; }
 
 // Exception handler.
 void ocall_exception_handler(const char* err_msg) {
   throw std::runtime_error(err_msg);
+}
+
+void ocall_read_position(const char* position_finderprint, uint8_t* position,
+                         size_t position_size) {
+  return;
+}
+
+void ocall_write_position(const char* position_finderprint,
+                          const uint8_t* position, size_t position_size) {
+  return;
 }
 
 size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,

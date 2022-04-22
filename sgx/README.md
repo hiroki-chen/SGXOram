@@ -73,7 +73,7 @@ In addition, you should manually set the correct path for gRPC for loading the c
 * Build the server:
 
 ```shell
-make -j server
+BUCKET_SIZE=128 make -j server # Note that the bucket size is defined in the macro.
 ```
 
 * Build the client:

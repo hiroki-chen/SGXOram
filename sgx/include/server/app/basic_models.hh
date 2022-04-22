@@ -14,11 +14,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <rapidjson/document.h>
-
 #include <stdint.h>
-#include <string>
-#include <vector>
 
 // Fixed.
 #define DEFAULT_ORAM_DATA_SIZE 4096
@@ -30,7 +26,21 @@ namespace sgx_oram {
 // If we need to transfer data between the untrusted memory and the enclave, we better
 // organize all the data structures in a C-like style for best performance.
 
+typedef enum _oram_slot_type {
+  ORAM_SLOT_TYPE_LEAF = 0,
+  ORAM_SLOT_TYPE_INTERNAL = 1,
+  ORAM_SLOT_TYPE_INVALID = 2
+} oram_slot_type_t;
+
+typedef enum _oram_block_type {
+  ORAM_BLOCK_TYPE_NORMAL = 0,
+  ORAM_BLOCK_TYPE_DUMMY = 1,
+  ORAM_BLOCK_TYPE_INVALID = 2
+} oram_block_type_t;
+
 typedef struct _oram_block_header_t {
+  // The type of the block.
+  oram_block_type_t type;
   // The block identifier.
   uint32_t bid;
   // The block address (real).
@@ -46,11 +56,13 @@ typedef struct _oram_block_t {
 } oram_block_t;
 
 typedef struct _oram_slot_header_t {
+  // The slot type.
+  uint16_t type;
+  // The level at which the slot is located.
+  uint16_t level;
   // The range of the slot.
   uint32_t range_begin;
   uint32_t range_end;
-  // The level of the slot.
-  uint32_t level;
   // The available space of the slot.
   uint32_t dummy_number;
 } oram_slot_header_t;
@@ -61,6 +73,13 @@ typedef struct _oram_slot_t {
   // The storage of the slot.
   oram_block_t blocks[DEFAULT_SLOT_SIZE];
 } oram_slot_t;
+
+typedef struct _oram_slot_leaf_t {
+  // The slot header.
+  oram_slot_header_t header;
+  // The storage of the slot.
+  oram_block_t blocks[BUCKET_SIZE];
+} oram_slot_leaf_t;
 
 typedef struct _oram_position_t {
   // The level.

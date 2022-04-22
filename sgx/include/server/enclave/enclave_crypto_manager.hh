@@ -17,6 +17,8 @@
 #ifndef ENCLAVE_CRYPTO_MANAGER_HH
 #define ENCLAVE_CRYPTO_MANAGER_HH
 
+#define DEFAULT_RANDOM_LENGTH 16
+
 #include <sgx_tcrypto.h>
 #include <sgx_ecp_types.h>
 
@@ -42,6 +44,8 @@ class EnclaveCryptoManager final {
 
   // Is fully initialized
   bool is_initialized;
+
+  uint8_t random_number[DEFAULT_RANDOM_LENGTH];
 
  public:
   /**

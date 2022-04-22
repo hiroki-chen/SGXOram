@@ -27,13 +27,32 @@
 EnclaveCryptoManager::EnclaveCryptoManager() {
   memset(shared_secret_key, 0, SGX_AESGCM_KEY_SIZE);
   is_initialized = false;
+
+  // Generate the random number.
+  // A freshly newly generated random number
+  // to prevent that the adversary can observe the
+  // hash fingerprint of each slot.
+  sgx_status_t ret = sgx_read_rand(random_number, DEFAULT_RANDOM_LENGTH);
+
+  check_sgx_status(ret, "enclave_crypto_mananger init()");
 }
 
 std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
-  const uint8_t* bytes = reinterpret_cast<const uint8_t*>(message.data());
+  const size_t message_length =
+      message.length() + message.size() + DEFAULT_RANDOM_LENGTH;
+
+  // Allocate the memory for the message which is used
+  // to store the message and the random number. Note
+  // that the random number is appended to the message.
+  uint8_t* buf = (uint8_t*)malloc(message_length);
+  memcpy(buf, message.c_str(), message.size());
+  memcpy(buf + message.size(), random_number, DEFAULT_RANDOM_LENGTH);
   sgx_sha256_hash_t ans = {0};
-  sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-  sgx_sha256_msg(bytes, message.size(), &ans);
+
+  sgx_status_t status = sgx_sha256_msg(buf, message_length, &ans);
+
+  safe_free(buf);
+  check_sgx_status(status, "enclave_sha_256()");
 
   // Cast back to the std::string.
   return hex_to_string(ans, SGX_SHA256_HASH_SIZE);
@@ -46,6 +65,8 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
     return "";
   }
 
+  sgx_status_t status = SGX_ERROR_UNEXPECTED;
+
   const uint8_t* plaintext = reinterpret_cast<const uint8_t*>(message.data());
 
   // Prepare a buffer for receiving the ciphertext.
@@ -53,18 +74,17 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
   uint8_t* ciphertext = (uint8_t*)(malloc(cipher_len));
   // Generate the IV (nonce). This is directly appended into the raw message and
   // is easy to be discarded.
-  sgx_read_rand(ciphertext + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE);
+  status = sgx_read_rand(ciphertext + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE);
+  check_sgx_status(status, "sgx_read_rand()");
 
   // Encrypt the data and then MAC it.
-  sgx_status_t ret = sgx_rijndael128GCM_encrypt(
+  status = sgx_rijndael128GCM_encrypt(
       &shared_secret_key, plaintext, message.size(),
       ciphertext + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,
       ciphertext + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE, NULL, 0,
       (sgx_aes_gcm_128bit_tag_t*)(ciphertext));
 
-  if (ret != SGX_SUCCESS) {
-    ocall_exception_handler("Cannot encrypt the data");
-  }
+  check_sgx_status(status, "enclave_aes_128_gcm_encrypt()");
 
   // We could extract the meaningful fields out of the ciphertext buffer and
   // then reconstruct a string from them. The buffer's layout is:
@@ -94,9 +114,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
   // Check the integrity of the message.
   // If sanity check fails, we throw an exception, indicating that the message
   // is corrupted, and the client should end the connection.
-  if (ret != SGX_SUCCESS) {
-    ocall_exception_handler("AES integrity check failed.");
-  }
+  check_sgx_status(ret, "enclave_aes_128_gcm_decrypt()");
 
   return std::string((char*)plaintext, message_len);
 }

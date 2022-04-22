@@ -139,6 +139,18 @@ typedef struct ms_ocall_exception_handler_t {
 	const char* ms_err_msg;
 } ms_ocall_exception_handler_t;
 
+typedef struct ms_ocall_read_position_t {
+	const char* ms_position_finderprint;
+	uint8_t* ms_position;
+	size_t ms_position_size;
+} ms_ocall_read_position_t;
+
+typedef struct ms_ocall_write_position_t {
+	const char* ms_position_finderprint;
+	const uint8_t* ms_position;
+	size_t ms_position_size;
+} ms_ocall_write_position_t;
+
 typedef struct ms_pthread_wait_timeout_ocall_t {
 	int ms_retval;
 	unsigned long long ms_waiter;
@@ -215,6 +227,22 @@ static sgx_status_t SGX_CDECL enclave_ocall_exception_handler(void* pms)
 	return SGX_SUCCESS;
 }
 
+static sgx_status_t SGX_CDECL enclave_ocall_read_position(void* pms)
+{
+	ms_ocall_read_position_t* ms = SGX_CAST(ms_ocall_read_position_t*, pms);
+	ocall_read_position(ms->ms_position_finderprint, ms->ms_position, ms->ms_position_size);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL enclave_ocall_write_position(void* pms)
+{
+	ms_ocall_write_position_t* ms = SGX_CAST(ms_ocall_write_position_t*, pms);
+	ocall_write_position(ms->ms_position_finderprint, ms->ms_position, ms->ms_position_size);
+
+	return SGX_SUCCESS;
+}
+
 static sgx_status_t SGX_CDECL enclave_pthread_wait_timeout_ocall(void* pms)
 {
 	ms_pthread_wait_timeout_ocall_t* ms = SGX_CAST(ms_pthread_wait_timeout_ocall_t*, pms);
@@ -281,14 +309,16 @@ static sgx_status_t SGX_CDECL enclave_sgx_thread_set_multiple_untrusted_events_o
 
 static const struct {
 	size_t nr_ocall;
-	void * table[12];
+	void * table[14];
 } ocall_table_enclave = {
-	12,
+	14,
 	{
 		(void*)enclave_ocall_printf,
 		(void*)enclave_ocall_read_slot,
 		(void*)enclave_ocall_write_slot,
 		(void*)enclave_ocall_exception_handler,
+		(void*)enclave_ocall_read_position,
+		(void*)enclave_ocall_write_position,
 		(void*)enclave_pthread_wait_timeout_ocall,
 		(void*)enclave_pthread_create_ocall,
 		(void*)enclave_pthread_wakeup_ocall,

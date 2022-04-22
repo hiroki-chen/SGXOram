@@ -14,10 +14,33 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <sgx_tseal.h>
+#include <sgx_urts.h>
 
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_u.h>
+
+// Error code for SGX API calls
+static sgx_error_list sgx_errlist = {
+    {SGX_ERROR_UNEXPECTED, "Unexpected error occurred."},
+    {SGX_ERROR_INVALID_PARAMETER, "Invalid parameter."},
+    {SGX_ERROR_OUT_OF_MEMORY, "Out of memory."},
+    {SGX_ERROR_ENCLAVE_LOST,
+     "Power transition occurred. Please refer to the sample "
+     "\"PowerTransition\" for details."},
+    {SGX_ERROR_INVALID_ENCLAVE, "Invalid enclave image."},
+    {SGX_ERROR_INVALID_ENCLAVE_ID, "Invalid enclave identification."},
+    {SGX_ERROR_INVALID_SIGNATURE, "Invalid enclave signature."},
+    {SGX_ERROR_OUT_OF_EPC, "Out of EPC memory."},
+    {SGX_ERROR_NO_DEVICE,
+     "Invalid SGX device. Please make sure SGX module is enabled in the BIOS, "
+     "and install SGX driver afterwards."},
+    {SGX_ERROR_MEMORY_MAP_CONFLICT, "Memory map conflicted."},
+    {SGX_ERROR_INVALID_METADATA, "Invalid enclave metadata."},
+    {SGX_ERROR_DEVICE_BUSY, "SGX device was busy."},
+    {SGX_ERROR_INVALID_ATTRIBUTE, "Enclave was not authorized."},
+    {SGX_ERROR_ENCLAVE_FILE_ACCESS, "Can't open enclave file."},
+    {SGX_ERROR_MEMORY_MAP_FAILURE, "Failed to reserve memory for the enclave."},
+};
 
 void safe_free(void* ptr) {
   if (ptr != nullptr) {
@@ -87,11 +110,20 @@ void bor(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out) {
 }
 
 size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint) {
-  const size_t size = ocall_read_slot(fingerprint, (uint8_t*)(slot), sizeof(sgx_oram::oram_slot_t));
-  
+  const size_t size = ocall_read_slot(fingerprint, (uint8_t*)(slot),
+                                      sizeof(sgx_oram::oram_slot_t));
+
   if (size == 0) {
     // The slot is not found or something went wrong.
     printf("033[31m The slot for %s is not found.\n033[0m", fingerprint);
   }
   return size;
+}
+
+void check_sgx_status(const sgx_status_t& status, const std::string& location) {
+  if (status != SGX_SUCCESS) {
+    printf("[enclave] %s triggered an SGX error: %s\n", location.data(),
+           sgx_errlist[status].data());
+    abort();
+  }
 }

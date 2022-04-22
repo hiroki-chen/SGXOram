@@ -35,6 +35,14 @@ void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_write_slot, (const char* slot_finderpri
 #define OCALL_EXCEPTION_HANDLER_DEFINED__
 void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_exception_handler, (const char* err_msg));
 #endif
+#ifndef OCALL_READ_POSITION_DEFINED__
+#define OCALL_READ_POSITION_DEFINED__
+void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_read_position, (const char* position_finderprint, uint8_t* position, size_t position_size));
+#endif
+#ifndef OCALL_WRITE_POSITION_DEFINED__
+#define OCALL_WRITE_POSITION_DEFINED__
+void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_write_position, (const char* position_finderprint, const uint8_t* position, size_t position_size));
+#endif
 #ifndef PTHREAD_WAIT_TIMEOUT_OCALL_DEFINED__
 #define PTHREAD_WAIT_TIMEOUT_OCALL_DEFINED__
 int SGX_UBRIDGE(SGX_CDECL, pthread_wait_timeout_ocall, (unsigned long long waiter, unsigned long long timeout));

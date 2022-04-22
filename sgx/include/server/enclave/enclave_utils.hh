@@ -17,11 +17,14 @@
 #ifndef ENCLAVE_UTILS_HH
 #define ENCLAVE_UTILS_HH
 
-#include <chrono>
+// #include <chrono>
 #include <type_traits>
 #include <string>
+#include <unordered_map>
 
 #include <server/app/basic_models.hh>
+
+using sgx_error_list = std::unordered_map<sgx_status_t, std::string>;
 
 static const std::string digits = "0123456789abcdef";
 /** @addtogroup String concatenation helpers with arbitrary elements.
@@ -91,8 +94,8 @@ void sprintf(const std::string& str, bool hex = false);
 
 /**
  * @brief Safe free the memory.
- * 
- * @param ptr 
+ *
+ * @param ptr
  */
 void safe_free(void* ptr);
 
@@ -104,11 +107,14 @@ void bneg(const uint8_t* lhs, uint8_t* out);
 
 /**
  * @brief Read the slot using ocall.
- * 
- * @param slot 
- * @param fingerprint the fingerprint is the sha-256 hash of the path (floor(bid / p^level)) + level.
- * @return size_t 
+ *
+ * @param slot
+ * @param fingerprint the fingerprint is the sha-256 hash of the path (floor(bid
+ * / p^level)) + level.
+ * @return size_t
  */
 size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint);
+
+void check_sgx_status(const sgx_status_t& status, const std::string& location);
 
 #endif
