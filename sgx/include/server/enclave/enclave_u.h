@@ -37,7 +37,7 @@ void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_exception_handler, (const char* err_msg
 #endif
 #ifndef OCALL_READ_POSITION_DEFINED__
 #define OCALL_READ_POSITION_DEFINED__
-void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_read_position, (const char* position_finderprint, uint8_t* position, size_t position_size));
+size_t SGX_UBRIDGE(SGX_NOCONVENTION, ocall_read_position, (const char* position_finderprint, uint8_t* position, size_t position_size));
 #endif
 #ifndef OCALL_WRITE_POSITION_DEFINED__
 #define OCALL_WRITE_POSITION_DEFINED__

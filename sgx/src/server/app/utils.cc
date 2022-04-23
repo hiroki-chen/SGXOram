@@ -45,9 +45,24 @@ void ocall_exception_handler(const char* err_msg) {
   throw std::runtime_error(err_msg);
 }
 
-void ocall_read_position(const char* position_finderprint, uint8_t* position,
-                         size_t position_size) {
-  return;
+// FIXME: The position map is non-recursive, so it is not safe!
+// We need to store the position map in a recursive manner.
+// Use with care!!
+size_t ocall_read_position(const char* position_fingerprint, uint8_t* position,
+                           size_t position_size) {
+  const std::string position_str =
+      server_runner->get_position(position_fingerprint);
+  if (position_str.empty()) {
+    throw std::runtime_error("The position is not found.");
+  }
+  memcpy(position, position_str.c_str(), position_str.size());
+  return position_str.size();
+}
+
+void ocall_write_position(const char* position_fingerprint, uint8_t* position,
+                          size_t position_size) {
+  std::string position_str(reinterpret_cast<char*>(position), position_size);
+  server_runner->store_position(position_fingerprint, position_str);
 }
 
 void ocall_write_position(const char* position_finderprint,

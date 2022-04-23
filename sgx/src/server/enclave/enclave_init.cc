@@ -148,7 +148,7 @@ sgx_status_t key_derivation(const sgx_ec256_dh_shared_t* shared_key,
 // @return Any error returned from the trusted key exchange API
 //         for creating a key context.
 
-sgx_status_t enclave_init_ra(int b_pse, sgx_ra_context_t* p_context) {
+sgx_status_t SGXAPI enclave_init_ra(int b_pse, sgx_ra_context_t* p_context) {
   // isv enclave call to trusted key exchange library.
   sgx_status_t ret;
 #ifdef SUPPLIED_KEY_DERIVATION
@@ -342,12 +342,12 @@ uint32_t uniform_random(uint32_t lower, uint32_t upper) {
   return uniform_random_helper(lower, upper);
 }
 
-sgx_status_t ecall_init_crypto_manager() {
+sgx_status_t SGXAPI ecall_init_crypto_manager() {
   printf("[enclave] Initializing crypto manager\n");
   crypto_manager = new EnclaveCryptoManager();
 }
 
-sgx_status_t ecall_init_oram_controller(uint8_t* oram_config,
+sgx_status_t SGXAPI ecall_init_oram_controller(uint8_t* oram_config,
                                         size_t oram_config_size) {
   // Some toy functions.....
   // Test if bit operation works in parallel.
@@ -405,7 +405,7 @@ sgx_status_t ecall_init_oram_controller(uint8_t* oram_config,
  *
  * @return     Truthy if seal successful, falsy otherwise.
  */
-sgx_status_t ecall_seal(const uint8_t* plaintext, size_t plaintext_len,
+sgx_status_t SGXAPI ecall_seal(const uint8_t* plaintext, size_t plaintext_len,
                         sgx_sealed_data_t* sealed_data, size_t sealed_size) {
   sgx_status_t status = sgx_seal_data(0, NULL, plaintext_len, plaintext,
                                       sealed_size, sealed_data);
@@ -427,7 +427,7 @@ sgx_status_t ecall_seal(const uint8_t* plaintext, size_t plaintext_len,
  *
  * @return     Truthy if unseal successful, falsy otherwise.
  */
-sgx_status_t ecall_unseal(const sgx_sealed_data_t* sealed_data,
+sgx_status_t SGXAPI ecall_unseal(const sgx_sealed_data_t* sealed_data,
                           size_t sealed_size, uint8_t* plaintext,
                           size_t plaintext_len) {
   sgx_status_t status =
@@ -442,7 +442,7 @@ sgx_status_t ecall_unseal(const sgx_sealed_data_t* sealed_data,
  *
  * @return sgx_status_t
  */
-sgx_status_t ecall_begin_DHKE() {
+sgx_status_t SGXAPI ecall_begin_DHKE() {
   // Create a ecc system for this session.
   printf("[enclave] Creating a new ECC system...\n");
   sgx_status_t status =
@@ -457,7 +457,7 @@ sgx_status_t ecall_begin_DHKE() {
  * @param pubkey_size
  * @return sgx_status_t
  */
-sgx_status_t ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
+sgx_status_t SGXAPI ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
   // Sample the key pairs.
   sgx_status_t status = sgx_ecc256_create_key_pair(
       crypto_manager->get_secret_key(), crypto_manager->get_public_key(),
@@ -477,7 +477,7 @@ sgx_status_t ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
   return status;
 }
 
-sgx_status_t ecall_compute_shared_key(const uint8_t* pubkey,
+sgx_status_t SGXAPI ecall_compute_shared_key(const uint8_t* pubkey,
                                       size_t pubkey_size) {
   sgx_ec256_dh_shared_t shared_key;
   sgx_ec256_public_t client_public_key;
@@ -512,7 +512,7 @@ sgx_status_t ecall_compute_shared_key(const uint8_t* pubkey,
              .data());
 }
 
-sgx_status_t ecall_check_verification_message(uint8_t* message,
+sgx_status_t SGXAPI ecall_check_verification_message(uint8_t* message,
                                               size_t message_size) {
   const std::string decrypted_message =
       crypto_manager->enclave_aes_128_gcm_decrypt(

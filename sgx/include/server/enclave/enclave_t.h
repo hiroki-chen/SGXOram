@@ -40,7 +40,7 @@ sgx_status_t SGX_CDECL ocall_printf(const char* str);
 sgx_status_t SGX_CDECL ocall_read_slot(size_t* retval, const char* slot_finderprint, uint8_t* slot, size_t slot_size);
 sgx_status_t SGX_CDECL ocall_write_slot(const char* slot_finderprint, const uint8_t* slot, size_t slot_size);
 sgx_status_t SGX_CDECL ocall_exception_handler(const char* err_msg);
-sgx_status_t SGX_CDECL ocall_read_position(const char* position_finderprint, uint8_t* position, size_t position_size);
+sgx_status_t SGX_CDECL ocall_read_position(size_t* retval, const char* position_finderprint, uint8_t* position, size_t position_size);
 sgx_status_t SGX_CDECL ocall_write_position(const char* position_finderprint, const uint8_t* position, size_t position_size);
 sgx_status_t SGX_CDECL pthread_wait_timeout_ocall(int* retval, unsigned long long waiter, unsigned long long timeout);
 sgx_status_t SGX_CDECL pthread_create_ocall(int* retval, unsigned long long self);

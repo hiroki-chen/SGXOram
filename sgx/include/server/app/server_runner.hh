@@ -49,6 +49,9 @@ class SGXORAMService final : public oram::sgx_oram::Service {
   // fingerprint.
   std::unordered_map<std::string, std::string> storage;
 
+  // FIXME: A non-access-pattern-hiding position map.
+  std::unordered_map<std::string, std::string> position_map;
+
   sgx_status_t init_enclave(sgx_enclave_id_t* const global_eid);
 
   sgx_status_t status;
@@ -70,7 +73,7 @@ class SGXORAMService final : public oram::sgx_oram::Service {
 
   sgx_status_t message_handler_round_three(const std::string& message,
                                            oram::InitReply* reply);
-                                           
+
   bool check_verification_message(const std::string& message);
 
  public:
@@ -154,5 +157,13 @@ class Server final {
 
   bool is_in_storage(const char* const fingerprint) {
     return service->storage.count(fingerprint) > 0;
+  }
+
+  std::string get_position(const std::string& address) {
+    return service->position_map[address];
+  }
+
+  void store_position(const std::string& address, const std::string& position) {
+    service->position_map[address] = position;
   }
 };

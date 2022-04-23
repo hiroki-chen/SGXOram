@@ -140,6 +140,7 @@ typedef struct ms_ocall_exception_handler_t {
 } ms_ocall_exception_handler_t;
 
 typedef struct ms_ocall_read_position_t {
+	size_t ms_retval;
 	const char* ms_position_finderprint;
 	uint8_t* ms_position;
 	size_t ms_position_size;
@@ -230,7 +231,7 @@ static sgx_status_t SGX_CDECL enclave_ocall_exception_handler(void* pms)
 static sgx_status_t SGX_CDECL enclave_ocall_read_position(void* pms)
 {
 	ms_ocall_read_position_t* ms = SGX_CAST(ms_ocall_read_position_t*, pms);
-	ocall_read_position(ms->ms_position_finderprint, ms->ms_position, ms->ms_position_size);
+	ms->ms_retval = ocall_read_position(ms->ms_position_finderprint, ms->ms_position, ms->ms_position_size);
 
 	return SGX_SUCCESS;
 }

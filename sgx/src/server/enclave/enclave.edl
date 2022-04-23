@@ -124,7 +124,7 @@ enclave {
 
     // Read the position from the outside memory.
     // The position map may be constructed in a recursive way.
-    void ocall_read_position([ in, string ] const char *position_finderprint,
+    size_t ocall_read_position([ in, string ] const char *position_finderprint,
                              [ out, size = position_size ] uint8_t *position,
                              size_t position_size);
 

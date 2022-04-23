@@ -166,6 +166,7 @@ typedef struct ms_ocall_exception_handler_t {
 } ms_ocall_exception_handler_t;
 
 typedef struct ms_ocall_read_position_t {
+	size_t ms_retval;
 	const char* ms_position_finderprint;
 	uint8_t* ms_position;
 	size_t ms_position_size;
@@ -1414,7 +1415,7 @@ sgx_status_t SGX_CDECL ocall_exception_handler(const char* err_msg)
 	return status;
 }
 
-sgx_status_t SGX_CDECL ocall_read_position(const char* position_finderprint, uint8_t* position, size_t position_size)
+sgx_status_t SGX_CDECL ocall_read_position(size_t* retval, const char* position_finderprint, uint8_t* position, size_t position_size)
 {
 	sgx_status_t status = SGX_SUCCESS;
 	size_t _len_position_finderprint = position_finderprint ? strlen(position_finderprint) + 1 : 0;
@@ -1477,6 +1478,7 @@ sgx_status_t SGX_CDECL ocall_read_position(const char* position_finderprint, uin
 	status = sgx_ocall(4, ms);
 
 	if (status == SGX_SUCCESS) {
+		if (retval) *retval = ms->ms_retval;
 		if (position) {
 			if (memcpy_s((void*)position, _len_position, __tmp_position, _len_position)) {
 				sgx_ocfree();
