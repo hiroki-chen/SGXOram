@@ -14,8 +14,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <enclave/enclave_init.hh>
+
 #include <stdlib.h>
 #include <string.h>
+
 #include <stdexcept>
 #include <string>
 
@@ -25,7 +28,6 @@
 #include <sgx_tseal.h>
 
 #include <enclave/enclave_crypto_manager.hh>
-#include <enclave/enclave_init.hh>
 #include <enclave/enclave_oram.hh>
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_t.h>

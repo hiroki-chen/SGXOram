@@ -71,4 +71,4 @@ sgx_status_t key_derivation(const sgx_ec256_dh_shared_t* shared_key,
                             sgx_ec_key_128bit_t* mk_key,
                             sgx_ec_key_128bit_t* vk_key);
 
-#endif
+#endif // ENCLAVE_INIT_HH

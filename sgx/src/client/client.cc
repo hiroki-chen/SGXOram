@@ -14,6 +14,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <client/client.hh>
+
 #include <fstream>
 #include <sstream>
 
@@ -25,7 +27,6 @@
 
 #include <plog/Log.h>
 #include <configs.hh>
-#include <client/client.hh>
 #include <client/utils.hh>
 
 // Declare the external variables captured in the arguments.

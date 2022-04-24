@@ -49,6 +49,10 @@ int destroy_enclave(sgx_enclave_id_t* const id);
 
 std::string hex_to_string(const uint8_t* array, const size_t& len = 32);
 
+std::string compress_data(const std::string& data);
+
+std::string decompress_data(const std::string& data);
+
 // safe free.
 void safe_free(void* ptr);
 }  // namespace sgx_oram

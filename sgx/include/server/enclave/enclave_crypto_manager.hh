@@ -19,14 +19,12 @@
 
 #define DEFAULT_RANDOM_LENGTH 16
 
+#include <string>
+
 #include <sgx_tcrypto.h>
 #include <sgx_ecp_types.h>
 
-#include <string>
-
-namespace sgx_oram {
-typedef struct _oram_configuration_t oram_configuration_t;
-}
+#include <app/basic_models.hh>
 
 /**
  * @brief A class that manages all the interfaces and keys for cryptographic
@@ -113,4 +111,4 @@ class EnclaveCryptoManager final {
 static const std::string candidate =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-#endif
+#endif // ENCLAVE_CRYPTO_MANAGER_HH

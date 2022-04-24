@@ -79,7 +79,7 @@ App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpth
 									-L$(GRPC_PATH)/lib `pkg-config --libs protobuf grpc++`\
            				-lpthread\
            				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           				-ldl -lgflags -lsnappy
+           				-ldl -lgflags -llz4
 
 App_Cpp_Objects := $(patsubst $(SRC_PATH)/app/%.cc, $(BUILD_PATH)/app/%.o, $(App_Cpp_Files))
 App_Name := $(BUILD_PATH)/../bin/server.bin

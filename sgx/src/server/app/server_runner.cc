@@ -11,6 +11,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <server/app/server_runner.hh>
+
 #include <thread>
 #include <atomic>
 #include <fstream>
@@ -26,7 +28,6 @@
 #include <utils.hh>
 #include <service_provider/service_provider.h>
 #include <enclave/enclave_u.h>
-#include <server/app/server_runner.hh>
 #include <plog/Log.h>
 
 std::atomic_bool server_running;
@@ -486,9 +487,9 @@ grpc::Status SGXORAMService::init_oram(
 
   LOG(plog::debug) << "The server has properly configured the ORAM.";
 
-  status = ecall_init_oram_controller(
-      *global_eid, &status, (uint8_t*)&oram_config, sizeof(oram_config),
-      permutation, real_number);
+  status =
+      ecall_init_oram_controller(*global_eid, &status, (uint8_t*)&oram_config,
+                                 sizeof(oram_config), permutation, real_number);
   if (status != SGX_SUCCESS) {
     const std::string error_message = "Failed to initialize the ORAM!";
     LOG(plog::error) << error_message;
@@ -510,10 +511,8 @@ void Server::run(const std::string& address,
   // Create the directory for storing slots on the disk.
   const std::string data_dir = "./data";
   if (mkdir(data_dir.c_str(), 0777) == -1) {
-    if (errno != EEXIST) {
-      LOG(plog::error) << "Cannot create the directory for storing slots!";
-      exit(1);
-    }
+    LOG_IF(plog::error, errno != EEXIST)
+        << "Failed to create the directory for storing slots on the disk.";
   }
 
   service = std::make_unique<SGXORAMService>(global_eid);

@@ -14,9 +14,10 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <enclave/enclave_utils.hh>
+
 #include <sgx_urts.h>
 
-#include <enclave/enclave_utils.hh>
 #include <enclave/enclave_u.h>
 
 // Error code for SGX API calls

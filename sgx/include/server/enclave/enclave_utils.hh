@@ -22,6 +22,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <sgx_urts.h>
+
 #include <server/app/basic_models.hh>
 
 using sgx_error_list = std::unordered_map<sgx_status_t, std::string>;
@@ -117,4 +119,4 @@ size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint);
 
 void check_sgx_status(const sgx_status_t& status, const std::string& location);
 
-#endif
+#endif // ENCLAVE_UTILS_HH

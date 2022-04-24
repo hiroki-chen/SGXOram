@@ -14,13 +14,15 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <enclave/enclave_crypto_manager.hh>
+
 #include <string.h>
+
 #include <stdexcept>
 
 #include <sgx_tcrypto.h>
 #include <sgx_trts.h>
 
-#include <enclave/enclave_crypto_manager.hh>
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_t.h>
 

@@ -14,6 +14,9 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#ifndef SERVER_RUNNER_HH
+#define SERVER_RUNNER_HH
+
 #include <unordered_map>
 #include <string>
 
@@ -167,3 +170,5 @@ class Server final {
     service->position_map[address] = position;
   }
 };
+
+#endif  // SERVER_RUNNER_HH

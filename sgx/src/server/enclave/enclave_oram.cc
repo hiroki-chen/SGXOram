@@ -14,15 +14,17 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <enclave/enclave_oram.hh>
+
+#include <string.h>
+
 #include <algorithm>
 #include <cmath>
-#include <string.h>
 
 #include <sgx_urts.h>
 
 #include <enclave/enclave_t.h>
 #include <enclave/enclave_utils.hh>
-#include <enclave/enclave_oram.hh>
 #include <enclave/enclave_crypto_manager.hh>
 
 extern EnclaveCryptoManager* crypto_manager;
@@ -31,10 +33,10 @@ extern EnclaveCryptoManager* crypto_manager;
 // based on the value of block id which indicates the path from the root
 // to the current slot. To determine the offset, the total level and the
 // ways of the ORAM tree are needed.
-static uint32_t calculate_offset(uint32_t block_id, uint32_t level) {}
+static inline uint32_t calculate_offset(uint32_t block_id, uint32_t level) {}
 
 // This function assembles position for the current block.
-static std::string assemble_position_and_encrypt(
+static inline std::string assemble_position_and_encrypt(
     sgx_oram::oram_position_t* position, uint32_t level, uint32_t bid,
     uint32_t address) {
   position->level = level;

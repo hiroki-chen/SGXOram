@@ -11,29 +11,56 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <utils.hh>
+
 #include <algorithm>
 #include <iostream>
 #include <random>
 #include <memory>
 #include <fstream>
 
-#include <gzip/compress.hpp>
-#include <gzip/decompress.hpp>
+#include <lz4.h>
+
 #include <app/server_runner.hh>
 #include <plog/Log.h>
-
 #include <enclave/enclave_u.h>
-#include <utils.hh>
 #include <configs.hh>
 
 extern std::unique_ptr<Server> server_runner;
+
+std::string compress_data(const std::string& data) {
+  // Compress the source std::string with lz4 compression libarary.
+  // The compressed data will be stored in the destination std::string.
+  // The destination std::string will be resized to the correct size.
+  std::string compressed_data;
+  const size_t max_allowed_size = LZ4_compressBound(data.size());
+  compressed_data.resize(max_allowed_size);
+  const size_t compressed_size =
+      LZ4_compress_default(data.c_str(), compressed_data.data(), data.size(),
+                           compressed_data.size());
+  compressed_data.resize(compressed_size);
+  return compressed_data;
+}
+
+std::string decompress_data(const std::string& data) {
+  // Decompress the source std::string with lz4 compression libarary.
+  std::string decompressed_data;
+  const size_t max_allowed_size = data.size() * 2;
+  decompressed_data.resize(max_allowed_size);
+  const size_t decompressed_size =
+      LZ4_decompress_safe(data.c_str(), decompressed_data.data(), data.size(),
+                          decompressed_data.size());
+  decompressed_data.resize(decompressed_size);
+  return decompressed_data;
+}
 
 void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
                       size_t data_len) {
   LOG(plog::debug) << "The fingerprint for the slot is: " << slot_finger_print;
 
-  const char* data_ptr = reinterpret_cast<const char*>(data);
-  std::string compressed_data = gzip::compress(data_ptr, data_len);
+  // Compress the data and then store it to the server.
+  std::string compressed_data =
+      compress_data(std::string((char*)data, data_len));
   server_runner->store_compressed_slot(slot_finger_print, compressed_data);
 }
 
@@ -80,11 +107,7 @@ size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
   if (is_in_memory) {
     std::string compressed_data =
         server_runner->get_compressed_slot(slot_finger_print);
-    const char* data_ptr =
-        reinterpret_cast<const char*>(compressed_data.data());
-    std::string decompressed_data =
-        gzip::decompress(data_ptr, compressed_data.size());
-
+    std::string decompressed_data = decompress_data(compressed_data);
     const size_t decompressed_size = decompressed_data.size();
     memcpy(data, decompressed_data.data(), decompressed_size);
     return decompressed_size;

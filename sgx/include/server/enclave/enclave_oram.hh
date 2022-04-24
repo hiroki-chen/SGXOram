@@ -22,4 +22,4 @@
 
 sgx_status_t init_oram(uint32_t* permutation, size_t permutation_size);
 
-#endif
+#endif  // ENCLAVE_ORAM_HH

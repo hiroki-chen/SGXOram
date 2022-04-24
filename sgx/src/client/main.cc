@@ -14,13 +14,14 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <client.hh>
 #include <plog/Log.h>
 #include <plog/Appenders/ColorConsoleAppender.h>
 #include <plog/Formatters/TxtFormatter.h>
 #include <plog/Initializers/RollingFileInitializer.h>
 
 #include <gflags/gflags.h>
+
+#include <client.hh>
 
 // Flags for the network communication.
 DEFINE_string(address, "localhost", "The server's IP address");
