@@ -3,13 +3,16 @@
 
 typedef struct ms_ecall_init_oram_controller_t {
 	sgx_status_t ms_retval;
-	uint8_t* ms_oram_config;
-	size_t ms_oram_config_size;
+	uint8_t* ms_config;
+	size_t ms_config_size;
+	uint32_t* ms_permutation;
+	size_t ms_permutation_size;
 } ms_ecall_init_oram_controller_t;
 
 typedef struct ms_ecall_access_data_t {
 	sgx_status_t ms_retval;
 	int ms_op_type;
+	uint32_t ms_block_address;
 	uint8_t* ms_data;
 	size_t ms_data_len;
 } ms_ecall_access_data_t;
@@ -330,22 +333,25 @@ static const struct {
 		(void*)enclave_sgx_thread_set_multiple_untrusted_events_ocall,
 	}
 };
-sgx_status_t ecall_init_oram_controller(sgx_enclave_id_t eid, sgx_status_t* retval, uint8_t* oram_config, size_t oram_config_size)
+sgx_status_t ecall_init_oram_controller(sgx_enclave_id_t eid, sgx_status_t* retval, uint8_t* config, size_t config_size, uint32_t* permutation, size_t permutation_size)
 {
 	sgx_status_t status;
 	ms_ecall_init_oram_controller_t ms;
-	ms.ms_oram_config = oram_config;
-	ms.ms_oram_config_size = oram_config_size;
+	ms.ms_config = config;
+	ms.ms_config_size = config_size;
+	ms.ms_permutation = permutation;
+	ms.ms_permutation_size = permutation_size;
 	status = sgx_ecall(eid, 0, &ocall_table_enclave, &ms);
 	if (status == SGX_SUCCESS && retval) *retval = ms.ms_retval;
 	return status;
 }
 
-sgx_status_t ecall_access_data(sgx_enclave_id_t eid, sgx_status_t* retval, int op_type, uint8_t* data, size_t data_len)
+sgx_status_t ecall_access_data(sgx_enclave_id_t eid, sgx_status_t* retval, int op_type, uint32_t block_address, uint8_t* data, size_t data_len)
 {
 	sgx_status_t status;
 	ms_ecall_access_data_t ms;
 	ms.ms_op_type = op_type;
+	ms.ms_block_address = block_address;
 	ms.ms_data = data;
 	ms.ms_data_len = data_len;
 	status = sgx_ecall(eid, 1, &ocall_table_enclave, &ms);

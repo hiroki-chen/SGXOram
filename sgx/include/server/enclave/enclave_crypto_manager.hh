@@ -24,6 +24,10 @@
 
 #include <string>
 
+namespace sgx_oram {
+typedef struct _oram_configuration_t oram_configuration_t;
+}
+
 /**
  * @brief A class that manages all the interfaces and keys for cryptographic
  *        ends. E.g., sha-256, aes-256, etc.
@@ -47,6 +51,9 @@ class EnclaveCryptoManager final {
 
   uint8_t random_number[DEFAULT_RANDOM_LENGTH];
 
+  // The configuration of the ORAM.
+  sgx_oram::oram_configuration_t* oram_config;
+
  public:
   /**
    * @brief Construct a new Enclave Crypto Manager object
@@ -60,12 +67,22 @@ class EnclaveCryptoManager final {
 
   sgx_ec256_public_t* get_public_key(void) { return &public_key; }
 
+  sgx_oram::oram_configuration_t* get_oram_config(void) { return oram_config; }
+
   /**
    * @brief Set the shared key object
    *
    * @param shared_key
    */
   void set_shared_key(const sgx_ec_key_128bit_t* shared_key);
+
+  /**
+   * @brief Set the oram config object
+   * 
+   * @param config 
+   * @param config_size 
+   */
+  void set_oram_config(uint8_t* config, size_t config_size);
 
   /**
    * @brief Secure Hash Algorithm with 256 bit-length.

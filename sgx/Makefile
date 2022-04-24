@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-.PHONY: clean all check_sgx
+.PHONY: clean all check_sgx protobuf
 
 PROTO_PATH := $(CURDIR)/protos
 PROTO_SRC := $(wildcard $(PROTO_PATH)/messages.proto)
@@ -35,6 +35,9 @@ endif
 all: mkdir $(SRC_FILE) server client
 	@printf "\033[1;93;49mCreated server and client.\033[0m\n"
 
+protobuf: $(SRC_FILE)
+	
+
 mkdir:
 ifeq ("$(wildcard $(BUILD_PATH))", "")
 	@mkdir -p $(BUILD_PATH)/bin
@@ -46,6 +49,7 @@ $(SRC_FILE): $(PROTO_SRC)
 	@$(PROTOC) --cpp_out=$(PROTO_PATH) -I $(PROTO_PATH) $(PROTO_SRC)
 	@$(PROTOC) --grpc_out=$(PROTO_PATH) --plugin=protoc-gen-grpc=$(shell which grpc_cpp_plugin) -I $(PROTO_PATH) $(PROTO_SRC)
 	@mv $(CURDIR)/protos/*.h $(INCLUDE_PATH)
+	@printf "\033[1;93;49mGenerated protobuf files.\033[0m\n"
 
 $(BUILD_PATH)/%.pb.o: $(PROTO_PATH)/%.pb.cc
 	@$(CXX) -o $@ -c $< $(CXX_FLAGS)

@@ -16,4 +16,3 @@
 LIB_PATH=$(pwd)/lib
 # Add custom library path to the load path.
 export LD_LIBRARY_PATH="${LIB_PATH}:$LD_LIBRARY_PATH"
-export SGX_SDK=/usr/local/sgxsdk

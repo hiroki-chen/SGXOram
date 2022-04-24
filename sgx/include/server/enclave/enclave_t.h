@@ -18,8 +18,8 @@
 extern "C" {
 #endif
 
-sgx_status_t ecall_init_oram_controller(uint8_t* oram_config, size_t oram_config_size);
-sgx_status_t ecall_access_data(int op_type, uint8_t* data, size_t data_len);
+sgx_status_t ecall_init_oram_controller(uint8_t* config, size_t config_size, uint32_t* permutation, size_t permutation_size);
+sgx_status_t ecall_access_data(int op_type, uint32_t block_address, uint8_t* data, size_t data_len);
 sgx_status_t ecall_check_verification_message(uint8_t* message, size_t message_size);
 sgx_status_t ecall_seal(const uint8_t* plaintext, size_t plaintext_len, sgx_sealed_data_t* sealed_data, size_t sealed_size);
 sgx_status_t ecall_unseal(const sgx_sealed_data_t* sealed_data, size_t sealed_size, uint8_t* plaintext, size_t plaintext_len);

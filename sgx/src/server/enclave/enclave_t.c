@@ -29,13 +29,16 @@
 
 typedef struct ms_ecall_init_oram_controller_t {
 	sgx_status_t ms_retval;
-	uint8_t* ms_oram_config;
-	size_t ms_oram_config_size;
+	uint8_t* ms_config;
+	size_t ms_config_size;
+	uint32_t* ms_permutation;
+	size_t ms_permutation_size;
 } ms_ecall_init_oram_controller_t;
 
 typedef struct ms_ecall_access_data_t {
 	sgx_status_t ms_retval;
 	int ms_op_type;
+	uint32_t ms_block_address;
 	uint8_t* ms_data;
 	size_t ms_data_len;
 } ms_ecall_access_data_t;
@@ -231,41 +234,65 @@ static sgx_status_t SGX_CDECL sgx_ecall_init_oram_controller(void* pms)
 	sgx_lfence();
 	ms_ecall_init_oram_controller_t* ms = SGX_CAST(ms_ecall_init_oram_controller_t*, pms);
 	sgx_status_t status = SGX_SUCCESS;
-	uint8_t* _tmp_oram_config = ms->ms_oram_config;
-	size_t _tmp_oram_config_size = ms->ms_oram_config_size;
-	size_t _len_oram_config = _tmp_oram_config_size;
-	uint8_t* _in_oram_config = NULL;
+	uint8_t* _tmp_config = ms->ms_config;
+	size_t _tmp_config_size = ms->ms_config_size;
+	size_t _len_config = _tmp_config_size;
+	uint8_t* _in_config = NULL;
+	uint32_t* _tmp_permutation = ms->ms_permutation;
+	size_t _tmp_permutation_size = ms->ms_permutation_size;
+	size_t _len_permutation = _tmp_permutation_size;
+	uint32_t* _in_permutation = NULL;
 
-	CHECK_UNIQUE_POINTER(_tmp_oram_config, _len_oram_config);
+	CHECK_UNIQUE_POINTER(_tmp_config, _len_config);
+	CHECK_UNIQUE_POINTER(_tmp_permutation, _len_permutation);
 
 	//
 	// fence after pointer checks
 	//
 	sgx_lfence();
 
-	if (_tmp_oram_config != NULL && _len_oram_config != 0) {
-		if ( _len_oram_config % sizeof(*_tmp_oram_config) != 0)
+	if (_tmp_config != NULL && _len_config != 0) {
+		if ( _len_config % sizeof(*_tmp_config) != 0)
 		{
 			status = SGX_ERROR_INVALID_PARAMETER;
 			goto err;
 		}
-		_in_oram_config = (uint8_t*)malloc(_len_oram_config);
-		if (_in_oram_config == NULL) {
+		_in_config = (uint8_t*)malloc(_len_config);
+		if (_in_config == NULL) {
 			status = SGX_ERROR_OUT_OF_MEMORY;
 			goto err;
 		}
 
-		if (memcpy_s(_in_oram_config, _len_oram_config, _tmp_oram_config, _len_oram_config)) {
+		if (memcpy_s(_in_config, _len_config, _tmp_config, _len_config)) {
+			status = SGX_ERROR_UNEXPECTED;
+			goto err;
+		}
+
+	}
+	if (_tmp_permutation != NULL && _len_permutation != 0) {
+		if ( _len_permutation % sizeof(*_tmp_permutation) != 0)
+		{
+			status = SGX_ERROR_INVALID_PARAMETER;
+			goto err;
+		}
+		_in_permutation = (uint32_t*)malloc(_len_permutation);
+		if (_in_permutation == NULL) {
+			status = SGX_ERROR_OUT_OF_MEMORY;
+			goto err;
+		}
+
+		if (memcpy_s(_in_permutation, _len_permutation, _tmp_permutation, _len_permutation)) {
 			status = SGX_ERROR_UNEXPECTED;
 			goto err;
 		}
 
 	}
 
-	ms->ms_retval = ecall_init_oram_controller(_in_oram_config, _tmp_oram_config_size);
+	ms->ms_retval = ecall_init_oram_controller(_in_config, _tmp_config_size, _in_permutation, _tmp_permutation_size);
 
 err:
-	if (_in_oram_config) free(_in_oram_config);
+	if (_in_config) free(_in_config);
+	if (_in_permutation) free(_in_permutation);
 	return status;
 }
 
@@ -309,7 +336,7 @@ static sgx_status_t SGX_CDECL sgx_ecall_access_data(void* pms)
 
 	}
 
-	ms->ms_retval = ecall_access_data(ms->ms_op_type, _in_data, _tmp_data_len);
+	ms->ms_retval = ecall_access_data(ms->ms_op_type, ms->ms_block_address, _in_data, _tmp_data_len);
 	if (_in_data) {
 		if (memcpy_s(_tmp_data, _len_data, _in_data, _len_data)) {
 			status = SGX_ERROR_UNEXPECTED;

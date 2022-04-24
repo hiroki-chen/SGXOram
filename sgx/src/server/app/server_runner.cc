@@ -451,7 +451,11 @@ grpc::Status SGXORAMService::init_oram(
   // The configuration of the ORAM is set by the network communication between
   // the client and the server.
   oram_config.way = oram_init_request->way();
-  oram_config.number = oram_init_request->number();
+  // Note that the total number of the block is two times of the real number of
+  // block because each bucket of the ORAM contains real / fake blocks of the
+  // same size.
+  const uint32_t real_number = oram_init_request->number();
+  oram_config.number = real_number << 1;
   oram_config.constant = oram_init_request->constant();
   oram_config.round = oram_init_request->round();
   oram_config.type = oram_init_request->type();
@@ -459,6 +463,11 @@ grpc::Status SGXORAMService::init_oram(
   oram_config.oram_type = oram_init_request->oram_type();
 
   const std::string verification_message = oram_init_request->verification();
+  uint32_t* permutation = new uint32_t[real_number];
+
+  for (size_t i = 0; i < real_number; i++) {
+    permutation[i] = oram_init_request->permutation(i);
+  }
 
   if (!check_verification_message(verification_message)) {
     const std::string error_message = "Failed to verify the message!";
@@ -470,14 +479,16 @@ grpc::Status SGXORAMService::init_oram(
   // Calculate the level of the ORAM tree.
   oram_config.level =
       std::ceil(std::log(oram_config.number / oram_config.bucket_size) /
-                std::log(oram_config.way));
+                std::log(oram_config.way)) +
+      1;
   // Print the configuration.
   print_oram_config(oram_config);
 
   LOG(plog::debug) << "The server has properly configured the ORAM.";
 
   status = ecall_init_oram_controller(
-      *global_eid, &status, (uint8_t*)&oram_config, sizeof(oram_config));
+      *global_eid, &status, (uint8_t*)&oram_config, sizeof(oram_config),
+      permutation, real_number);
   if (status != SGX_SUCCESS) {
     const std::string error_message = "Failed to initialize the ORAM!";
     LOG(plog::error) << error_message;

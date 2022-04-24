@@ -63,6 +63,8 @@ message OramInitRequest {
   // otherwise it should initialize the TPORAM.
   optional uint32 oram_type = 7;
   optional bytes verification = 8;
+  // The initial permutation vector.
+  repeated uint32 permutation = 9;
 }
 
 message ReadRequest {

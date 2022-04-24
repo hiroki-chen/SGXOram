@@ -347,45 +347,6 @@ sgx_status_t SGXAPI ecall_init_crypto_manager() {
   crypto_manager = new EnclaveCryptoManager();
 }
 
-sgx_status_t SGXAPI ecall_init_oram_controller(uint8_t* oram_config,
-                                        size_t oram_config_size) {
-  // Some toy functions.....
-  // Test if bit operation works in parallel.
-  std::string lhs = "0123456789abcdef1234567890abcdef";
-  std::string rhs = "0123456789abcdef1234567890abcdef";
-  uint8_t out[32] = {0};
-  band((uint8_t*)(lhs.data()), (uint8_t*)(rhs.data()), out);
-
-  sprintf(std::string(reinterpret_cast<char*>(out), 32), false);
-
-  // Test compression.
-  sgx_oram::oram_slot_t* slot =
-      (sgx_oram::oram_slot_t*)malloc(sizeof(sgx_oram::oram_slot_t));
-  slot->header.dummy_number = 123;
-  const std::string slot_hash = crypto_manager->enclave_sha_256("123");
-  ocall_write_slot(slot_hash.data(), (uint8_t*)(slot),
-                   sizeof(sgx_oram::oram_slot_t));
-  // Test decompression.
-  uint8_t buf[sizeof(sgx_oram::oram_slot_t)] = {0};
-  size_t size;
-  // The size should be pre-defined.
-  ocall_read_slot(&size, slot_hash.data(), buf, sizeof(sgx_oram::oram_slot_t));
-  printf("[enclave] The dummy number is: %d\n",
-         ((sgx_oram::oram_slot_t*)buf)->header.dummy_number);
-  // printf("%s", crypto_manager->enclave_sha256("Hello World!").data());
-  const std::string cipher = crypto_manager->enclave_aes_128_gcm_encrypt(
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eget ");
-  sprintf(cipher, true);
-  sprintf(crypto_manager->enclave_aes_128_gcm_decrypt(cipher));
-
-  // Test read_slot?
-
-  // Begin initialize the slot...
-  printf("[enclave] Initializing the slot...");
-  printf("[enclave] oram_type is %d\n", *((uint32_t*)(oram_config) + 7));
-  return init_oram((sgx_oram::oram_configuration_t*)oram_config);
-}
-
 /**
  * @brief      Seals the plaintext given into the sgx_sealed_data_t structure
  *             given.
@@ -406,7 +367,8 @@ sgx_status_t SGXAPI ecall_init_oram_controller(uint8_t* oram_config,
  * @return     Truthy if seal successful, falsy otherwise.
  */
 sgx_status_t SGXAPI ecall_seal(const uint8_t* plaintext, size_t plaintext_len,
-                        sgx_sealed_data_t* sealed_data, size_t sealed_size) {
+                               sgx_sealed_data_t* sealed_data,
+                               size_t sealed_size) {
   sgx_status_t status = sgx_seal_data(0, NULL, plaintext_len, plaintext,
                                       sealed_size, sealed_data);
   return status;
@@ -428,8 +390,8 @@ sgx_status_t SGXAPI ecall_seal(const uint8_t* plaintext, size_t plaintext_len,
  * @return     Truthy if unseal successful, falsy otherwise.
  */
 sgx_status_t SGXAPI ecall_unseal(const sgx_sealed_data_t* sealed_data,
-                          size_t sealed_size, uint8_t* plaintext,
-                          size_t plaintext_len) {
+                                 size_t sealed_size, uint8_t* plaintext,
+                                 size_t plaintext_len) {
   sgx_status_t status =
       sgx_unseal_data(sealed_data, NULL, NULL, (uint8_t*)plaintext,
                       (uint32_t*)&(plaintext_len));
@@ -478,7 +440,7 @@ sgx_status_t SGXAPI ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
 }
 
 sgx_status_t SGXAPI ecall_compute_shared_key(const uint8_t* pubkey,
-                                      size_t pubkey_size) {
+                                             size_t pubkey_size) {
   sgx_ec256_dh_shared_t shared_key;
   sgx_ec256_public_t client_public_key;
   memcpy(&client_public_key, pubkey, sizeof(sgx_ec256_public_t));
@@ -513,14 +475,14 @@ sgx_status_t SGXAPI ecall_compute_shared_key(const uint8_t* pubkey,
 }
 
 sgx_status_t SGXAPI ecall_check_verification_message(uint8_t* message,
-                                              size_t message_size) {
+                                                     size_t message_size) {
   const std::string decrypted_message =
       crypto_manager->enclave_aes_128_gcm_decrypt(
           std::string((char*)message, message_size));
 
   printf("[enclave] Decrypted message: %s", decrypted_message.data());
 
-  if (decrypted_message.compare("Hello!") != 0) {
+  if (decrypted_message.compare("Hello") != 0) {
     printf("[enclave] The verification message is not correct!");
     return SGX_ERROR_UNEXPECTED;
   } else {

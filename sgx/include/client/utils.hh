@@ -28,4 +28,6 @@ void convert_endian(uint8_t* array, const size_t& len = 32);
 // safe free.
 void safe_free(void* ptr);
 
+void fisher_yates_shuffle(uint32_t* array, const size_t& len);
+
 #endif

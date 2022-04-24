@@ -14,6 +14,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <random>
+
 #include <utils.hh>
 
 std::string hex_to_string(const uint8_t* array, const size_t& len) {
@@ -42,5 +44,19 @@ void convert_endian(uint8_t* array, const size_t& len) {
 void safe_free(void* ptr) {
   if (ptr != nullptr) {
     free(ptr);
+  }
+}
+
+void fisher_yates_shuffle(uint32_t* array, const size_t& len) {
+  // Initialize the random number generator.
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  // Intialize the uniform distribution.
+  std::uniform_int_distribution<> dis(0, len - 1);
+  for (size_t i = len - 1; i > 0; i--) {
+    size_t j = dis(gen);
+    uint32_t tmp = array[i];
+    array[i] = array[j];
+    array[j] = tmp;
   }
 }

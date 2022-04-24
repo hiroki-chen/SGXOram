@@ -86,10 +86,13 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
 
   check_sgx_status(status, "enclave_aes_128_gcm_encrypt()");
 
+  // Cast back to the std::string.
+  const std::string cipher_str = std::string((char*)(ciphertext), cipher_len);
+  safe_free(ciphertext);
   // We could extract the meaningful fields out of the ciphertext buffer and
   // then reconstruct a string from them. The buffer's layout is:
   //   <GCM_TAG> || <NONCE> || <CIPHERTEXT>
-  return std::string((char*)(ciphertext), cipher_len);
+  return cipher_str;
 }
 
 std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
@@ -116,7 +119,11 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
   // is corrupted, and the client should end the connection.
   check_sgx_status(ret, "enclave_aes_128_gcm_decrypt()");
 
-  return std::string((char*)plaintext, message_len);
+  // Cast back to the std::string.
+  const std::string plaintext_str = std::string((char*)(plaintext), message_len);
+  safe_free(plaintext);
+
+  return plaintext_str;
 }
 
 void EnclaveCryptoManager::set_shared_key(
@@ -126,4 +133,12 @@ void EnclaveCryptoManager::set_shared_key(
   memcpy(&shared_secret_key, shared_key, sizeof(sgx_ec_key_128bit_t));
   // Only if the shared key is set, we can set the flag to true.
   is_initialized = true;
+}
+
+void EnclaveCryptoManager::set_oram_config(uint8_t* buffer, size_t size) {
+  printf("[enclave] Setting oram config...");
+  // Copy the oram config into the enclave.
+  oram_config = (sgx_oram::oram_configuration_t*)malloc(size);
+  memset(oram_config, 0, size);
+  memcpy(oram_config, buffer, size);
 }

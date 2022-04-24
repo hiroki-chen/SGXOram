@@ -107,6 +107,17 @@ int Client::init_oram(void) {
   request.set_round(FLAGS_round);
   request.set_oram_type(FLAGS_oram_type);
   request.set_verification(encrypted_verification_message);
+
+  // Set the permutation of the ORAM in the request.
+  uint32_t* permutation = new uint32_t[FLAGS_number];
+  for (int i = 0; i < FLAGS_number; i++) {
+    permutation[i] = i;
+  }
+  // Shuffle it.
+  fisher_yates_shuffle(permutation, FLAGS_number);
+  for (int i = 0; i < FLAGS_number; i++) {
+    request.add_permutation(permutation[i]);
+  }
   
   // Prin the encrypted verification message.
   LOG(plog::info) << "The encrypted verification message is: "

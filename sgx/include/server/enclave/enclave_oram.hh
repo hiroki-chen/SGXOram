@@ -20,10 +20,6 @@
 
 #include <sgx_urts.h>
 
-namespace sgx_oram {
-  typedef struct _oram_configuration_t oram_configuration_t;
-}
-
-sgx_status_t init_oram(sgx_oram::oram_configuration_t* oram_config);
+sgx_status_t init_oram(uint32_t* permutation, size_t permutation_size);
 
 #endif

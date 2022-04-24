@@ -565,6 +565,7 @@ class OramInitRequest final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kPermutationFieldNumber = 9,
     kVerificationFieldNumber = 8,
     kWayFieldNumber = 1,
     kNumberFieldNumber = 2,
@@ -574,6 +575,28 @@ class OramInitRequest final :
     kRoundFieldNumber = 6,
     kOramTypeFieldNumber = 7,
   };
+  // repeated uint32 permutation = 9;
+  int permutation_size() const;
+  private:
+  int _internal_permutation_size() const;
+  public:
+  void clear_permutation();
+  private:
+  uint32_t _internal_permutation(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      _internal_permutation() const;
+  void _internal_add_permutation(uint32_t value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      _internal_mutable_permutation();
+  public:
+  uint32_t permutation(int index) const;
+  void set_permutation(int index, uint32_t value);
+  void add_permutation(uint32_t value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+      permutation() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+      mutable_permutation();
+
   // optional bytes verification = 8;
   bool has_verification() const;
   private:
@@ -668,6 +691,8 @@ class OramInitRequest final :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t > permutation_;
+  mutable std::atomic<int> _permutation_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr verification_;
   uint32_t way_;
   uint32_t number_;
@@ -3481,6 +3506,53 @@ inline void OramInitRequest::set_allocated_verification(std::string* verificatio
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:oram.OramInitRequest.verification)
+}
+
+// repeated uint32 permutation = 9;
+inline int OramInitRequest::_internal_permutation_size() const {
+  return permutation_.size();
+}
+inline int OramInitRequest::permutation_size() const {
+  return _internal_permutation_size();
+}
+inline void OramInitRequest::clear_permutation() {
+  permutation_.Clear();
+}
+inline uint32_t OramInitRequest::_internal_permutation(int index) const {
+  return permutation_.Get(index);
+}
+inline uint32_t OramInitRequest::permutation(int index) const {
+  // @@protoc_insertion_point(field_get:oram.OramInitRequest.permutation)
+  return _internal_permutation(index);
+}
+inline void OramInitRequest::set_permutation(int index, uint32_t value) {
+  permutation_.Set(index, value);
+  // @@protoc_insertion_point(field_set:oram.OramInitRequest.permutation)
+}
+inline void OramInitRequest::_internal_add_permutation(uint32_t value) {
+  permutation_.Add(value);
+}
+inline void OramInitRequest::add_permutation(uint32_t value) {
+  _internal_add_permutation(value);
+  // @@protoc_insertion_point(field_add:oram.OramInitRequest.permutation)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+OramInitRequest::_internal_permutation() const {
+  return permutation_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >&
+OramInitRequest::permutation() const {
+  // @@protoc_insertion_point(field_list:oram.OramInitRequest.permutation)
+  return _internal_permutation();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+OramInitRequest::_internal_mutable_permutation() {
+  return &permutation_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< uint32_t >*
+OramInitRequest::mutable_permutation() {
+  // @@protoc_insertion_point(field_mutable_list:oram.OramInitRequest.permutation)
+  return _internal_mutable_permutation();
 }
 
 // -------------------------------------------------------------------
