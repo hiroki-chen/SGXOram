@@ -50,34 +50,34 @@ void safe_free(void* ptr) {
 }
 
 std::string hex_to_string(const uint8_t* array, const size_t& len) {
-  std::string ans;
-
+  // Convert the array of bytes into a hex string.
+  // The delimiter is the space character; also, we insert a linebreak every 20
+  // bytes. Do not use std::stringstream.
+  std::string ans = "\n0000: ";
   for (size_t i = 0; i < len; i++) {
-    // To hex.
-    uint8_t num = array[i];
-    ans += digits[num & 0xf];
-    ans += digits[num >> 4];
-  }
+    // Convert every byte into a hex string.
+    ans += digits[array[i] & 0xf];
+    ans += digits[array[i] >> 4];
 
+    if (i % 20 == 19) {
+      ans += '\n';
+      ans.append("00" + std::to_string(i + 1) + ": ");
+    } else {
+      ans += ' ';
+    }
+  }
+  ans += '\n';
   return ans;
 }
 
 void string_to_hex(const std::string& in, uint8_t* out) {
   // The output length is specified by in.size().
-  uint32_t j = 0;
-  for (uint32_t i = 0; i < in.size(); i += 2) {
-    if (std::isalpha(in[i])) {
-      out[j] = (10 + in[i] - 'a') << 4;
-    } else {
-      out[j] = (in[i] - '0') << 4;
-    }
-
-    if (std::isalpha(in[i + 1])) {
-      out[j] += (10 + in[i + 1] - 'a');
-    } else {
-      out[j] += (in[i + 1] - '0');
-    }
-    j++;
+  for (size_t i = 0; i < in.size(); i += 2) {
+    // To binary.
+    uint8_t num = 0;
+    num += digits.find(in[i]);
+    num += digits.find(in[i + 1]) << 4;
+    out[i / 2] = num;
   }
 }
 

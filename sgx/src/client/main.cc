@@ -14,14 +14,13 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <plog/Log.h>
-#include <plog/Appenders/ColorConsoleAppender.h>
-#include <plog/Formatters/TxtFormatter.h>
-#include <plog/Initializers/RollingFileInitializer.h>
-
 #include <gflags/gflags.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 
-#include <client.hh>
+#include <client/client.hh>
+#include <client/utils.hh>
+#include <configs.hh>
 
 // Flags for the network communication.
 DEFINE_string(address, "localhost", "The server's IP address");
@@ -36,10 +35,9 @@ DEFINE_double(constant, 1.0, "A special constant for the ORAM tree");
 DEFINE_uint32(round, 1, "The number of rounds of the ORAM access");
 DEFINE_uint32(oram_type, 1, "The type of the ORAM used by the client.");
 
-static plog::RollingFileAppender<plog::TxtFormatter> file_appender(
-    "./log/oram.log");  // Create the 1st appender.
-static plog::ColorConsoleAppender<plog::TxtFormatter>
-    consoler_appender;  // Create the 2nd appender.
+std::shared_ptr<spdlog::logger> logger = spdlog::rotating_logger_mt(
+    client_name, client_log_dir + "/" + client_name + "_" + get_log_file_name(),
+    client_log_size, client_log_num);
 
 int main(int argc, char** argv) {
   // Parse the command line arguments.
@@ -48,8 +46,10 @@ int main(int argc, char** argv) {
   gflags::SetVersionString("0.0.1");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-  // Create a logger.
-  plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
+  // Initialize the logger.
+  spdlog::set_default_logger(logger);
+  spdlog::set_level(spdlog::level::debug);
+  spdlog::set_pattern(log_pattern);
 
   try {
     std::unique_ptr<Client> client =
@@ -60,7 +60,7 @@ int main(int argc, char** argv) {
     // Put all the needed operations below.
     client->close_connection();
   } catch (const std::exception& e) {
-    LOG(plog::fatal) << e.what();
+    (e.what());
   }
 
   gflags::ShutDownCommandLineFlags();

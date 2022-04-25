@@ -16,8 +16,6 @@
 
 #include <sgx_urts.h>
 
-#include <plog/Record.h>
-
 #include <string>
 #include <vector>
 
@@ -52,6 +50,8 @@ std::string hex_to_string(const uint8_t* array, const size_t& len = 32);
 std::string compress_data(const std::string& data);
 
 std::string decompress_data(const std::string& data);
+
+std::string get_log_file_name(void);
 
 // safe free.
 void safe_free(void* ptr);

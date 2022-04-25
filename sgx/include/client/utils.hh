@@ -30,4 +30,6 @@ void safe_free(void* ptr);
 
 void fisher_yates_shuffle(uint32_t* array, const size_t& len);
 
+std::string get_log_file_name(void);
+
 #endif

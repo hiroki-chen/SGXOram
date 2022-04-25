@@ -19,6 +19,8 @@
 #include <sstream>
 #include <cmath>
 
+#include <spdlog/spdlog.h>
+#include <spdlog/fmt/bin_to_hex.h>
 #include <sgx_uae_launch.h>
 #include <sgx_uae_epid.h>
 #include <sgx_uae_quote_ex.h>
@@ -28,7 +30,6 @@
 #include <utils.hh>
 #include <service_provider/service_provider.h>
 #include <enclave/enclave_u.h>
-#include <plog/Log.h>
 
 std::atomic_bool server_running;
 
@@ -45,15 +46,15 @@ static std::string read_keycert(const std::string& path) {
 }
 
 static void print_oram_config(const OramConfiguration& oram_config) {
-  LOG(plog::info) << "ORAM Configuration:";
-  LOG(plog::info) << "  way: " << oram_config.way;
-  LOG(plog::info) << "  number: " << oram_config.number;
-  LOG(plog::info) << "  bucket_size: " << oram_config.bucket_size;
-  LOG(plog::info) << "  type: " << oram_config.type;
-  LOG(plog::info) << "  constant: " << oram_config.constant;
-  LOG(plog::info) << "  round: " << oram_config.round;
-  LOG(plog::info) << "  level: " << oram_config.level;
-  LOG(plog::info) << "  oram_type: " << oram_config.oram_type;
+  logger->info("ORAM Configuration:");
+  logger->info("  way: {}", oram_config.way);
+  logger->info("  number: {}", oram_config.number);
+  logger->info("  bucket_size: ", oram_config.bucket_size);
+  logger->info("  type: {}", oram_config.type);
+  logger->info("  constant: {}", oram_config.constant);
+  logger->info("  round: {}", oram_config.round);
+  logger->info("  level: {}", oram_config.level);
+  logger->info("  oram_type: {}", oram_config.oram_type);
 }
 
 // This function is dedicated to the assembly of message 2!!!
@@ -177,8 +178,7 @@ grpc::Status SGXORAMService::init_enclave(grpc::ServerContext* server_context,
   // First check if the round number is zero.
   const uint32_t round = init_request->round();
   if (round == 0) {
-    LOG(plog::info) << "Trying to initialize the enclave with id "
-                    << *global_eid;
+    logger->info("Trying to initialize the enclave with id {}.", *global_eid);
     if (init_enclave(global_eid) != SGX_SUCCESS) {
       // A toy enclave. We only create it once.
       // If there is need to ensure that the enclave is online, please put this
@@ -210,7 +210,7 @@ grpc::Status SGXORAMService::generate_session_key(
     grpc::ServerContext* server_context, const oram::InitRequest* init_request,
     oram::InitReply* init_reply) {
   const uint32_t round = init_request->round();
-  LOG(plog::info) << "Begin to generate DH key pair...";
+  logger->info("Begin to generate DH key pair...");
 
   // Start DHKE.
   if (round == 1u) {
@@ -238,9 +238,9 @@ grpc::Status SGXORAMService::generate_session_key(
   } else if (round == 2) {
     // Round = 2 denotes that the client has sent its public key to the server.
     const std::string client_pk = init_request->content();
-    LOG(plog::debug) << "In server runner: "
-                     << sgx_oram::hex_to_string((uint8_t*)(client_pk.data()),
-                                                64);
+    std::array<uint8_t, sizeof(sgx_ec256_public_t)> pk_array;
+    std::copy(client_pk.begin(), client_pk.end(), pk_array.begin());
+    logger->info("In server runner: {}", spdlog::to_hex(pk_array));
     // Call the enclave.
     // The enclave will generate the shared secret based on the client's public
     // key and the server's private key.
@@ -276,8 +276,7 @@ grpc::Status SGXORAMService::write_block(
 grpc::Status SGXORAMService::close_connection(
     grpc::ServerContext* server_context,
     const oram::CloseRequest* close_request, google::protobuf::Empty* empty) {
-  LOG(plog::info) << server_context->peer()
-                  << " - Closing connection... Goodbye!";
+  logger->info(server_context->peer(), " - Closing connection... Goodbye!");
   server_running = false;
   return grpc::Status::OK;
 }
@@ -285,8 +284,8 @@ grpc::Status SGXORAMService::close_connection(
 grpc::Status SGXORAMService::remote_attestation_begin(
     grpc::ServerContext* server_context,
     const oram::InitialMessage* initial_message, oram::Message0* reply) {
-  LOG(plog::info) << "Begin remote attestation...";
-  LOG(plog::info) << "The server is generating the epid group id...";
+  logger->info("Begin remote attestation...");
+  logger->info("The server is generating the epid group id...");
 
   uint32_t extended_epid_group_id;
   status = sgx_get_extended_epid_group_id(&extended_epid_group_id);
@@ -294,7 +293,7 @@ grpc::Status SGXORAMService::remote_attestation_begin(
   if (status != SGX_SUCCESS) {
     // There is some error in generating the epid group id.
     const std::string error_message = "Failed to generate epid group id!";
-    LOG(plog::error) << error_message;
+    logger->error(error_message);
 
     // Notify the client that the remote attestation failed.
     reply->set_epid(0ul);
@@ -302,8 +301,8 @@ grpc::Status SGXORAMService::remote_attestation_begin(
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   } else {
     // If the epid group id is generated successfully, we send it to the client.
-    LOG(plog::info) << "The server has generated the epid group id: "
-                    << extended_epid_group_id;
+    logger->info("The server has generated the epid group id: {}",
+                 extended_epid_group_id);
     reply->set_epid(extended_epid_group_id);
     return grpc::Status::OK;
   }
@@ -312,8 +311,8 @@ grpc::Status SGXORAMService::remote_attestation_begin(
 grpc::Status SGXORAMService::remote_attestation_msg0(
     grpc::ServerContext* server_context, const oram::Message0* message,
     oram::Message1* reply) {
-  LOG(plog::info) << "Received message 0 from the client...";
-  LOG(plog::info) << "The server is generating the message 1...";
+  logger->info("Received message 0 from the client...");
+  logger->info("The server is generating the message 1...");
 
   sgx_ra_msg1_t ra_message1;
   status = sgx_ra_get_msg1(context, *global_eid, sgx_ra_get_ga, &ra_message1);
@@ -321,7 +320,7 @@ grpc::Status SGXORAMService::remote_attestation_msg0(
   if (status != SGX_SUCCESS) {
     // There is some error in generating the message 1.
     const std::string error_message = "Failed to generate message 1!";
-    LOG(plog::error) << error_message;
+    logger->error(error_message);
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   } else {
     for (size_t i = 0; i < 32; i++) {
@@ -337,13 +336,13 @@ grpc::Status SGXORAMService::remote_attestation_msg0(
 grpc::Status SGXORAMService::remote_attestation_msg2(
     grpc::ServerContext* server_context, const oram::Message2* message,
     oram::Message3* reply) {
-  LOG(plog::info) << "Received message 2 from the client.";
-  LOG(plog::info) << "The server is generating the message 3...";
+  logger->info("Received message 2 from the client.");
+  logger->info("The server is generating the message 3...");
 
   const uint32_t size = message->size();
   sgx_ra_msg2_t* p_ra_message2;
   assemble_message(message, &p_ra_message2);
-  LOG(plog::info) << "The server has assembled the message 2.";
+  logger->info("The server has assembled the message 2.");
 
   // Prepare the message 3.
   sgx_ra_msg3_t* p_ra_message3 = nullptr;
@@ -361,7 +360,7 @@ grpc::Status SGXORAMService::remote_attestation_msg2(
   if (status != SGX_SUCCESS) {
     // There is some error in generating the message 3.
     const std::string error_message = "Failed to generate message 3!";
-    LOG(plog::error) << error_message;
+    logger->error(error_message);
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   } else {
     reply->set_size(message3_size);
@@ -383,7 +382,7 @@ grpc::Status SGXORAMService::remote_attestation_msg2(
     }
 
     sgx_oram::safe_free(p_ra_message3);
-    LOG(plog::info) << "The server has successfully generated the message 3.";
+    logger->info("The server has successfully generated the message 3.");
     return grpc::Status::OK;
   }
 }
@@ -391,9 +390,8 @@ grpc::Status SGXORAMService::remote_attestation_msg2(
 grpc::Status SGXORAMService::remote_attestation_final(
     grpc::ServerContext* server_context,
     const oram::AttestationMessage* message, google::protobuf::Empty* empty) {
-  LOG(plog::info) << "Received message 3 from the client.";
-  LOG(plog::info)
-      << "The server is generating the final attestation message...";
+  logger->info("Received message 3 from the client.");
+  logger->info("The server is generating the final attestation message...");
 
   ra_samp_response_header_t* p_att_result_msg_full = nullptr;
   assemble_attestation_message(message, &p_att_result_msg_full);
@@ -412,14 +410,14 @@ grpc::Status SGXORAMService::remote_attestation_final(
   if (status != SGX_SUCCESS) {
     const std::string error_message =
         "Failed to verify the attestation result!";
-    LOG(plog::error) << error_message;
+    logger->error(error_message);
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   } else if (p_att_result_msg_full->status[0] != 0 ||
              p_att_result_msg_full->status[1] != 0) {
     // There is an error in the mac.
     const std::string error_message =
         "Attestation mac result message MK based CMAC failed!";
-    LOG(plog::error) << error_message;
+    logger->error(error_message);
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   } else {
     // Verify secret data.
@@ -433,11 +431,12 @@ grpc::Status SGXORAMService::remote_attestation_final(
 
     if (status != SGX_SUCCESS) {
       const std::string error_message = "Failed to verify the secret data!";
-      LOG(plog::error) << error_message;
+      logger->error(error_message);
       return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
     } else {
-      LOG(plog::info) << "The server has successfully verified the secret "
-                         "data. Local attestation OK.";
+      logger->info(
+          "The server has successfully verified the secret "
+          "data. Local attestation OK.");
     }
   }
 
@@ -472,7 +471,7 @@ grpc::Status SGXORAMService::init_oram(
 
   if (!check_verification_message(verification_message)) {
     const std::string error_message = "Failed to verify the message!";
-    LOG(plog::error) << error_message;
+    logger->error(error_message);
     server_running = false;
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   }
@@ -485,17 +484,17 @@ grpc::Status SGXORAMService::init_oram(
   // Print the configuration.
   print_oram_config(oram_config);
 
-  LOG(plog::debug) << "The server has properly configured the ORAM.";
+  logger->info("The server has properly configured the ORAM.");
 
   status =
       ecall_init_oram_controller(*global_eid, &status, (uint8_t*)&oram_config,
                                  sizeof(oram_config), permutation, real_number);
   if (status != SGX_SUCCESS) {
     const std::string error_message = "Failed to initialize the ORAM!";
-    LOG(plog::error) << error_message;
+    logger->error(error_message);
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   } else {
-    LOG(plog::info) << "The server has successfully initialized the ORAM.";
+    logger->info("The server has successfully initialized the ORAM.");
     return grpc::Status::OK;
   }
 }
@@ -511,8 +510,10 @@ void Server::run(const std::string& address,
   // Create the directory for storing slots on the disk.
   const std::string data_dir = "./data";
   if (mkdir(data_dir.c_str(), 0777) == -1) {
-    LOG_IF(plog::error, errno != EEXIST)
-        << "Failed to create the directory for storing slots on the disk.";
+    if (errno != EEXIST) {
+      logger->error("Failed to create the directory for storing slots!");
+      exit(1);
+    }
   }
 
   service = std::make_unique<SGXORAMService>(global_eid);
@@ -535,7 +536,7 @@ void Server::run(const std::string& address,
   builder.RegisterService(service.get());
 
   server = (builder.BuildAndStart());
-  LOG(plog::info) << "Server listening on " << address;
+  logger->info("Server listening on {}.", address);
   server_running = true;
 
   // Start a monitor thread.
@@ -552,13 +553,13 @@ sgx_status_t SGXORAMService::init_enclave(sgx_enclave_id_t* const global_eid) {
   // Initialize the enclave by loading into the signed shared object into the
   // main memory.
   if (sgx_oram::init_enclave(global_eid) != SGX_SUCCESS) {
-    LOG(plog::error) << "Cannot initialize the enclave!";
+    logger->info("Cannot initialize the enclave!");
     return SGX_ERROR_UNEXPECTED;
   }
 
   // Initialize the cryptomanager in the enclave.
   if (ecall_init_crypto_manager(*global_eid, &status) != SGX_SUCCESS) {
-    LOG(plog::error) << "Cannot initialize the cryptomanager!";
+    logger->info("Cannot initialize the cryptomanager!");
     return SGX_ERROR_UNEXPECTED;
   }
 
@@ -566,16 +567,19 @@ sgx_status_t SGXORAMService::init_enclave(sgx_enclave_id_t* const global_eid) {
 }
 
 bool SGXORAMService::check_verification_message(const std::string& message) {
-  LOG(plog::debug) << "The verification message is "
-                   << sgx_oram::hex_to_string((uint8_t*)message.c_str(),
-                                              message.size());
+  std::array<uint8_t, 1024> message_array;
+  std::copy(message.begin(), message.end(), message_array.begin());
+  logger->info("The verification message is {}.",
+               spdlog::to_hex(message_array.begin(),
+                              message_array.begin() + message.size()));
+
   if (ecall_check_verification_message(*global_eid, &status,
                                        (uint8_t*)message.c_str(),
                                        message.size()) != SGX_SUCCESS) {
-    LOG(plog::error) << "Cannot check the verification message!";
+    logger->error("Cannot check the verification message!");
     return false;
   } else {
-    LOG(plog::info) << "The server has successfully verified the secret data.";
+    logger->info("The server has successfully verified the secret data.");
     return true;
   }
 }

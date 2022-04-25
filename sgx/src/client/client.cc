@@ -16,6 +16,7 @@
  */
 #include <client/client.hh>
 
+#include <array>
 #include <fstream>
 #include <sstream>
 
@@ -24,8 +25,9 @@
 #include <grpc++/security/credentials.h>
 #include <gflags/gflags.h>
 #include <sodium.h>
+#include <spdlog/fmt/bin_to_hex.h>
+#include <spdlog/spdlog.h>
 
-#include <plog/Log.h>
 #include <configs.hh>
 #include <client/utils.hh>
 
@@ -65,7 +67,7 @@ Client::Client(const std::string& address, const std::string& port) {
 }
 
 int Client::init_enclave(void) {
-  LOG(plog::info) << "Trying to initializing the enclave on the server.";
+  logger->info("Trying to initializing the enclave on the server.");
 
   grpc::ClientContext context;
   oram::InitRequest request;
@@ -75,11 +77,11 @@ int Client::init_enclave(void) {
   grpc::Status status = stub_->init_enclave(&context, request, &reply);
 
   if (!status.ok()) {
-    LOG(plog::fatal) << status.error_message();
+    logger->error(status.error_message());
 
     return -1;
   } else {
-    LOG(plog::info) << "The server has initialized the enclave!";
+    logger->info("The server has initialized the enclave!");
 
     return 0;
   }
@@ -111,21 +113,23 @@ int Client::init_oram(void) {
 
   // Set the permutation of the ORAM in the request.
   uint32_t* permutation = new uint32_t[FLAGS_number];
-  for (int i = 0; i < FLAGS_number; i++) {
+  for (uint32_t i = 0; i < FLAGS_number; i++) {
     permutation[i] = i;
   }
   // Shuffle it.
   fisher_yates_shuffle(permutation, FLAGS_number);
-  for (int i = 0; i < FLAGS_number; i++) {
+  for (uint32_t i = 0; i < FLAGS_number; i++) {
     request.add_permutation(permutation[i]);
   }
-  
+
   // Prin the encrypted verification message.
-  LOG(plog::info) << "The encrypted verification message is: "
-                  << hex_to_string((uint8_t*)encrypted_verification_message.c_str(),
-                                   encrypted_verification_message.size());
-  // Print the log.
-  LOG(plog::info) << "Sending parameters of the ORAM to the server!";
+  std::array<uint8_t, 1024> buffer;
+  memcpy(buffer.data(), encrypted_verification_message.data(),
+         encrypted_verification_message.size());
+  logger->info("The encrypted verification message is: {}",
+               spdlog::to_hex(buffer));
+  // Print the LOG.
+  logger->info("Sending parameters of the ORAM to the server!");
 
   google::protobuf::Empty empty;
   stub_->init_oram(&context, request, &empty);
@@ -134,7 +138,7 @@ int Client::init_oram(void) {
 }
 
 int Client::generate_session_key(void) {
-  LOG(plog::info) << "Sending negotiated key to the server.";
+  logger->info("Sending negotiated key to the server.");
 
   grpc::ClientContext context;
   oram::InitRequest request;
@@ -144,15 +148,16 @@ int Client::generate_session_key(void) {
   grpc::Status status = stub_->generate_session_key(&context, request, &reply);
 
   if (!status.ok()) {
-    LOG(plog::fatal) << status.error_message();
+    logger->error(status.error_message());
 
     return -1;
   } else {
     // Extract the secret key.
     const std::string server_pk = reply.content();
-    LOG(plog::debug) << "Server's public key received! The pulic key is "
-                     << hex_to_string((uint8_t*)server_pk.data(),
-                                      server_pk.size());
+    std::array<uint8_t, 32> server_pk_array;
+    memcpy(server_pk_array.data(), server_pk.c_str(), server_pk.size());
+    logger->info("Server's public key received! The pulic key is {}.",
+                 spdlog::to_hex(server_pk_array));
 
     // Calculate the shared key.
     sample_ecc_state_handle_t state_handle;
@@ -162,9 +167,11 @@ int Client::generate_session_key(void) {
         (sample_ec256_private_t*)&secret_key,
         (sample_ec256_public_t*)(server_pk.data()),
         (sample_ec256_dh_shared_t*)&shared_key, state_handle);
-    LOG(plog::info) << "Shared key established! The key is "
-                    << hex_to_string((uint8_t*)(&shared_key),
-                                     sizeof(sample_ec256_dh_shared_t));
+
+    std::array<uint8_t, 32> shared_key_array;
+    memcpy(shared_key_array.data(), &shared_key, 32);
+    logger->info("Shared key established! The key is {}.",
+                 spdlog::to_hex(shared_key_array));
 
     // Start to send client's public key.
     grpc::ClientContext ctx;
@@ -175,7 +182,7 @@ int Client::generate_session_key(void) {
     status = stub_->generate_session_key(&ctx, req, &reply);
 
     if (!status.ok()) {
-      LOG(plog::fatal) << status.error_message();
+      logger->error(status.error_message());
       return -1;
     }
 
@@ -183,12 +190,14 @@ int Client::generate_session_key(void) {
     sample_ec_key_128bit_t smk_key;
     if (!derive_key((sample_ec_dh_shared_t*)&shared_key, 0u, &smk_key,
                     &secret_key_session)) {
-      LOG(plog::fatal) << "Cannot derive secret key!";
+      logger->error("Cannot derive secret key!");
     }
 
-    LOG(plog::info) << "The session key is established! The key is "
-                    << hex_to_string((uint8_t*)(&secret_key_session),
-                                     sizeof(sample_ec_key_128bit_t));
+    std::array<char, sizeof(sample_ec_key_128bit_t)> secret_key_session_buf;
+    memcpy(secret_key_session_buf.data(), &secret_key_session,
+           sizeof(sample_ec_key_128bit_t));
+    logger->info("The session key is established! The key is {}",
+                 spdlog::to_hex(secret_key_session_buf));
     is_initialized = true;
     sample_ecc256_close_context(state_handle);
   }
@@ -198,7 +207,7 @@ int Client::generate_session_key(void) {
 
 std::string Client::encrypt(const std::string& plaintext) {
   if (!is_initialized) {
-    LOG(plog::fatal) << "The client is not initialized!";
+    logger->info("The client is not initialized!");
     return "";
   }
 
@@ -217,7 +226,7 @@ std::string Client::encrypt(const std::string& plaintext) {
       (sample_aes_gcm_128bit_tag_t*)ciphertext);
 
   if (ret != SAMPLE_SUCCESS) {
-    LOG(plog::fatal) << "Cannot encrypt the data!";
+    logger->error("Cannot encrypt the data!");
     return "";
   }
 
@@ -226,7 +235,7 @@ std::string Client::encrypt(const std::string& plaintext) {
 
 std::string Client::decrypt(const std::string& ciphertext) {
   if (!is_initialized) {
-    LOG(plog::fatal) << "The client is not initialized!";
+    logger->info("The client is not initialized!");
     return "";
   }
 
@@ -244,7 +253,7 @@ std::string Client::decrypt(const std::string& ciphertext) {
       (sample_aes_gcm_128bit_tag_t*)ciphertext_ptr);
 
   if (ret != SAMPLE_SUCCESS) {
-    LOG(plog::fatal) << "Cannot decrypt the data!";
+    logger->error("Cannot decrypt the data!");
     return "";
   }
 

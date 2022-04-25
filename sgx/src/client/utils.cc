@@ -14,9 +14,31 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <utils.hh>
+
+#include <ctime>
+#include <cstring>
 #include <random>
 
-#include <utils.hh>
+#include <unistd.h>
+
+static std::string get_machine_name(void) {
+  char hostname[256];
+  gethostname(hostname, sizeof(hostname));
+  return std::string(hostname);
+}
+
+static std::string get_current_time(void) {
+  time_t rawtime;
+  struct tm* timeinfo;
+  char buffer[80];
+
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
+
+  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
+  return std::string(buffer);
+}
 
 std::string hex_to_string(const uint8_t* array, const size_t& len) {
   std::string ans;
@@ -59,4 +81,14 @@ void fisher_yates_shuffle(uint32_t* array, const size_t& len) {
     array[i] = array[j];
     array[j] = tmp;
   }
+}
+
+// Get the log file name by the current time and the machine's name.
+std::string get_log_file_name(void) {
+  std::string ans;
+  ans += get_machine_name();
+  ans += "_";
+  ans += get_current_time();
+  ans += ".log";
+  return ans;
 }

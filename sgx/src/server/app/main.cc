@@ -15,48 +15,53 @@
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <gflags/gflags.h>
+#include <spdlog/spdlog.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <sgx_urts.h>
 
-#include <plog/Log.h>
-#include <plog/Appenders/ColorConsoleAppender.h>
-#include <plog/Formatters/TxtFormatter.h>
-#include <plog/Initializers/RollingFileInitializer.h>
+#include <configs.hh>
+#include <utils.hh>
 #include <app/server_runner.hh>
+
+using sgx_oram::get_log_file_name;
 
 // Configurations for the server.
 DEFINE_string(address, "localhost", "The server's IP address");
 DEFINE_string(port, "1234", "The server's port");
+DEFINE_bool(verbose, true, "Whether to print verbose information");
 
-// Configurations for the ORAM should be sent by the client?
-
+// Configurations for the enclave.
 static sgx_enclave_id_t global_eid = 0;
-
-static plog::RollingFileAppender<plog::TxtFormatter> file_appender(
-    "./log/oram.log");  // Create the 1st appender.
-static plog::ColorConsoleAppender<plog::TxtFormatter>
-    consoler_appender;  // Create the 2nd appender.
-
 // A global variable.
 std::unique_ptr<Server> server_runner;
 
+std::shared_ptr<spdlog::logger> logger = spdlog::rotating_logger_mt(
+    server_name,
+    server_log_dir + "/" + server_name + +"_" + get_log_file_name(),
+    server_log_size, server_log_num);
+
 int SGX_CDECL main(int argc, char** argv) {
   // Parse the command line arguments.
-  gflags::SetUsageMessage("The SGX-Based Doubly Oblibvious RAM by Nankai University.");
+  gflags::SetUsageMessage(
+      "The SGX-Based Doubly Oblibvious RAM by Nankai University.");
   gflags::SetVersionString("0.0.1");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
+
+  // Initialize the logger.
+  spdlog::set_default_logger(logger);
+  spdlog::set_level(spdlog::level::debug);
+  spdlog::set_pattern(log_pattern);
 
   // Nullify the input arguments.
   (void)(argc);
   (void)(argv);
-  // Create a logger.
-  plog::init(plog::debug, &file_appender).addAppender(&consoler_appender);
 
   // Run the server.
   try {
     server_runner = std::make_unique<Server>();
     server_runner->run(FLAGS_address + ":" + FLAGS_port, &global_eid);
   } catch (const std::exception& e) {
-    LOG(plog::fatal) << e.what();
+    logger->error(e.what());
   }
 
   gflags::ShutDownCommandLineFlags();

@@ -21,6 +21,20 @@
 
 static const std::string key_path = "./key";
 
-static const std::string enclave_path = "./build/server/enclave/enclave_signed.so";
+static const std::string enclave_path =
+    "./build/server/enclave/enclave_signed.so";
 
-#endif // CONFIG_HH
+static const std::string log_pattern =
+    "[%c] [Thread: %t | Process: %P | Name: %n] [%l] %v";
+
+static const std::string server_log_dir = "./log";
+static const std::string server_name = "server.bin";
+static constexpr uint32_t server_log_size = 1024 * 1024 * 10;
+static constexpr uint32_t server_log_num = 10;
+
+static const std::string client_log_dir = "./log";
+static const std::string client_name = "client.bin";
+static constexpr uint32_t client_log_size = 1024 * 1024 * 10;
+static constexpr uint32_t client_log_num = 10;
+
+#endif  // CONFIG_HH

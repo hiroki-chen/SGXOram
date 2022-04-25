@@ -79,7 +79,7 @@ App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpth
 									-L$(GRPC_PATH)/lib `pkg-config --libs protobuf grpc++`\
            				-lpthread\
            				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           				-ldl -lgflags -llz4
+           				-ldl -lgflags -llz4 -lglog
 
 App_Cpp_Objects := $(patsubst $(SRC_PATH)/app/%.cc, $(BUILD_PATH)/app/%.o, $(App_Cpp_Files))
 App_Name := $(BUILD_PATH)/../bin/server.bin
@@ -149,7 +149,7 @@ ServiceProvider_Link_Flags :=  -shared $(SGX_COMMON_CFLAGS) -L../../lib -l$(SP_C
 #   Prerelease - Macro NDEBUG and EDEBUG enabled.
 #   Release - Macro NDEBUG enabled.
 ifeq ($(SGX_DEBUG), 1)
-        App_C_Flags += -DDEBUG -UNDEBUG -UEDEBUG
+        App_C_Flags += -g -DDEBUG -UNDEBUG -UEDEBUG
 else ifeq ($(SGX_PRERELEASE), 1)
         App_C_Flags += -DNDEBUG -DEDEBUG -UDEBUG
 else

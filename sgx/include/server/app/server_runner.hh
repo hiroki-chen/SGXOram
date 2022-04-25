@@ -23,6 +23,7 @@
 #include <grpc++/grpc++.h>
 #include <grpc++/server.h>
 #include <grpc++/server_builder.h>
+#include <spdlog/logger.h>
 #include <sgx_urts.h>
 #include <sgx_key_exchange.h>
 
@@ -33,6 +34,8 @@
 #define DH_SHARED_KEY_LEN 32
 #define SAMPLE_SP_IV_SIZE 12
 #define MAX_VERIFICATION_RESULT 2
+
+extern std::shared_ptr<spdlog::logger> logger; 
 
 struct OramConfiguration {
   uint32_t way;

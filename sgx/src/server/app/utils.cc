@@ -13,20 +13,63 @@
  */
 #include <utils.hh>
 
+#include <cstring>
 #include <algorithm>
 #include <iostream>
 #include <random>
 #include <memory>
+#include <iomanip>
 #include <fstream>
 
 #include <lz4.h>
+#include <gflags/gflags.h>
+#include <spdlog/spdlog.h>
+#include <unistd.h>
 
 #include <app/server_runner.hh>
-#include <plog/Log.h>
 #include <enclave/enclave_u.h>
 #include <configs.hh>
 
 extern std::unique_ptr<Server> server_runner;
+
+DECLARE_bool(verbose);
+
+void ocall_printf(const char* message) {
+  // If the flag is set, print the message.
+  // This is used for debugging.
+  logger->debug(message);
+}
+
+static const std::string get_machine_name(void) {
+  char hostname[256];
+  gethostname(hostname, sizeof(hostname));
+  return std::string(hostname);
+}
+
+static std::string get_current_time(void) {
+  time_t rawtime;
+  struct tm* timeinfo;
+  char buffer[80];
+
+  time(&rawtime);
+  timeinfo = localtime(&rawtime);
+
+  strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
+  return std::string(buffer);
+}
+
+
+// Exception handler, but reserved. Please do not use.
+// We strongly recommend you to use the exception handler provided by the
+// SGX SDK, i.e., you should not use this function for exception handling,
+// unless you are defintely sure what you are doing.
+// For reasons why C++ exceptions are not an ideal solution, please refer to
+// the link provided by Google's C++ coding guideline:
+//
+//    https://google.github.io/styleguide/cppguide.html#Exceptions
+void ocall_exception_handler(const char* err_msg) {
+  throw std::runtime_error(err_msg);
+}
 
 std::string compress_data(const std::string& data) {
   // Compress the source std::string with lz4 compression libarary.
@@ -54,24 +97,6 @@ std::string decompress_data(const std::string& data) {
   return decompressed_data;
 }
 
-void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
-                      size_t data_len) {
-  LOG(plog::debug) << "The fingerprint for the slot is: " << slot_finger_print;
-
-  // Compress the data and then store it to the server.
-  std::string compressed_data =
-      compress_data(std::string((char*)data, data_len));
-  server_runner->store_compressed_slot(slot_finger_print, compressed_data);
-}
-
-// Debug function.
-void ocall_printf(const char* message) { LOG(plog::debug) << message; }
-
-// Exception handler.
-void ocall_exception_handler(const char* err_msg) {
-  throw std::runtime_error(err_msg);
-}
-
 // FIXME: The position map is non-recursive, so it is not safe!
 // We need to store the position map in a recursive manner.
 // Use with care!!
@@ -82,24 +107,35 @@ size_t ocall_read_position(const char* position_fingerprint, uint8_t* position,
   if (position_str.empty()) {
     throw std::runtime_error("The position is not found.");
   }
-  memcpy(position, position_str.c_str(), position_str.size());
-  return position_str.size();
+  // Decompress the position.
+  const std::string decompressed_position = decompress_data(position_str);
+  // Copy the decompressed position to the position buffer.
+  memcpy(position, decompressed_position.data(), decompressed_position.size());
+  return decompressed_position.size();
 }
 
-void ocall_write_position(const char* position_fingerprint, uint8_t* position,
-                          size_t position_size) {
-  std::string position_str(reinterpret_cast<char*>(position), position_size);
-  server_runner->store_position(position_fingerprint, position_str);
-}
-
-void ocall_write_position(const char* position_finderprint,
+void ocall_write_position(const char* position_fingerprint,
                           const uint8_t* position, size_t position_size) {
-  return;
+  const std::string position_str(reinterpret_cast<const char*>(position),
+                                 position_size);
+  // Compress the position.
+  const std::string compressed_position = compress_data(position_str);
+  server_runner->store_position(position_fingerprint, compressed_position);
+}
+
+void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
+                      size_t data_len) {
+  logger->info("The fingerprint for the slot is: {}", slot_finger_print);
+
+  // Compress the data and then store it to the server.
+  std::string compressed_data =
+      compress_data(std::string((char*)data, data_len));
+  server_runner->store_compressed_slot(slot_finger_print, compressed_data);
 }
 
 size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
                        size_t data_len) {
-  LOG(plog::debug) << "The fingerprint for the slot is: " << slot_finger_print;
+  logger->info("The fingerprint for the slot is: {}", slot_finger_print);
 
   // Check if the slot is in the memory.
   bool is_in_memory = server_runner->is_in_storage(slot_finger_print);
@@ -112,7 +148,7 @@ size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
     memcpy(data, decompressed_data.data(), decompressed_size);
     return decompressed_size;
   } else {
-    LOG(plog::debug) << "Slot not found in memory.";
+    logger->error("Slot not found in memory.");
 
     // TODO: Find the slot in the directory called data.
     return 0;
@@ -137,14 +173,14 @@ std::vector<std::string> generate_random_strings(const uint32_t& number,
 }
 
 std::vector<std::string> get_data_from_file(std::ifstream* const file) {
-  LOG(plog::debug) << "Reading data from file is started!";
+  logger->info("Reading data from file is started!");
   std::vector<std::string> ans;
   while (!(*file).eof()) {
     std::string s;
     std::getline(*file, s);
     ans.push_back(s);
   }
-  LOG(plog::debug) << "Reading data from file is finished!";
+  logger->info("Reading data from file is finished!");
 
   return ans;
 }
@@ -175,16 +211,11 @@ int init_enclave(sgx_enclave_id_t* const id) {
 }
 
 std::string hex_to_string(const uint8_t* array, const size_t& len) {
-  std::string ans;
-
+  std::stringstream ss;
   for (size_t i = 0; i < len; i++) {
-    // To hex.
-    uint8_t num = array[i];
-    ans += digits[num & 0xf];
-    ans += digits[num >> 4];
+    ss << std::hex << std::setw(2) << std::setfill('0') << (int)array[i];
   }
-
-  return ans;
+  return ss.str();
 }
 
 int destroy_enclave(sgx_enclave_id_t* const id) {
@@ -201,6 +232,15 @@ void safe_free(void* ptr) {
   if (ptr != nullptr) {
     free(ptr);
   }
+}
+
+std::string get_log_file_name(void) {
+  std::string ans;
+  ans += get_machine_name();
+  ans += "_";
+  ans += get_current_time();
+  ans += ".log";
+  return ans;
 }
 
 }  // namespace sgx_oram
