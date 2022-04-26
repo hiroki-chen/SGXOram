@@ -26,8 +26,6 @@
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_crypto_manager.hh>
 
-extern EnclaveCryptoManager* crypto_manager;
-
 static void print_permutation(const uint32_t* permutation, uint32_t size) {
   for (uint32_t i = 0; i < size; ++i) {
     ENCLAVE_LOG("%u ", permutation[i]);
@@ -35,28 +33,76 @@ static void print_permutation(const uint32_t* permutation, uint32_t size) {
   ENCLAVE_LOG("\n");
 }
 
+static void get_position_and_decrypt(sgx_oram::oram_position_t* position,
+                                     uint32_t block_address) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
+  // Prepare the ciphertext buffer.
+  uint8_t* ciphertext = (uint8_t*)malloc(ENCRYPTED_POSITION_SIZE);
+  memset(ciphertext, 0, ENCRYPTED_POSITION_SIZE);
+
+  // Read from the outside memory using OCALL.
+  sgx_status_t status = SGX_ERROR_UNEXPECTED;
+  size_t position_size = 0;
+  const std::string position_fingerprint =
+      crypto_manager->enclave_sha_256(std::to_string(block_address));
+  ocall_read_position(&position_size, position_fingerprint.c_str(), ciphertext,
+                      ENCRYPTED_POSITION_SIZE);
+
+  // Check if the position is valid.
+  if (position_size == 0) {
+    ocall_panic_and_flush("The position is invalid.");
+  }
+
+  // Decrypt the position.
+  const std::string position_encrypted =
+      crypto_manager->enclave_aes_128_gcm_decrypt(std::string(
+          reinterpret_cast<char*>(ciphertext), ENCRYPTED_POSITION_SIZE));
+  // Copy the plaintext back to the buffer we've just prepared.
+  memcpy(position, position_encrypted.c_str(),
+         sizeof(sgx_oram::oram_position_t));
+  // Finally, free the buffer we've just allocated.
+  safe_free(ciphertext);
+}
+
 // This function fetches the target slot from the outside memory by calculting
 // its hash value and then decrypt it in the enclave. Finally, it writes the
 // decrypted target slot to the target slot buffer allocate by the caller.
+// FIXME: the decryption is erroreous.
 static void get_slot_and_decrypt(uint32_t level, uint32_t offset,
                                  uint8_t* slot_buffer, size_t slot_size) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
+  // Compute the hash value of the target slot.
   const std::string sid = std::to_string(level) + std::to_string(offset);
   const std::string slot_hash = crypto_manager->enclave_sha_256(sid);
+
+  // Prepare a buffer for storing the ciphertext of the slot.
+  uint8_t* ciphertext = (uint8_t*)malloc(ENCRYPTED_SLOT_SIZE);
+  memset(ciphertext, 0, ENCRYPTED_SLOT_SIZE);
 
   // For safety reason, we use the same buffer to store the decrypted target.
   // Note that the size of the buffer should be at least the size of the
   // leaf slot to prevent buffer overflow.
+  // Here, the variable slot_size is useless, but we use it as sanity check.
   sgx_status_t status = SGX_ERROR_UNEXPECTED;
-  status =
-      ocall_read_slot(&slot_size, slot_hash.c_str(), slot_buffer, slot_size);
+  status = ocall_read_slot(&slot_size, slot_hash.c_str(), ciphertext,
+                           ENCRYPTED_SLOT_SIZE);
   check_sgx_status(status, "get_slot_and_decrypt()");
+
+  // Check if the slot is valid.
+  if (slot_size == 0) {
+    ocall_panic_and_flush("The slot is invalid.");
+  }
 
   // Decrypt the target slot.
   const std::string decrypted_slot =
-      crypto_manager->enclave_aes_128_gcm_decrypt(
-          std::string(reinterpret_cast<char*>(slot_buffer), slot_size));
+      crypto_manager->enclave_aes_128_gcm_decrypt(std::string(
+          reinterpret_cast<char*>(ciphertext), ENCRYPTED_SLOT_SIZE));
   // Copy back to the buffer.
   memcpy(slot_buffer, decrypted_slot.c_str(), decrypted_slot.size());
+  // Finally, free the buffer we've just allocated.
+  safe_free(ciphertext);
 }
 
 // This function will calculate the offset for the slot at current level
@@ -64,6 +110,9 @@ static void get_slot_and_decrypt(uint32_t level, uint32_t offset,
 // to the current slot. To determine the offset, the total level and the
 // ways of the ORAM tree are needed.
 static inline uint32_t calculate_offset(uint32_t block_id, uint32_t level_cur) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
+
   const uint32_t level = crypto_manager->get_oram_config()->level;
   const uint32_t way = crypto_manager->get_oram_config()->way;
 
@@ -73,6 +122,8 @@ static inline uint32_t calculate_offset(uint32_t block_id, uint32_t level_cur) {
 // This function assembles position for the current block.
 static std::string assemble_position_and_encrypt(uint32_t level, uint32_t bid,
                                                  uint32_t address) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
   ENCLAVE_LOG("[enclave] Assembling position for bid: %d\n", bid);
   sgx_oram::oram_position_t* position =
       (sgx_oram::oram_position_t*)malloc(sizeof(sgx_oram::oram_position_t));
@@ -83,6 +134,7 @@ static std::string assemble_position_and_encrypt(uint32_t level, uint32_t bid,
   const std::string ans = crypto_manager->enclave_aes_128_gcm_encrypt(
       std::string((char*)position, sizeof(sgx_oram::oram_position_t)));
   safe_free(position);
+
   return ans;
 }
 
@@ -98,6 +150,9 @@ static sgx_status_t populate_leaf_slot(sgx_oram::oram_slot_leaf_t* slot,
     ENCLAVE_LOG("[enclave] The slot is not a leaf node.\n");
     return SGX_ERROR_INVALID_PARAMETER;
   }
+
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
 
   const uint32_t slot_begin = slot_header->range_begin;
   const uint32_t real_number = crypto_manager->get_oram_config()->number / 2;
@@ -124,12 +179,11 @@ static sgx_status_t populate_leaf_slot(sgx_oram::oram_slot_leaf_t* slot,
     block_ptr->header.address = permutation[offset + i];
 
     // Assemble the <k, v> pair.
-    ENCLAVE_LOG("[enclave] Adddress is %d\n", permutation[offset + i]);
+    ENCLAVE_LOG("[enclave] Address is %d\n", permutation[offset + i]);
     const std::string position_str = assemble_position_and_encrypt(
         slot_header->level, offset + i, permutation[offset + i]);
     const std::string position_fingerprint = crypto_manager->enclave_sha_256(
         std::to_string(permutation[offset + i]));
-
     // Write the position back to the server.
     // Note that the key of the position map is the hash value for the address
     // and the value of that is the encrypted byte array.
@@ -159,6 +213,9 @@ static sgx_status_t init_so2_oram(uint32_t* level_size_information) {
 
   uint32_t sgx_size = 0;
   uint32_t cur_size = 1;
+
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
 
   const uint32_t way = crypto_manager->get_oram_config()->way;
   const uint32_t type = crypto_manager->get_oram_config()->type;
@@ -197,6 +254,9 @@ static sgx_status_t init_so2_slots(uint32_t* level_size_information,
                                    uint32_t* permutation,
                                    size_t permutation_size) {
   print_permutation(permutation, permutation_size);
+
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
 
   ENCLAVE_LOG("[enclave] The bucket size is %d", BUCKET_SIZE);
   ENCLAVE_LOG(
@@ -295,6 +355,8 @@ static sgx_status_t init_so2_slots(uint32_t* level_size_information,
 static void data_access(sgx_oram::oram_operation_t, uint32_t current_level,
                         uint8_t* data, size_t data_size, bool condition,
                         sgx_oram::oram_position_t* position) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
   // Read two slots S1 and S2 from the outside memory. Originally, in the (ORAM)
   // simulation mode, we fetch the slots by their levels and offsets at certain
   // level. However, in the SGX mode, we fetch the slots by their hash values,
@@ -329,22 +391,22 @@ static void data_access(sgx_oram::oram_operation_t, uint32_t current_level,
 
 sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
                                uint8_t* data, size_t data_len) {
+  ENCLAVE_LOG("[enclave] Accessing data at address %d.\n", block_address);
+  // Get the instance of the cryptomanager.
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
   // Travers all the levels of the ORAM tree and call data_access function.
   const uint32_t level = crypto_manager->get_oram_config()->level;
   //  Also, we need to read the position for the address.
   sgx_oram::oram_position_t* position =
       (sgx_oram::oram_position_t*)malloc(sizeof(sgx_oram::oram_position_t));
-  sgx_status_t status = SGX_ERROR_UNEXPECTED;
-  size_t position_size = 0;
-  const std::string position_fingerprint =
-      crypto_manager->enclave_sha_256(std::to_string(block_address));
-  ocall_read_position(&position_size, position_fingerprint.c_str(),
-                      (uint8_t*)position, sizeof(sgx_oram::oram_position_t));
+
+  get_position_and_decrypt(position, block_address);
 
   const uint32_t block_level = position->level;
   const uint32_t bid_cur = position->bid;
 
-  ENCLAVE_LOG("[enclave] block_level: %u, bid_cir: %u", block_level, bid_cur);
+  ENCLAVE_LOG("[enclave] block_level: %u, bid_cur: %u", block_level, bid_cur);
 
   for (uint32_t i = 1; i <= level; i++) {
     // If the current level is the same as the block level, then we should
@@ -358,6 +420,8 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
 }
 
 sgx_status_t init_oram(uint32_t* permutation, size_t permutation_size) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
   // Check if the bucket_size is correct.
   if (crypto_manager->get_oram_config()->bucket_size != BUCKET_SIZE) {
     ENCLAVE_LOG("[enclave] The bucket size is not correct.\n");
@@ -395,6 +459,8 @@ sgx_status_t SGXAPI ecall_init_oram_controller(uint8_t* oram_config,
                                                uint32_t* permutation,
                                                size_t permutation_size) {
   // Copy the configuration into the cryptomanager.
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
   crypto_manager->set_oram_config(oram_config, oram_config_size);
   // Begin initialize the slot...
   ENCLAVE_LOG("[enclave] Initializing the slot...");

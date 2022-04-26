@@ -24,6 +24,7 @@
 #include <lz4.h>
 #include <gflags/gflags.h>
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/bin_to_hex.h>
 #include <unistd.h>
 
 #include <app/server_runner.hh>
@@ -40,9 +41,11 @@ void ocall_printf(const char* message) {
   logger->debug(message);
 }
 
-void ocall_panic_and_flush(void) {
-  logger->error("An fatal error happened in the enclave!");
+void ocall_panic_and_flush(const char* reason) {
+  logger->error("An fatal error happened in the enclave, the reason is: {}.",
+                reason);
   logger->flush();
+  abort();
 }
 
 static const std::string get_machine_name(void) {
@@ -109,6 +112,7 @@ size_t ocall_read_position(const char* position_fingerprint, uint8_t* position,
   const std::string position_str =
       server_runner->get_position(position_fingerprint);
 
+
   if (position_str.empty()) {
     logger->error("Position with fingerprint {} is not found!",
                   position_fingerprint);
@@ -121,6 +125,7 @@ size_t ocall_read_position(const char* position_fingerprint, uint8_t* position,
   const std::string decompressed_position = decompress_data(position_str);
   // Copy the decompressed position to the position buffer.
   memcpy(position, decompressed_position.data(), decompressed_position.size());
+  logger->debug("Read position: {}", spdlog::to_hex(decompressed_position));
   return decompressed_position.size();
 }
 
@@ -131,6 +136,7 @@ void ocall_write_position(const char* position_fingerprint,
   const std::string position_str(reinterpret_cast<const char*>(position),
                                  position_size);
   logger->debug("Position: {}", position_fingerprint);
+  logger->debug("Ciphertext: {}", spdlog::to_hex(position_str));
   // Compress the position.
   const std::string compressed_position = compress_data(position_str);
   server_runner->store_position(position_fingerprint, compressed_position);

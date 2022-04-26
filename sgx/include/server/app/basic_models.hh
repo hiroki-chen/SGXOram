@@ -25,9 +25,19 @@
 // Note that the block size is 4160 bytes (including the header).
 #define DEFAULT_SLOT_SIZE 32
 
+#define ENCRYPTED_POSITION_SIZE \
+  sizeof(sgx_oram::oram_position_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
+
+#define ENCRYPTED_SLOT_SIZE \
+  sizeof(sgx_oram::oram_slot_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
+
+#define ENCRYPTED_BLOCK_SIZE \
+  sizeof(sgx_oram::oram_block_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
+
 namespace sgx_oram {
-// If we need to transfer data between the untrusted memory and the enclave, we better
-// organize all the data structures in a C-like style for best performance.
+// If we need to transfer data between the untrusted memory and the enclave, we
+// better organize all the data structures in a C-like style for best
+// performance.
 
 typedef enum _oram_slot_type {
   ORAM_SLOT_TYPE_LEAF = 0,
@@ -112,4 +122,4 @@ typedef enum _oram_operation_t {
 
 }  // namespace sgx_oram
 
-#endif // BASIC_MODELS_HH
+#endif  // BASIC_MODELS_HH

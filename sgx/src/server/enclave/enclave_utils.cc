@@ -43,6 +43,9 @@ static sgx_error_list sgx_errlist = {
     {SGX_ERROR_MEMORY_MAP_FAILURE, "Failed to reserve memory for the enclave."},
 };
 
+// A safe free is always used to free memory allocated by the enclave and is
+// very important to avoid memory leaks, especially in the enclave because
+// its memory is extremely limited.
 void safe_free(void* ptr) {
   if (ptr != nullptr) {
     free(ptr);
@@ -58,8 +61,8 @@ std::string hex_to_string(const uint8_t* array, const size_t& len) {
   std::string ans = "\n0000: ";
   for (size_t i = 0; i < len; i++) {
     // Convert every byte into a hex string.
-    ans += digits[array[i] & 0xf];
     ans += digits[array[i] >> 4];
+    ans += digits[array[i] & 0xf];
 
     if (i % 20 == 19) {
       ans += '\n';
@@ -94,7 +97,8 @@ void printf(const char* fmt, ...) {
 
 void sprintf(const std::string& str, bool hex) {
   if (hex) {
-    ENCLAVE_LOG("%s", hex_to_string((const uint8_t*)str.data(), str.size()).data());
+    ENCLAVE_LOG("%s",
+                hex_to_string((const uint8_t*)str.data(), str.size()).data());
   } else {
     ENCLAVE_LOG("%s", str.data());
   }
@@ -126,8 +130,8 @@ size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint) {
 void check_sgx_status(const sgx_status_t& status, const std::string& reason) {
   if (status != SGX_SUCCESS) {
     ENCLAVE_LOG("[enclave] %s triggered an SGX error: %s\n", reason.data(),
-           sgx_errlist[status].data());
-    ocall_panic_and_flush();
+                sgx_errlist[status].data());
+    ocall_panic_and_flush(reason.c_str());
     abort();
   }
 }

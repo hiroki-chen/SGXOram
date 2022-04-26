@@ -20,6 +20,7 @@
 #define DEFAULT_RANDOM_LENGTH 16
 
 #include <string>
+#include <memory>
 
 #include <sgx_tcrypto.h>
 #include <sgx_ecp_types.h>
@@ -33,6 +34,9 @@
  */
 class EnclaveCryptoManager final {
  private:
+  // The instance of the class.
+  static std::shared_ptr<EnclaveCryptoManager> instance;
+
   // This key is derived after Diffie-Hellman Key Exchange procedure.
   sgx_aes_gcm_128bit_key_t shared_secret_key;
 
@@ -52,12 +56,9 @@ class EnclaveCryptoManager final {
   // The configuration of the ORAM.
   sgx_oram::oram_configuration_t* oram_config;
 
- public:
-  /**
-   * @brief Construct a new Enclave Crypto Manager object
-   *
-   */
   EnclaveCryptoManager();
+ public:
+  static std::shared_ptr<EnclaveCryptoManager> get_instance(void);
 
   sgx_ecc_state_handle_t* get_state_handle(void) { return &state_handle; }
 

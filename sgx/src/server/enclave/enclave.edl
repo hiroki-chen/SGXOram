@@ -55,7 +55,6 @@ enclave {
                                      size_t sealed_size,
                                      [ out, size = plaintext_len ] uint8_t *plaintext,
                                      size_t plaintext_len);
-    public sgx_status_t ecall_init_crypto_manager();
 
     public sgx_status_t ecall_begin_DHKE();
 
@@ -141,6 +140,6 @@ enclave {
 
     // When something fatal happende in the enclave, the enclave will call abort() and then
     // notify the outside application to flush all logs onto the disk and stop running.
-    void ocall_panic_and_flush();
+    void ocall_panic_and_flush([ in, string ] const char* reason);
   };
 };

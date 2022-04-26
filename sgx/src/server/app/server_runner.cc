@@ -566,12 +566,6 @@ sgx_status_t SGXORAMService::init_enclave(sgx_enclave_id_t* const global_eid) {
     return SGX_ERROR_UNEXPECTED;
   }
 
-  // Initialize the cryptomanager in the enclave.
-  if (ecall_init_crypto_manager(*global_eid, &status) != SGX_SUCCESS) {
-    logger->info("Cannot initialize the cryptomanager!");
-    return SGX_ERROR_UNEXPECTED;
-  }
-
   return SGX_SUCCESS;
 }
 

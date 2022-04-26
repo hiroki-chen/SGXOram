@@ -45,7 +45,7 @@ void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_write_position, (const char* position_f
 #endif
 #ifndef OCALL_PANIC_AND_FLUSH_DEFINED__
 #define OCALL_PANIC_AND_FLUSH_DEFINED__
-void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_panic_and_flush, (void));
+void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_panic_and_flush, (const char* reason));
 #endif
 #ifndef PTHREAD_WAIT_TIMEOUT_OCALL_DEFINED__
 #define PTHREAD_WAIT_TIMEOUT_OCALL_DEFINED__
@@ -85,7 +85,6 @@ sgx_status_t ecall_access_data(sgx_enclave_id_t eid, sgx_status_t* retval, int o
 sgx_status_t ecall_check_verification_message(sgx_enclave_id_t eid, sgx_status_t* retval, uint8_t* message, size_t message_size);
 sgx_status_t ecall_seal(sgx_enclave_id_t eid, sgx_status_t* retval, const uint8_t* plaintext, size_t plaintext_len, sgx_sealed_data_t* sealed_data, size_t sealed_size);
 sgx_status_t ecall_unseal(sgx_enclave_id_t eid, sgx_status_t* retval, const sgx_sealed_data_t* sealed_data, size_t sealed_size, uint8_t* plaintext, size_t plaintext_len);
-sgx_status_t ecall_init_crypto_manager(sgx_enclave_id_t eid, sgx_status_t* retval);
 sgx_status_t ecall_begin_DHKE(sgx_enclave_id_t eid, sgx_status_t* retval);
 sgx_status_t ecall_sample_key_pair(sgx_enclave_id_t eid, sgx_status_t* retval, uint8_t* pub_key, size_t pubkey_size);
 sgx_status_t ecall_compute_shared_key(sgx_enclave_id_t eid, sgx_status_t* retval, const uint8_t* pub_key, size_t pubkey_size);

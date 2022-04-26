@@ -30,8 +30,6 @@ typedef enum _derive_key_type_t {
   DERIVE_KEY_MK_VK,
 } derive_key_type_t;
 
-EnclaveCryptoManager* crypto_manager = nullptr;
-
 const char ID_U[] = "SGXRAENCLAVE";
 const char ID_V[] = "SGXRASERVER";
 

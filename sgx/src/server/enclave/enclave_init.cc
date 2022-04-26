@@ -32,12 +32,13 @@
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_t.h>
 
-extern EnclaveCryptoManager* crypto_manager;
-
 // Used to store the secret passed by the SP in the sample code. The
 // size is forced to be 8 bytes. Expected value is
 // 0x01,0x02,0x03,0x04,0x0x5,0x0x6,0x0x7
 uint8_t g_secret[8] = {0};
+
+std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+    EnclaveCryptoManager::get_instance();
 
 #ifdef SUPPLIED_KEY_DERIVATION
 
@@ -344,12 +345,6 @@ static uint32_t uniform_random_helper(const uint32_t& lower,
 
 uint32_t uniform_random(uint32_t lower, uint32_t upper) {
   return uniform_random_helper(lower, upper);
-}
-
-sgx_status_t SGXAPI ecall_init_crypto_manager() {
-  ENCLAVE_LOG("[enclave] Initializing crypto manager\n");
-  crypto_manager = new EnclaveCryptoManager();
-  return SGX_SUCCESS;
 }
 
 /**

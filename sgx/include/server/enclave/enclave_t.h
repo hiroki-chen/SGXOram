@@ -23,7 +23,6 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address, uint8_t* dat
 sgx_status_t ecall_check_verification_message(uint8_t* message, size_t message_size);
 sgx_status_t ecall_seal(const uint8_t* plaintext, size_t plaintext_len, sgx_sealed_data_t* sealed_data, size_t sealed_size);
 sgx_status_t ecall_unseal(const sgx_sealed_data_t* sealed_data, size_t sealed_size, uint8_t* plaintext, size_t plaintext_len);
-sgx_status_t ecall_init_crypto_manager(void);
 sgx_status_t ecall_begin_DHKE(void);
 sgx_status_t ecall_sample_key_pair(uint8_t* pub_key, size_t pubkey_size);
 sgx_status_t ecall_compute_shared_key(const uint8_t* pub_key, size_t pubkey_size);
@@ -42,7 +41,7 @@ sgx_status_t SGX_CDECL ocall_write_slot(const char* slot_finderprint, const uint
 sgx_status_t SGX_CDECL ocall_exception_handler(const char* err_msg);
 sgx_status_t SGX_CDECL ocall_read_position(size_t* retval, const char* position_finderprint, uint8_t* position, size_t position_size);
 sgx_status_t SGX_CDECL ocall_write_position(const char* position_finderprint, const uint8_t* position, size_t position_size);
-sgx_status_t SGX_CDECL ocall_panic_and_flush(void);
+sgx_status_t SGX_CDECL ocall_panic_and_flush(const char* reason);
 sgx_status_t SGX_CDECL pthread_wait_timeout_ocall(int* retval, unsigned long long waiter, unsigned long long timeout);
 sgx_status_t SGX_CDECL pthread_create_ocall(int* retval, unsigned long long self);
 sgx_status_t SGX_CDECL pthread_wakeup_ocall(int* retval, unsigned long long waiter);

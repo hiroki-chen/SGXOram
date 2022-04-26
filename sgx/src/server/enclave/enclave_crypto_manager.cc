@@ -26,6 +26,8 @@
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_t.h>
 
+std::shared_ptr<EnclaveCryptoManager> EnclaveCryptoManager::instance;
+
 EnclaveCryptoManager::EnclaveCryptoManager() {
   memset(shared_secret_key, 0, SGX_AESGCM_KEY_SIZE);
   is_initialized = false;
@@ -35,14 +37,24 @@ EnclaveCryptoManager::EnclaveCryptoManager() {
   // to prevent that the adversary can observe the
   // hash fingerprint of each slot.
   sgx_status_t ret = sgx_read_rand(random_number, DEFAULT_RANDOM_LENGTH);
-
   check_sgx_status(ret, "enclave_crypto_mananger init()");
 }
 
-std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
-  const size_t message_length =
-      message.length() + message.size() + DEFAULT_RANDOM_LENGTH;
+std::shared_ptr<EnclaveCryptoManager> EnclaveCryptoManager::get_instance() {
+  if (instance == nullptr) {
+    // Do not use std::make_shared here, because the constructor of
+    // EnclaveCryptoManager is private, and we cannot call it by
+    // std::make_shared.
+    instance =
+        std::shared_ptr<EnclaveCryptoManager>(new EnclaveCryptoManager());
+  }
 
+  return instance;
+}
+
+std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
+  // Determine the length of the input message with a random numebr.
+  const size_t message_length = message.size() + DEFAULT_RANDOM_LENGTH;
   // Allocate the memory for the message which is used
   // to store the message and the random number. Note
   // that the random number is appended to the message.
@@ -122,7 +134,8 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
   check_sgx_status(ret, "enclave_aes_128_gcm_decrypt()");
 
   // Cast back to the std::string.
-  const std::string plaintext_str = std::string((char*)(plaintext), message_len);
+  const std::string plaintext_str =
+      std::string((char*)(plaintext), message_len);
   safe_free(plaintext);
 
   return plaintext_str;

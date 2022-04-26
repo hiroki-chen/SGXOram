@@ -64,6 +64,7 @@ std::shared_ptr<spdlog::logger> logger = spdlog::rotating_logger_mt(
 
 int SGX_CDECL main(int argc, char** argv) {
   signal(SIGSEGV, handler);
+  signal(SIGABRT, handler);
   // Parse the command line arguments.
   gflags::SetUsageMessage(
       "The SGX-Based Doubly Oblibvious RAM by Nankai University.");
