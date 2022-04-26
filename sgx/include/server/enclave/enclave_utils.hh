@@ -26,6 +26,13 @@
 
 #include <server/app/basic_models.hh>
 
+#ifndef ENCLAVE_LOG
+#define ENCLAVE_LOG(format, ...)                 \
+  {                                             \
+    printf(format, ##__VA_ARGS__);              \
+  }
+#endif
+
 using sgx_error_list = std::unordered_map<sgx_status_t, std::string>;
 
 static const std::string digits = "0123456789abcdef";
@@ -101,11 +108,13 @@ void sprintf(const std::string& str, bool hex = false);
  */
 void safe_free(void* ptr);
 
-void band(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out);
+void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
+          uint8_t* __restrict__ out);
 
-void bor(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out);
+void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
+         uint8_t* __restrict__ out);
 
-void bneg(const uint8_t* lhs, uint8_t* out);
+void bneg(const uint8_t* __restrict__ lhs, uint8_t* __restrict__ out);
 
 /**
  * @brief Read the slot using ocall.
@@ -119,4 +128,4 @@ size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint);
 
 void check_sgx_status(const sgx_status_t& status, const std::string& location);
 
-#endif // ENCLAVE_UTILS_HH
+#endif  // ENCLAVE_UTILS_HH

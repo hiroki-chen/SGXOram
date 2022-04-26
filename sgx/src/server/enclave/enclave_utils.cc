@@ -46,6 +46,8 @@ static sgx_error_list sgx_errlist = {
 void safe_free(void* ptr) {
   if (ptr != nullptr) {
     free(ptr);
+  } else {
+    ENCLAVE_LOG("[enclave] ptr is nullptr.\n");
   }
 }
 
@@ -92,9 +94,9 @@ void printf(const char* fmt, ...) {
 
 void sprintf(const std::string& str, bool hex) {
   if (hex) {
-    printf("%s", hex_to_string((const uint8_t*)str.data(), str.size()).data());
+    ENCLAVE_LOG("%s", hex_to_string((const uint8_t*)str.data(), str.size()).data());
   } else {
-    printf("%s", str.data());
+    ENCLAVE_LOG("%s", str.data());
   }
 }
 
@@ -116,15 +118,16 @@ size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint) {
 
   if (size == 0) {
     // The slot is not found or something went wrong.
-    printf("033[31m The slot for %s is not found.\n033[0m", fingerprint);
+    ENCLAVE_LOG("033[31m The slot for %s is not found.\n033[0m", fingerprint);
   }
   return size;
 }
 
-void check_sgx_status(const sgx_status_t& status, const std::string& location) {
+void check_sgx_status(const sgx_status_t& status, const std::string& reason) {
   if (status != SGX_SUCCESS) {
-    printf("[enclave] %s triggered an SGX error: %s\n", location.data(),
+    ENCLAVE_LOG("[enclave] %s triggered an SGX error: %s\n", reason.data(),
            sgx_errlist[status].data());
+    ocall_panic_and_flush();
     abort();
   }
 }

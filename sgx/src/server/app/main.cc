@@ -18,12 +18,34 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
 #include <sgx_urts.h>
+#include <stdio.h>
+#include <execinfo.h>
+#include <signal.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include <configs.hh>
 #include <utils.hh>
 #include <app/server_runner.hh>
 
 using sgx_oram::get_log_file_name;
+
+// Defines an error handler.
+void handler(int sig) {
+  // Flush the log to capture all error information.
+  logger->flush();
+  // Print the stack trace.
+  void* array[10];
+  size_t size;
+
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 10);
+
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
+}
 
 // Configurations for the server.
 DEFINE_string(address, "localhost", "The server's IP address");
@@ -41,6 +63,7 @@ std::shared_ptr<spdlog::logger> logger = spdlog::rotating_logger_mt(
     server_log_size, server_log_num);
 
 int SGX_CDECL main(int argc, char** argv) {
+  signal(SIGSEGV, handler);
   // Parse the command line arguments.
   gflags::SetUsageMessage(
       "The SGX-Based Doubly Oblibvious RAM by Nankai University.");
@@ -51,6 +74,9 @@ int SGX_CDECL main(int argc, char** argv) {
   spdlog::set_default_logger(logger);
   spdlog::set_level(spdlog::level::debug);
   spdlog::set_pattern(log_pattern);
+
+  spdlog::info("Hello");
+  logger->flush();
 
   // Nullify the input arguments.
   (void)(argc);

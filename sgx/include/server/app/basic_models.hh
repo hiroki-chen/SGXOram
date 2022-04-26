@@ -104,6 +104,12 @@ typedef struct _oram_configuration_t {
   uint32_t oram_type;
 } oram_configuration_t;
 
+typedef enum _oram_operation_t {
+  ORAM_OPERATION_READ = 0,
+  ORAM_OPERATION_WRITE = 1,
+  ORAM_OPERATION_INVALID = 2
+} oram_operation_t;
+
 }  // namespace sgx_oram
 
 #endif // BASIC_MODELS_HH

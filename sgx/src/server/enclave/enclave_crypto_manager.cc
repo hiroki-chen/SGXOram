@@ -63,7 +63,7 @@ std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
 std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
     const std::string& message) {
   if (!is_initialized) {
-    printf("[enclave] Crypto manager is not initialized.\n");
+    ENCLAVE_LOG("[enclave] Crypto manager is not initialized.\n");
     return "";
   }
 
@@ -100,7 +100,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
 std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
     const std::string& message) {
   if (!is_initialized) {
-    printf("[enclave] Crypto manager is not initialized.\n");
+    ENCLAVE_LOG("[enclave] Crypto manager is not initialized.\n");
     return "";
   }
 
@@ -138,7 +138,7 @@ void EnclaveCryptoManager::set_shared_key(
 }
 
 void EnclaveCryptoManager::set_oram_config(uint8_t* buffer, size_t size) {
-  printf("[enclave] Setting oram config...");
+  ENCLAVE_LOG("[enclave] Setting oram config...");
   // Copy the oram config into the enclave.
   oram_config = (sgx_oram::oram_configuration_t*)malloc(size);
   memset(oram_config, 0, size);

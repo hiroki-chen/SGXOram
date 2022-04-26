@@ -139,5 +139,8 @@ enclave {
                               [ in, size = position_size ] const uint8_t* position,
                               size_t position_size);
 
+    // When something fatal happende in the enclave, the enclave will call abort() and then
+    // notify the outside application to flush all logs onto the disk and stop running.
+    void ocall_panic_and_flush();
   };
 };

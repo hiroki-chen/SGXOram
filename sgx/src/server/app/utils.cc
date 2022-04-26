@@ -40,6 +40,11 @@ void ocall_printf(const char* message) {
   logger->debug(message);
 }
 
+void ocall_panic_and_flush(void) {
+  logger->error("An fatal error happened in the enclave!");
+  logger->flush();
+}
+
 static const std::string get_machine_name(void) {
   char hostname[256];
   gethostname(hostname, sizeof(hostname));
@@ -57,7 +62,6 @@ static std::string get_current_time(void) {
   strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
   return std::string(buffer);
 }
-
 
 // Exception handler, but reserved. Please do not use.
 // We strongly recommend you to use the exception handler provided by the
@@ -104,9 +108,15 @@ size_t ocall_read_position(const char* position_fingerprint, uint8_t* position,
                            size_t position_size) {
   const std::string position_str =
       server_runner->get_position(position_fingerprint);
+
   if (position_str.empty()) {
-    throw std::runtime_error("The position is not found.");
+    logger->error("Position with fingerprint {} is not found!",
+                  position_fingerprint);
+
+    // We return 0 to
+    return 0;
   }
+
   // Decompress the position.
   const std::string decompressed_position = decompress_data(position_str);
   // Copy the decompressed position to the position buffer.
@@ -116,8 +126,11 @@ size_t ocall_read_position(const char* position_fingerprint, uint8_t* position,
 
 void ocall_write_position(const char* position_fingerprint,
                           const uint8_t* position, size_t position_size) {
+  // The position must be encrypted, and the position_fingerprint should be the
+  // hash value.
   const std::string position_str(reinterpret_cast<const char*>(position),
                                  position_size);
+  logger->debug("Position: {}", position_fingerprint);
   // Compress the position.
   const std::string compressed_position = compress_data(position_str);
   server_runner->store_position(position_fingerprint, compressed_position);
@@ -125,7 +138,7 @@ void ocall_write_position(const char* position_fingerprint,
 
 void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
                       size_t data_len) {
-  logger->info("The fingerprint for the slot is: {}", slot_finger_print);
+  logger->debug("The fingerprint for the slot is: {}", slot_finger_print);
 
   // Compress the data and then store it to the server.
   std::string compressed_data =
@@ -135,7 +148,7 @@ void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
 
 size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
                        size_t data_len) {
-  logger->info("The fingerprint for the slot is: {}", slot_finger_print);
+  logger->debug("The fingerprint for the slot is: {}", slot_finger_print);
 
   // Check if the slot is in the memory.
   bool is_in_memory = server_runner->is_in_storage(slot_finger_print);

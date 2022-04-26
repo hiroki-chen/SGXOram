@@ -29,6 +29,7 @@
 #include <configs.hh>
 #include <utils.hh>
 #include <service_provider/service_provider.h>
+#include <app/basic_models.hh>
 #include <enclave/enclave_u.h>
 
 std::atomic_bool server_running;
@@ -486,17 +487,25 @@ grpc::Status SGXORAMService::init_oram(
 
   logger->info("The server has properly configured the ORAM.");
 
-  status =
-      ecall_init_oram_controller(*global_eid, &status, (uint8_t*)&oram_config,
-                                 sizeof(oram_config), permutation, real_number);
+  status = ecall_init_oram_controller(
+      *global_eid, &status, (uint8_t*)&oram_config, sizeof(oram_config),
+      permutation, real_number * sizeof(uint32_t));
+
   if (status != SGX_SUCCESS) {
     const std::string error_message = "Failed to initialize the ORAM!";
     logger->error(error_message);
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   } else {
     logger->info("The server has successfully initialized the ORAM.");
-    return grpc::Status::OK;
   }
+
+  // Test if data access works fine?
+  sgx_oram::oram_block_t* block =
+      (sgx_oram::oram_block_t*)malloc(sizeof(sgx_oram::oram_block_t));
+  status = ecall_access_data(*global_eid, &status, 0, 1, (uint8_t*)block,
+                             sizeof(block));
+  logger->debug("ecall_data_access seems to be find.");
+  return grpc::Status::OK;
 }
 
 void Server::store_compressed_slot(const char* const fingerprint,

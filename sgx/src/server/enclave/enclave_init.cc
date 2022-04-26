@@ -32,6 +32,8 @@
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_t.h>
 
+extern EnclaveCryptoManager* crypto_manager;
+
 // Used to store the secret passed by the SP in the sample code. The
 // size is forced to be 8 bytes. Expected value is
 // 0x01,0x02,0x03,0x04,0x0x5,0x0x6,0x0x7
@@ -158,7 +160,7 @@ sgx_status_t SGXAPI enclave_init_ra(int b_pse, sgx_ra_context_t* p_context) {
 #else
   ret = sgx_ra_init(&g_sp_pub_key, b_pse, p_context);
 #endif
-  printf("[enclave] Initializing the remote attestation context...");
+  ENCLAVE_LOG("[enclave] Initializing the remote attestation context...");
   return ret;
 }
 
@@ -345,8 +347,9 @@ uint32_t uniform_random(uint32_t lower, uint32_t upper) {
 }
 
 sgx_status_t SGXAPI ecall_init_crypto_manager() {
-  printf("[enclave] Initializing crypto manager\n");
+  ENCLAVE_LOG("[enclave] Initializing crypto manager\n");
   crypto_manager = new EnclaveCryptoManager();
+  return SGX_SUCCESS;
 }
 
 /**
@@ -408,7 +411,7 @@ sgx_status_t SGXAPI ecall_unseal(const sgx_sealed_data_t* sealed_data,
  */
 sgx_status_t SGXAPI ecall_begin_DHKE() {
   // Create a ecc system for this session.
-  printf("[enclave] Creating a new ECC system...\n");
+  ENCLAVE_LOG("[enclave] Creating a new ECC system...\n");
   sgx_status_t status =
       sgx_ecc256_open_context(crypto_manager->get_state_handle());
   return status;
@@ -436,7 +439,8 @@ sgx_status_t SGXAPI ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
                               sizeof(sgx_ec256_public_t)));
   std::string sk = std::move(hex_to_string(
       (uint8_t*)(crypto_manager->get_secret_key()), SGX_ECP256_KEY_SIZE));
-  printf("[enclave] Key pair sampled! PK: %s, SK: %s", pk.data(), sk.data());
+  ENCLAVE_LOG("[enclave] Key pair sampled! PK: %s, SK: %s", pk.data(),
+              sk.data());
 
   return status;
 }
@@ -449,14 +453,14 @@ sgx_status_t SGXAPI ecall_compute_shared_key(const uint8_t* pubkey,
 
   std::string pub = std::move(hex_to_string((uint8_t*)(&client_public_key),
                                             sizeof(sgx_ec256_public_t)));
-  printf("[enclave] Client public key: %s", pub.data());
+  ENCLAVE_LOG("[enclave] Client public key: %s", pub.data());
 
   sgx_status_t status = sgx_ecc256_compute_shared_dhkey(
       crypto_manager->get_secret_key(), &client_public_key, &shared_key,
       *crypto_manager->get_state_handle());
   std::string shared =
       std::move(hex_to_string((uint8_t*)(&shared_key), SGX_ECP256_KEY_SIZE));
-  printf("[enclave] Shared key computed: %s", shared.data());
+  ENCLAVE_LOG("[enclave] Shared key computed: %s", shared.data());
 
   // Derive secret keys from the shared key.
   // The first key is used to MAC the message while the second key is used for
@@ -465,15 +469,17 @@ sgx_status_t SGXAPI ecall_compute_shared_key(const uint8_t* pubkey,
   sgx_ec_key_128bit_t second_derived_key;
 
   if (!derive_key(&shared_key, 0u, &first_derived_key, &second_derived_key)) {
-    printf("[enclave] Cannot derive the session key!");
+    ENCLAVE_LOG("[enclave] Cannot derive the session key!");
     return SGX_ERROR_UNEXPECTED;
   }
 
   crypto_manager->set_shared_key(&second_derived_key);
-  printf("[enclave] The session key is established! The key is %s",
-         hex_to_string((uint8_t*)(&second_derived_key),
-                       sizeof(sgx_ec_key_128bit_t))
-             .data());
+  ENCLAVE_LOG("[enclave] The session key is established! The key is %s",
+              hex_to_string((uint8_t*)(&second_derived_key),
+                            sizeof(sgx_ec_key_128bit_t))
+                  .data());
+
+  return status;
 }
 
 sgx_status_t SGXAPI ecall_check_verification_message(uint8_t* message,
@@ -482,13 +488,13 @@ sgx_status_t SGXAPI ecall_check_verification_message(uint8_t* message,
       crypto_manager->enclave_aes_128_gcm_decrypt(
           std::string((char*)message, message_size));
 
-  printf("[enclave] Decrypted message: %s", decrypted_message.data());
+  ENCLAVE_LOG("[enclave] Decrypted message: %s", decrypted_message.data());
 
   if (decrypted_message.compare("Hello") != 0) {
-    printf("[enclave] The verification message is not correct!");
+    ENCLAVE_LOG("[enclave] The verification message is not correct!");
     return SGX_ERROR_UNEXPECTED;
   } else {
-    printf("[enclave] The verification message is correct!");
+    ENCLAVE_LOG("[enclave] The verification message is correct!");
     return SGX_SUCCESS;
   }
 }
