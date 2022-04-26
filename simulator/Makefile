@@ -8,7 +8,7 @@ TEST_FILE = $(filter-out $(BUILD_DIR)/experiment.o, $(OBJ_FILE))
 EOBJ_FILE = $(filter-out $(BUILD_DIR)/main.o, $(OBJ_FILE)) # For experiment
 TARGET = $(BUILD_DIR)/Simulator
 EXPERIMENT = $(BUILD_DIR)/Experimenter
-MODE ?= DEBUG
+MODE ?= RELEASE
 # OR MODE ?= RELEASE
 
 CXX = clang++

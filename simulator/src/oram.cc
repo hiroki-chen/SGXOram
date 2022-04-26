@@ -412,17 +412,11 @@ void sgx_oram::Oram::run_test(void) {
   for (uint32_t r = 0; r < round; r++) {
     for (uint32_t i = 0; i < block_number; i++) {
       try {
-        Block b(true);
-        // Generate lexicongraphic order for the root slot.
-        Slot& root = get_slot(0, 0);
-        const uint32_t order = root.last_eviction_order;
-        std::vector<uint32_t> lexicon_order = to_p_nary(order, p, level);
-        root.last_eviction_order =
-            (root.last_eviction_order + 1) % (uint32_t)(std::pow(p, level));
-        auto res = std::move(
-            oram_access(0, i, b, 0, position_map[i].bid_cur, lexicon_order));
 
-        if (res.data != data[i]) {
+        std::string res;
+        oram_access(0, i, res);
+
+        if (res != data[i]) {
           // std::cout << res.data << ", " << data[i] << std::endl;
           // std::cout << "data not correct.\n";
           exit(1);

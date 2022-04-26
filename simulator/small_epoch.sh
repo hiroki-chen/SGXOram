@@ -31,11 +31,11 @@ then
     rm -rf *.txt
 fi
 
-declare -a ways=("16" "32" "64")
-declare -a bucket_sizes=("32" "64" "128")
-declare -a block_nums=("1000" "10000" "50000")
-declare -a rounds=("10" "100")
-declare -a constants=("1.0" "1.5" "2.0")
+declare -a ways=("4" "8" "16" "32" "64" "128" "256")
+declare -a bucket_sizes=("128")
+declare -a block_nums=("10000")
+declare -a rounds=("1")
+declare -a constants=("2")
 
 for way in "${ways[@]}";
 do
@@ -52,7 +52,7 @@ do
                 do
                     for constant in "${constants[@]}";
                     do
-                        cmd="./build/Simulator -w ${way} -n ${block_num} -r ${round} -b ${bucket_size} -t 2 -c ${constant}"
+                        cmd="./build/Simulator -w ${way} -n ${block_num} -r ${round} -b ${bucket_size} -t 0 -c ${constant}"
                         # Invoke the binary the run the experiment.
                         echo "Experiment setting: ${cmd}"
                         ${cmd}
