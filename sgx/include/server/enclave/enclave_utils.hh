@@ -36,7 +36,10 @@
 using sgx_error_list = std::unordered_map<sgx_status_t, std::string>;
 
 static const std::string digits = "0123456789abcdef";
+
+#if __cplusplus >= 201703L
 /** @addtogroup String concatenation helpers with arbitrary elements.
+ *  @warning This is not supported by current SGX libstdc++ libraries (C++14).
  *
  *  @{
  */
@@ -46,6 +49,8 @@ inline std::string to_string(T&& val) {
     return std::to_string(val);
   } else if constexpr (std::is_same<std::decay_t<T>, const char*>::value) {
     return std::string(val);
+  } else {
+    return "";
   }
 }
 
@@ -61,12 +66,12 @@ inline std::string strcat_helper(const std::string& string, T&& val,
 }
 
 template <class... Args>
-inline std::string strcat(Args&&... args) {
+inline std::string enclave_strcat(Args&&... args) {
   std::string string;
   return strcat_helper(string, (std::forward<Args>(args))...);
 }
-
 /** @} */
+#endif
 
 /**
  * @brief Cast an unsigned char array to hexical std::string.
@@ -127,5 +132,13 @@ void bneg(const uint8_t* __restrict__ lhs, uint8_t* __restrict__ out);
 size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint);
 
 void check_sgx_status(const sgx_status_t& status, const std::string& location);
+
+/**
+ * @brief Concatenate arbitrary arguments into a string.
+ * 
+ * @param str ...
+ * @return std::string 
+ */
+std::string enclave_strcat(const std::string& str, ...);
 
 #endif  // ENCLAVE_UTILS_HH

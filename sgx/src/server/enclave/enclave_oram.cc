@@ -26,6 +26,13 @@
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_crypto_manager.hh>
 
+static inline bool check_slot_header(const char* const slot_header,
+                                     uint32_t level) {
+  const sgx_oram::oram_slot_header_t* header =
+      reinterpret_cast<const sgx_oram::oram_slot_header_t*>(slot_header);
+  return header->level == level;
+}
+
 static void print_permutation(const uint32_t* permutation, uint32_t size) {
   for (uint32_t i = 0; i < size; ++i) {
     ENCLAVE_LOG("%u ", permutation[i]);
@@ -33,7 +40,7 @@ static void print_permutation(const uint32_t* permutation, uint32_t size) {
   ENCLAVE_LOG("\n");
 }
 
-static void get_position_and_decrypt(sgx_oram::oram_position_t* position,
+static void get_position_and_decrypt(sgx_oram::oram_position_t* const position,
                                      uint32_t block_address) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
@@ -68,18 +75,24 @@ static void get_position_and_decrypt(sgx_oram::oram_position_t* position,
 // This function fetches the target slot from the outside memory by calculting
 // its hash value and then decrypt it in the enclave. Finally, it writes the
 // decrypted target slot to the target slot buffer allocate by the caller.
-// FIXME: the decryption is erroreous.
 static void get_slot_and_decrypt(uint32_t level, uint32_t offset,
                                  uint8_t* slot_buffer, size_t slot_size) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
+  // Determine the size of the target slot in ciphertext.
+  const size_t ciphertext_size =
+      slot_size + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE;
   // Compute the hash value of the target slot.
-  const std::string sid = std::to_string(level) + std::to_string(offset);
+  const std::string sid = enclave_strcat(std::to_string(level).c_str(), "_",
+                                         std::to_string(level).c_str());
+  ENCLAVE_LOG("[enclave] sid: %s\n", sid.c_str());
   const std::string slot_hash = crypto_manager->enclave_sha_256(sid);
 
   // Prepare a buffer for storing the ciphertext of the slot.
-  uint8_t* ciphertext = (uint8_t*)malloc(ENCRYPTED_SLOT_SIZE);
-  memset(ciphertext, 0, ENCRYPTED_SLOT_SIZE);
+  // Note that there are leaf and internal nodes, so we must allocate a buffer
+  // that is large enough to hold the worst-case ciphertext.
+  uint8_t* ciphertext = (uint8_t*)malloc(ciphertext_size);
+  memset(ciphertext, 0, ciphertext_size);
 
   // For safety reason, we use the same buffer to store the decrypted target.
   // Note that the size of the buffer should be at least the size of the
@@ -87,22 +100,28 @@ static void get_slot_and_decrypt(uint32_t level, uint32_t offset,
   // Here, the variable slot_size is useless, but we use it as sanity check.
   sgx_status_t status = SGX_ERROR_UNEXPECTED;
   status = ocall_read_slot(&slot_size, slot_hash.c_str(), ciphertext,
-                           ENCRYPTED_SLOT_SIZE);
+                           ciphertext_size);
   check_sgx_status(status, "get_slot_and_decrypt()");
 
   // Check if the slot is valid.
   if (slot_size == 0) {
-    ocall_panic_and_flush("The slot is invalid.");
+    ocall_panic_and_flush("The enclave proxy cannot fetch the target slot.");
   }
 
   // Decrypt the target slot.
   const std::string decrypted_slot =
-      crypto_manager->enclave_aes_128_gcm_decrypt(std::string(
-          reinterpret_cast<char*>(ciphertext), ENCRYPTED_SLOT_SIZE));
+      crypto_manager->enclave_aes_128_gcm_decrypt(
+          std::string(reinterpret_cast<char*>(ciphertext), ciphertext_size));
+  safe_free(ciphertext);
+
+  // Sanity check: The header of the decrypted slot should not be corrupted
+  //               by something weird.
+  if (!check_slot_header(decrypted_slot.c_str(), level)) {
+    ocall_panic_and_flush("The slot header is invalid.");
+  }
   // Copy back to the buffer.
   memcpy(slot_buffer, decrypted_slot.c_str(), decrypted_slot.size());
   // Finally, free the buffer we've just allocated.
-  safe_free(ciphertext);
 }
 
 // This function will calculate the offset for the slot at current level
@@ -116,7 +135,7 @@ static inline uint32_t calculate_offset(uint32_t block_id, uint32_t level_cur) {
   const uint32_t level = crypto_manager->get_oram_config()->level;
   const uint32_t way = crypto_manager->get_oram_config()->way;
 
-  return std::floor((block_id * 1.0 / std::pow(way, level - level_cur - 1)));
+  return std::floor((block_id * 1.0 / std::pow(way, level - level_cur)));
 }
 
 // This function assembles position for the current block.
@@ -138,8 +157,9 @@ static std::string assemble_position_and_encrypt(uint32_t level, uint32_t bid,
   return ans;
 }
 
-static sgx_status_t populate_leaf_slot(sgx_oram::oram_slot_leaf_t* slot,
-                                       size_t slot_size, uint32_t* permutation,
+static sgx_status_t populate_leaf_slot(sgx_oram::oram_slot_leaf_t* const slot,
+                                       size_t slot_size,
+                                       const uint32_t* const permutation,
                                        size_t permutation_size,
                                        uint32_t offset) {
   sgx_oram::oram_slot_header_t* slot_header = &(slot->header);
@@ -166,11 +186,11 @@ static sgx_status_t populate_leaf_slot(sgx_oram::oram_slot_leaf_t* slot,
   // The loop should end when i reaches the halve of the slot size or the
   // offset is larger than the needed size.
   // Note that blocks in the same bucket have the same block id. So the offset
-  // is BUCKET_SIZE times bigger than the actual offset; therefore, we need to
-  // multiply slot_begin by the macro BUCKET_SIZE.
+  // is DEFAULT_BUCKET_SIZE times bigger than the actual offset; therefore, we
+  // need to multiply slot_begin by the macro DEFAULT_BUCKET_SIZE.
 
   // Or more simply, the offset + i cannot exceed the real_number.
-  for (; (i + offset <= real_number) && (i < BUCKET_SIZE >> 1); i++) {
+  for (; (i + offset <= real_number) && (i < DEFAULT_BUCKET_SIZE >> 1); i++) {
     // Locate the slot in the storage.
     sgx_oram::oram_block_t* block_ptr = &(slot->blocks[i]);
     // Fill in the block with metadata first.
@@ -206,7 +226,7 @@ static sgx_status_t populate_leaf_slot(sgx_oram::oram_slot_leaf_t* slot,
   return SGX_SUCCESS;
 }
 
-static sgx_status_t init_so2_oram(uint32_t* level_size_information) {
+static sgx_status_t init_so2_oram(uint32_t* const level_size_information) {
   ENCLAVE_LOG(
       "[enclave] The ORAM controller is initializing the SGX storage tree "
       "level by level...\n");
@@ -250,15 +270,14 @@ static sgx_status_t init_so2_oram(uint32_t* level_size_information) {
 }
 
 // This function will initialize the storage tree.
-static sgx_status_t init_so2_slots(uint32_t* level_size_information,
-                                   uint32_t* permutation,
+static sgx_status_t init_so2_slots(uint32_t* const level_size_information,
+                                   const uint32_t* const permutation,
                                    size_t permutation_size) {
   print_permutation(permutation, permutation_size);
 
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
 
-  ENCLAVE_LOG("[enclave] The bucket size is %d", BUCKET_SIZE);
   ENCLAVE_LOG(
       "[enclave] The ORAM controller is initializing the SGX storage slots "
       "for each level...\n");
@@ -274,12 +293,6 @@ static sgx_status_t init_so2_slots(uint32_t* level_size_information,
     const uint32_t level_size = (uint32_t)std::pow(way, level - i - 1);
 
     for (uint32_t j = 0; j < cur_slot_num; j++) {
-      // If offset is bigger than the number of the blocks, then we should
-      // immediately stop; otherwise it is meaningless.
-      // if (offset >= permutation_size) {
-      //   break;
-      // }
-
       const uint32_t begin = j * level_size;
       const uint32_t end = begin + level_size - 1;
 
@@ -293,6 +306,7 @@ static sgx_status_t init_so2_slots(uint32_t* level_size_information,
       header->level = i;
       header->dummy_number =
           (is_leaf ? bucket_size : level_size_information[i]);
+      header->slot_size = header->dummy_number;
       header->range_begin = begin;
       header->range_end = end;
 
@@ -323,9 +337,10 @@ static sgx_status_t init_so2_slots(uint32_t* level_size_information,
 
       // Calculate the hash value of the slot by its current level and the
       // offset at the current level.
-      const std::string slot_identifier = std::to_string(i) + std::to_string(j);
-      const std::string slot_hash =
-          crypto_manager->enclave_sha_256(slot_identifier);
+      const std::string sid = enclave_strcat(std::to_string(i).c_str(), "_",
+                                             std::to_string(j).c_str());
+      ENCLAVE_LOG("[enclave] The sid is %s.\n", sid.c_str());
+      const std::string slot_hash = crypto_manager->enclave_sha_256(sid);
 
       // Encrypt the slot.
       const std::string encrypted_slot =
@@ -348,32 +363,56 @@ static sgx_status_t init_so2_slots(uint32_t* level_size_information,
   return SGX_SUCCESS;
 }
 
+static void sub_access(sgx_oram::oram_operation_t op_type, bool condition,
+                       uint8_t* const s1, uint8_t* const s2,
+                       uint8_t* const data_star, uint32_t level) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
+  // Get the type of the slot from its header.
+  sgx_oram::oram_slot_header_t* slot_header = (sgx_oram::oram_slot_header_t*)s1;
+  sgx_oram::oram_slot_type_t slot_type_s1 = slot_header->type;
+
+  // Determine the size of the slot.
+  const size_t slot_size = (slot_type_s1 == sgx_oram::ORAM_SLOT_TYPE_LEAF)
+                               ? DEFAULT_BUCKET_SIZE
+                               : DEFAULT_SLOT_SIZE;
+
+  // First, we do an one-pass on the slot S1.
+  for (size_t i = 0; i < slot_size; i++) {
+    // TODO
+  }
+}
+
 // The main entry of the data access.
 // In this function, three slots are involved to fetch the block from
 // the ORAM tree, although a slot is implicitly accessed by another function
 // called by this function.
 static void data_access(sgx_oram::oram_operation_t, uint32_t current_level,
-                        uint8_t* data, size_t data_size, bool condition,
-                        sgx_oram::oram_position_t* position) {
+                        uint8_t* const data, size_t data_size, bool condition,
+                        sgx_oram::oram_position_t* const position) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
-  // Read two slots S1 and S2 from the outside memory. Originally, in the (ORAM)
-  // simulation mode, we fetch the slots by their levels and offsets at certain
-  // level. However, in the SGX mode, we fetch the slots by their hash values,
-  // albeit the hash values are not the same as the levels and offsets, but they
-  // are calculated by level + offset.
-  const uint32_t offset_s1 = calculate_offset(position->bid, current_level);
-  const uint32_t offset_s2 = calculate_offset(position->bid, current_level - 1);
+  // - Read two slots S1 and S2 from the outside memory. Originally, in the
+  //   (ORAM) simulation mode, we fetch the slots by their levels and offsets at
+  //   certain level.
+  // - However, in the SGX mode, we fetch the slots by their hash values, albeit
+  //   the hash values are not the same as the levels and offsets, but they are
+  //   calculated by level + offset.
+  // - Also note that since the level starts from 0, the level is slightly
+  //   different from what we have written in the pseudocode. Moreover, because
+  //   slot s1 is fetched by adding 1 to the current level, the iteration must
+  //   stop at total_level - 1 to prevent the level overflow.
+  const uint32_t offset_s1 = calculate_offset(position->bid, current_level + 1);
+  const uint32_t offset_s2 = calculate_offset(position->bid, current_level);
   // Allocate the slot buffers.
   const uint32_t level = crypto_manager->get_oram_config()->level;
-  size_t slot_size_s1 = (current_level == level)
+  // An extra offset is added.
+  size_t slot_size_s1 = (current_level + 2 == level)
                             ? sizeof(sgx_oram::oram_slot_leaf_t)
                             : sizeof(sgx_oram::oram_slot_t);
-  size_t slot_size_s2 = (current_level == level)
-                            ? sizeof(sgx_oram::oram_slot_leaf_t)
-                            : sizeof(sgx_oram::oram_slot_t);
-  uint8_t* s1 = (uint8_t*)malloc(sizeof(sgx_oram::oram_slot_leaf_t));
-  uint8_t* s2 = (uint8_t*)malloc(sizeof(sgx_oram::oram_slot_leaf_t));
+  size_t slot_size_s2 = sizeof(sgx_oram::oram_slot_t);
+  uint8_t* s1 = (uint8_t*)malloc(slot_size_s1);
+  uint8_t* s2 = (uint8_t*)malloc(slot_size_s2);
   size_t s1_size = 0;
   size_t s2_size = 0;
 
@@ -381,8 +420,8 @@ static void data_access(sgx_oram::oram_operation_t, uint32_t current_level,
   // FIXME: We may need to put all the slots in a buffer pool so that we can
   // immediately free the unneeded slots after a write opeation.
   // CAVEAT: Malloc without free is not a good idea.
-  get_slot_and_decrypt(current_level, offset_s1, s1, slot_size_s1);
-  get_slot_and_decrypt(current_level - 1, offset_s2, s2, slot_size_s2);
+  get_slot_and_decrypt(current_level + 1, offset_s1, s1, slot_size_s1);
+  get_slot_and_decrypt(current_level, offset_s2, s2, slot_size_s2);
 
   // Call sub_access(op_type, condition, S1, S2, data, data_size, i, pi);
   safe_free(s1);
@@ -408,7 +447,8 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
 
   ENCLAVE_LOG("[enclave] block_level: %u, bid_cur: %u", block_level, bid_cur);
 
-  for (uint32_t i = 1; i <= level; i++) {
+  // We start from 0.
+  for (uint32_t i = 0; i < level - 1; i++) {
     // If the current level is the same as the block level, then we should
     // directly access the data; otherwise, we should perform fake access.
     bool condition = (i == block_level);
@@ -423,8 +463,9 @@ sgx_status_t init_oram(uint32_t* permutation, size_t permutation_size) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
   // Check if the bucket_size is correct.
-  if (crypto_manager->get_oram_config()->bucket_size != BUCKET_SIZE) {
-    ENCLAVE_LOG("[enclave] The bucket size is not correct.\n");
+  if (crypto_manager->get_oram_config()->bucket_size != DEFAULT_BUCKET_SIZE ||
+      crypto_manager->get_oram_config()->way != DEFAULT_SLOT_SIZE) {
+    ENCLAVE_LOG("[enclave] The ORAM configuration is not correct.\n");
     return SGX_ERROR_UNEXPECTED;
   }
 

@@ -41,6 +41,7 @@ static sgx_error_list sgx_errlist = {
     {SGX_ERROR_INVALID_ATTRIBUTE, "Enclave was not authorized."},
     {SGX_ERROR_ENCLAVE_FILE_ACCESS, "Can't open enclave file."},
     {SGX_ERROR_MEMORY_MAP_FAILURE, "Failed to reserve memory for the enclave."},
+    {SGX_ERROR_MAC_MISMATCH, "The MAC verification failed."},
 };
 
 // A safe free is always used to free memory allocated by the enclave and is
@@ -134,4 +135,19 @@ void check_sgx_status(const sgx_status_t& status, const std::string& reason) {
     ocall_panic_and_flush(reason.c_str());
     abort();
   }
+}
+
+std::string enclave_strcat(const std::string& str, ...) {
+  va_list ap;
+  va_start(ap, str);
+  std::string ans = str;
+  while (true) {
+    const char* next = va_arg(ap, const char*);
+    if (next == nullptr) {
+      break;
+    }
+    ans += next;
+  }
+  va_end(ap);
+  return ans;
 }

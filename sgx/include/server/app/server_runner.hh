@@ -35,7 +35,7 @@
 #define SAMPLE_SP_IV_SIZE 12
 #define MAX_VERIFICATION_RESULT 2
 
-extern std::shared_ptr<spdlog::logger> logger; 
+extern std::shared_ptr<spdlog::logger> logger;
 
 struct OramConfiguration {
   uint32_t way;
@@ -155,7 +155,9 @@ class Server final {
   void run(const std::string& address, sgx_enclave_id_t* const global_eid);
 
   void store_compressed_slot(const char* const fingerprint,
-                             const std::string& compressed_slot);
+                             const std::string& compressed_slot) {
+    service->storage[fingerprint] = compressed_slot;
+  }
 
   std::string get_compressed_slot(const char* const fingerprint) {
     return service->storage[fingerprint];

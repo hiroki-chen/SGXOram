@@ -141,5 +141,7 @@ enclave {
     // When something fatal happende in the enclave, the enclave will call abort() and then
     // notify the outside application to flush all logs onto the disk and stop running.
     void ocall_panic_and_flush([ in, string ] const char* reason);
+
+    void ocall_flush_log();
   };
 };

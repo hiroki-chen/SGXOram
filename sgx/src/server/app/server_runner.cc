@@ -504,14 +504,8 @@ grpc::Status SGXORAMService::init_oram(
       (sgx_oram::oram_block_t*)malloc(sizeof(sgx_oram::oram_block_t));
   status = ecall_access_data(*global_eid, &status, 0, 1, (uint8_t*)block,
                              sizeof(block));
-  logger->debug("ecall_data_access seems to be find.");
+  logger->debug("ecall_data_access seems to be found.");
   return grpc::Status::OK;
-}
-
-void Server::store_compressed_slot(const char* const fingerprint,
-                                   const std::string& compressed_slot) {
-  // Store the compressed slot.
-  service->storage[fingerprint] = compressed_slot;
 }
 
 void Server::run(const std::string& address,

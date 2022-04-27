@@ -48,6 +48,8 @@ void ocall_panic_and_flush(const char* reason) {
   abort();
 }
 
+void ocall_flush_log() { logger->flush(); }
+
 static const std::string get_machine_name(void) {
   char hostname[256];
   gethostname(hostname, sizeof(hostname));
@@ -112,7 +114,6 @@ size_t ocall_read_position(const char* position_fingerprint, uint8_t* position,
   const std::string position_str =
       server_runner->get_position(position_fingerprint);
 
-
   if (position_str.empty()) {
     logger->error("Position with fingerprint {} is not found!",
                   position_fingerprint);
@@ -168,8 +169,8 @@ size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
     return decompressed_size;
   } else {
     logger->error("Slot not found in memory.");
-
-    // TODO: Find the slot in the directory called data.
+    // Returns 0 to indicate that the slot is not found.
+    // The enclave will simply crash or handle the error.
     return 0;
   }
 }

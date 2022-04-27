@@ -255,6 +255,13 @@ static sgx_status_t SGX_CDECL enclave_ocall_panic_and_flush(void* pms)
 	return SGX_SUCCESS;
 }
 
+static sgx_status_t SGX_CDECL enclave_ocall_flush_log(void* pms)
+{
+	if (pms != NULL) return SGX_ERROR_INVALID_PARAMETER;
+	ocall_flush_log();
+	return SGX_SUCCESS;
+}
+
 static sgx_status_t SGX_CDECL enclave_pthread_wait_timeout_ocall(void* pms)
 {
 	ms_pthread_wait_timeout_ocall_t* ms = SGX_CAST(ms_pthread_wait_timeout_ocall_t*, pms);
@@ -321,9 +328,9 @@ static sgx_status_t SGX_CDECL enclave_sgx_thread_set_multiple_untrusted_events_o
 
 static const struct {
 	size_t nr_ocall;
-	void * table[15];
+	void * table[16];
 } ocall_table_enclave = {
-	15,
+	16,
 	{
 		(void*)enclave_ocall_printf,
 		(void*)enclave_ocall_read_slot,
@@ -332,6 +339,7 @@ static const struct {
 		(void*)enclave_ocall_read_position,
 		(void*)enclave_ocall_write_position,
 		(void*)enclave_ocall_panic_and_flush,
+		(void*)enclave_ocall_flush_log,
 		(void*)enclave_pthread_wait_timeout_ocall,
 		(void*)enclave_pthread_create_ocall,
 		(void*)enclave_pthread_wakeup_ocall,

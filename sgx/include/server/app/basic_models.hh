@@ -21,18 +21,24 @@
 
 // Fixed.
 #define DEFAULT_ORAM_DATA_SIZE 4096
-// How many blocks a slot can hold.
-// Note that the block size is 4160 bytes (including the header).
-#define DEFAULT_SLOT_SIZE 32
 
 #define ENCRYPTED_POSITION_SIZE \
   sizeof(sgx_oram::oram_position_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
 
 #define ENCRYPTED_SLOT_SIZE \
-  sizeof(sgx_oram::oram_slot_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
+  sizeof(sgx_oram::oram_slot_leaf_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
 
 #define ENCRYPTED_BLOCK_SIZE \
   sizeof(sgx_oram::oram_block_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
+
+// If the compiler does not give the macro, use the default value.
+#ifndef DEFAULT_SLOT_SIZE
+#define DEFAULT_SLOT_SIZE 32
+#endif
+
+#ifndef DEFAULT_BUCKET_SIZE
+#define DEFAULT_BUCKET_SIZE 64
+#endif
 
 namespace sgx_oram {
 // If we need to transfer data between the untrusted memory and the enclave, we
@@ -70,14 +76,18 @@ typedef struct _oram_block_t {
 
 typedef struct _oram_slot_header_t {
   // The slot type.
-  uint16_t type;
+  oram_slot_type_t type;
   // The level at which the slot is located.
   uint16_t level;
   // The range of the slot.
   uint32_t range_begin;
   uint32_t range_end;
   // The available space of the slot.
+  // Note that the actual space is much bigger than the available space
+  // because we need to allocate the buffer in advance; thus we cannot
+  // predict the actual space.
   uint32_t dummy_number;
+  uint32_t slot_size;
 } oram_slot_header_t;
 
 typedef struct _oram_slot_t {
@@ -91,7 +101,7 @@ typedef struct _oram_slot_leaf_t {
   // The slot header.
   oram_slot_header_t header;
   // The storage of the slot.
-  oram_block_t blocks[BUCKET_SIZE];
+  oram_block_t blocks[DEFAULT_BUCKET_SIZE];
 } oram_slot_leaf_t;
 
 typedef struct _oram_position_t {
