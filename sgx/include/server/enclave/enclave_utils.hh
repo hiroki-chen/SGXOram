@@ -24,7 +24,7 @@
 
 #include <sgx_urts.h>
 
-#include <server/app/basic_models.hh>
+#include <basic_models.hh>
 
 #ifndef ENCLAVE_LOG
 #define ENCLAVE_LOG(format, ...)                 \

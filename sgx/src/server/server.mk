@@ -242,7 +242,7 @@ $(KEY_PATH)/key.pem:
 $(Signed_Enclave_Name): $(Enclave_Name) $(KEY_PATH)/key.pem
 	@$(SGX_SIGN) sign -key $(KEY_PATH)/key.pem \
 					  -enclave $(Enclave_Name) -out $@ \
-					  -config $(Enclave_Config_File) &> /dev/null
+					  -config $(Enclave_Config_File) > /dev/null 2>&1
 
 enclave: mk create_proxy $(Signed_Enclave_Name)
 	@printf "\033[1;93;49mEnclave created!\033[0m\n"

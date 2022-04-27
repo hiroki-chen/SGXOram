@@ -112,6 +112,7 @@ static void get_slot_and_decrypt(uint32_t level, uint32_t offset,
   const std::string decrypted_slot =
       crypto_manager->enclave_aes_128_gcm_decrypt(
           std::string(reinterpret_cast<char*>(ciphertext), ciphertext_size));
+  // Free the buffer we've just allocated.
   safe_free(ciphertext);
 
   // Sanity check: The header of the decrypted slot should not be corrupted
@@ -121,7 +122,6 @@ static void get_slot_and_decrypt(uint32_t level, uint32_t offset,
   }
   // Copy back to the buffer.
   memcpy(slot_buffer, decrypted_slot.c_str(), decrypted_slot.size());
-  // Finally, free the buffer we've just allocated.
 }
 
 // This function will calculate the offset for the slot at current level
@@ -195,13 +195,13 @@ static sgx_status_t populate_leaf_slot(sgx_oram::oram_slot_leaf_t* const slot,
     sgx_oram::oram_block_t* block_ptr = &(slot->blocks[i]);
     // Fill in the block with metadata first.
     block_ptr->header.type = sgx_oram::ORAM_BLOCK_TYPE_NORMAL;
-    block_ptr->header.bid = offset + i;
+    block_ptr->header.bid = slot_begin;
     block_ptr->header.address = permutation[offset + i];
 
     // Assemble the <k, v> pair.
     ENCLAVE_LOG("[enclave] Address is %d\n", permutation[offset + i]);
     const std::string position_str = assemble_position_and_encrypt(
-        slot_header->level, offset + i, permutation[offset + i]);
+        slot_header->level, slot_begin, permutation[offset + i]);
     const std::string position_fingerprint = crypto_manager->enclave_sha_256(
         std::to_string(permutation[offset + i]));
     // Write the position back to the server.
@@ -469,27 +469,20 @@ sgx_status_t init_oram(uint32_t* permutation, size_t permutation_size) {
     return SGX_ERROR_UNEXPECTED;
   }
 
-  if (crypto_manager->get_oram_config()->oram_type == 1) {
-    uint32_t* level_size_information = (uint32_t*)malloc(
-        sizeof(uint32_t) * crypto_manager->get_oram_config()->level);
-    sgx_status_t status = SGX_ERROR_UNEXPECTED;
+  uint32_t* level_size_information = (uint32_t*)malloc(
+      sizeof(uint32_t) * crypto_manager->get_oram_config()->level);
+  sgx_status_t status = SGX_ERROR_UNEXPECTED;
 
-    if ((status = init_so2_oram(level_size_information)) != SGX_SUCCESS) {
-      ENCLAVE_LOG("[enclave] Failed to initialize the ORAM tree.");
-      // Safely free the allocated memory.
-      safe_free(level_size_information);
-      return status;
-    } else if ((status = init_so2_slots(level_size_information, permutation,
-                                        permutation_size)) != SGX_SUCCESS) {
-      ENCLAVE_LOG("[enclave] Failed to initialize the ORAM slots.");
-      safe_free(level_size_information);
-      return status;
-    }
-
-  } else {
-    // The ORAM type is incorrect. We report an error.
-    ENCLAVE_LOG("[enclave] The ORAM type is incorrect.\n");
-    return SGX_ERROR_INVALID_ATTRIBUTE;
+  if ((status = init_so2_oram(level_size_information)) != SGX_SUCCESS) {
+    ENCLAVE_LOG("[enclave] Failed to initialize the ORAM tree.");
+    // Safely free the allocated memory.
+    safe_free(level_size_information);
+    return status;
+  } else if ((status = init_so2_slots(level_size_information, permutation,
+                                      permutation_size)) != SGX_SUCCESS) {
+    ENCLAVE_LOG("[enclave] Failed to initialize the ORAM slots.");
+    safe_free(level_size_information);
+    return status;
   }
 
   return SGX_SUCCESS;

@@ -29,7 +29,7 @@
 #include <configs.hh>
 #include <utils.hh>
 #include <service_provider/service_provider.h>
-#include <app/basic_models.hh>
+#include <basic_models.hh>
 #include <enclave/enclave_u.h>
 
 std::atomic_bool server_running;
@@ -478,10 +478,10 @@ grpc::Status SGXORAMService::init_oram(
   }
 
   // Calculate the level of the ORAM tree.
+  const uint32_t bucket_number =
+      std::ceil(oram_config.number * 1.0 / oram_config.bucket_size);
   oram_config.level =
-      std::ceil(std::log(oram_config.number / oram_config.bucket_size) /
-                std::log(oram_config.way)) +
-      1;
+      std::ceil(std::log(bucket_number) / std::log(oram_config.way)) + 1;
   // Print the configuration.
   print_oram_config(oram_config);
 

@@ -156,4 +156,9 @@ void EnclaveCryptoManager::set_oram_config(uint8_t* buffer, size_t size) {
   oram_config = (sgx_oram::oram_configuration_t*)malloc(size);
   memset(oram_config, 0, size);
   memcpy(oram_config, buffer, size);
+
+  // Check the correctness of the oram config.
+  if (oram_config->oram_type != 1) {
+    ocall_panic_and_flush("Expected oram type: SO2");
+  }
 }

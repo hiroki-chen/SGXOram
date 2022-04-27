@@ -25,7 +25,7 @@
 #include <sgx_tcrypto.h>
 #include <sgx_ecp_types.h>
 
-#include <app/basic_models.hh>
+#include <basic_models.hh>
 
 /**
  * @brief A class that manages all the interfaces and keys for cryptographic
