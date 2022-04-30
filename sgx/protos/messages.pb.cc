@@ -78,7 +78,7 @@ struct ReadRequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT ReadRequestDefaultTypeInternal _ReadRequest_default_instance_;
 constexpr ReadReply::ReadReply(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : block_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  : data_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , success_(false){}
 struct ReadReplyDefaultTypeInternal {
   constexpr ReadReplyDefaultTypeInternal()
@@ -319,7 +319,7 @@ const uint32_t TableStruct_messages_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::oram::ReadReply, block_),
+  PROTOBUF_FIELD_OFFSET(::oram::ReadReply, data_),
   PROTOBUF_FIELD_OFFSET(::oram::ReadReply, success_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::oram::WriteRequest, _internal_metadata_),
@@ -507,65 +507,65 @@ const char descriptor_table_protodef_messages_2eproto[] PROTOBUF_SECTION_VARIABL
   "t\030\005 \001(\r\022\r\n\005round\030\006 \001(\r\022\026\n\toram_type\030\007 \001("
   "\rH\000\210\001\001\022\031\n\014verification\030\010 \001(\014H\001\210\001\001\022\023\n\013per"
   "mutation\030\t \003(\rB\014\n\n_oram_typeB\017\n\r_verific"
-  "ation\"\036\n\013ReadRequest\022\017\n\007address\030\001 \001(\r\"+\n"
-  "\tReadReply\022\r\n\005block\030\001 \001(\014\022\017\n\007success\030\002 \001"
-  "(\010\"-\n\014WriteRequest\022\017\n\007address\030\001 \001(\r\022\014\n\004d"
-  "ata\030\002 \001(\014\"\035\n\nWriteReply\022\017\n\007success\030\001 \001(\010"
-  "\"\016\n\014CloseRequest\":\n\016InitialMessage\022\014\n\004ty"
-  "pe\030\001 \001(\r\022\021\n\004size\030\002 \001(\rH\000\210\001\001B\007\n\005_size\"F\n\010"
-  "Message0\022\014\n\004type\030\001 \001(\r\022\014\n\004epid\030\002 \001(\r\022\023\n\006"
-  "status\030\003 \001(\rH\000\210\001\001B\t\n\007_status\"K\n\010Message1"
-  "\022\014\n\004type\030\001 \001(\r\022\017\n\003GaX\030\002 \003(\rB\002\020\001\022\017\n\003GaY\030\003"
-  " \003(\rB\002\020\001\022\017\n\003GID\030\004 \003(\rB\002\020\001\"\315\002\n\010Message2\022\014"
-  "\n\004type\030\001 \001(\r\022\021\n\004size\030\002 \001(\rH\000\210\001\001\022\031\n\rpubli"
-  "c_key_gx\030\003 \003(\rB\002\020\001\022\031\n\rpublic_key_gy\030\004 \003("
-  "\rB\002\020\001\022\027\n\nquote_type\030\005 \001(\rH\001\210\001\001\022\020\n\004spid\030\006"
-  " \003(\rB\002\020\001\022\030\n\013cmac_kdf_id\030\007 \001(\rH\002\210\001\001\022\027\n\013si"
-  "gnature_x\030\010 \003(\rB\002\020\001\022\027\n\013signature_y\030\t \003(\r"
-  "B\002\020\001\022\020\n\004smac\030\n \003(\rB\002\020\001\022\027\n\nsize_sigrl\030\013 \001"
-  "(\rH\003\210\001\001\022\021\n\005sigrl\030\014 \003(\rB\002\020\001B\007\n\005_sizeB\r\n\013_"
-  "quote_typeB\016\n\014_cmac_kdf_idB\r\n\013_size_sigr"
-  "l\"\242\001\n\010Message3\022\014\n\004type\030\001 \001(\r\022\021\n\004size\030\002 \001"
-  "(\rH\000\210\001\001\022\023\n\007sgx_mac\030\003 \003(\rB\002\020\001\022\024\n\010gax_msg3"
-  "\030\004 \003(\rB\002\020\001\022\024\n\010gay_msg3\030\005 \003(\rB\002\020\001\022\030\n\014sec_"
-  "property\030\006 \003(\rB\002\020\001\022\021\n\005quote\030\007 \003(\rB\002\020\001B\007\n"
-  "\005_size\"\240\004\n\022AttestationMessage\022\014\n\004type\030\001 "
-  "\001(\r\022\014\n\004size\030\002 \001(\r\022\036\n\021epid_group_status\030\003"
-  " \001(\rH\000\210\001\001\022\"\n\025tcb_evaluation_status\030\004 \001(\r"
-  "H\001\210\001\001\022\"\n\025pse_evaluation_status\030\005 \001(\rH\002\210\001"
-  "\001\022&\n\032latest_equivalent_tcb_psvn\030\006 \003(\rB\002\020"
-  "\001\022\035\n\021latest_pse_isvsvn\030\007 \003(\rB\002\020\001\022\033\n\017late"
-  "st_psda_svn\030\010 \003(\rB\002\020\001\022!\n\025performance_rek"
-  "ey_gid\030\t \003(\rB\002\020\001\022\030\n\014ec_sign256_x\030\n \003(\rB\002"
-  "\020\001\022\030\n\014ec_sign256_y\030\013 \003(\rB\002\020\001\022\023\n\007mac_smk\030"
-  "\014 \003(\rB\002\020\001\022\030\n\013result_size\030\r \001(\rH\003\210\001\001\022\024\n\010r"
-  "eserved\030\016 \003(\rB\002\020\001\022\027\n\013payload_tag\030\017 \003(\rB\002"
-  "\020\001\022\023\n\007payload\030\020 \003(\rB\002\020\001B\024\n\022_epid_group_s"
-  "tatusB\030\n\026_tcb_evaluation_statusB\030\n\026_pse_"
-  "evaluation_statusB\016\n\014_result_size2\367\004\n\010sg"
-  "x_oram\0224\n\014init_enclave\022\021.oram.InitReques"
-  "t\032\017.oram.InitReply\"\000\022<\n\tinit_oram\022\025.oram"
-  ".OramInitRequest\032\026.google.protobuf.Empty"
-  "\"\000\022<\n\024generate_session_key\022\021.oram.InitRe"
-  "quest\032\017.oram.InitReply\"\000\022B\n\030remote_attes"
-  "tation_begin\022\024.oram.InitialMessage\032\016.ora"
-  "m.Message0\"\000\022;\n\027remote_attestation_msg0\022"
-  "\016.oram.Message0\032\016.oram.Message1\"\000\022;\n\027rem"
-  "ote_attestation_msg2\022\016.oram.Message2\032\016.o"
-  "ram.Message3\"\000\022N\n\030remote_attestation_fin"
-  "al\022\030.oram.AttestationMessage\032\026.google.pr"
-  "otobuf.Empty\"\000\0222\n\nread_block\022\021.oram.Read"
-  "Request\032\017.oram.ReadReply\"\000\0225\n\013write_bloc"
-  "k\022\022.oram.WriteRequest\032\020.oram.WriteReply\""
-  "\000\022@\n\020close_connection\022\022.oram.CloseReques"
-  "t\032\026.google.protobuf.Empty\"\000b\006proto3"
+  "ation\"\036\n\013ReadRequest\022\017\n\007address\030\001 \001(\r\"*\n"
+  "\tReadReply\022\014\n\004data\030\001 \001(\014\022\017\n\007success\030\002 \001("
+  "\010\"-\n\014WriteRequest\022\017\n\007address\030\001 \001(\r\022\014\n\004da"
+  "ta\030\002 \001(\014\"\035\n\nWriteReply\022\017\n\007success\030\001 \001(\010\""
+  "\016\n\014CloseRequest\":\n\016InitialMessage\022\014\n\004typ"
+  "e\030\001 \001(\r\022\021\n\004size\030\002 \001(\rH\000\210\001\001B\007\n\005_size\"F\n\010M"
+  "essage0\022\014\n\004type\030\001 \001(\r\022\014\n\004epid\030\002 \001(\r\022\023\n\006s"
+  "tatus\030\003 \001(\rH\000\210\001\001B\t\n\007_status\"K\n\010Message1\022"
+  "\014\n\004type\030\001 \001(\r\022\017\n\003GaX\030\002 \003(\rB\002\020\001\022\017\n\003GaY\030\003 "
+  "\003(\rB\002\020\001\022\017\n\003GID\030\004 \003(\rB\002\020\001\"\315\002\n\010Message2\022\014\n"
+  "\004type\030\001 \001(\r\022\021\n\004size\030\002 \001(\rH\000\210\001\001\022\031\n\rpublic"
+  "_key_gx\030\003 \003(\rB\002\020\001\022\031\n\rpublic_key_gy\030\004 \003(\r"
+  "B\002\020\001\022\027\n\nquote_type\030\005 \001(\rH\001\210\001\001\022\020\n\004spid\030\006 "
+  "\003(\rB\002\020\001\022\030\n\013cmac_kdf_id\030\007 \001(\rH\002\210\001\001\022\027\n\013sig"
+  "nature_x\030\010 \003(\rB\002\020\001\022\027\n\013signature_y\030\t \003(\rB"
+  "\002\020\001\022\020\n\004smac\030\n \003(\rB\002\020\001\022\027\n\nsize_sigrl\030\013 \001("
+  "\rH\003\210\001\001\022\021\n\005sigrl\030\014 \003(\rB\002\020\001B\007\n\005_sizeB\r\n\013_q"
+  "uote_typeB\016\n\014_cmac_kdf_idB\r\n\013_size_sigrl"
+  "\"\242\001\n\010Message3\022\014\n\004type\030\001 \001(\r\022\021\n\004size\030\002 \001("
+  "\rH\000\210\001\001\022\023\n\007sgx_mac\030\003 \003(\rB\002\020\001\022\024\n\010gax_msg3\030"
+  "\004 \003(\rB\002\020\001\022\024\n\010gay_msg3\030\005 \003(\rB\002\020\001\022\030\n\014sec_p"
+  "roperty\030\006 \003(\rB\002\020\001\022\021\n\005quote\030\007 \003(\rB\002\020\001B\007\n\005"
+  "_size\"\240\004\n\022AttestationMessage\022\014\n\004type\030\001 \001"
+  "(\r\022\014\n\004size\030\002 \001(\r\022\036\n\021epid_group_status\030\003 "
+  "\001(\rH\000\210\001\001\022\"\n\025tcb_evaluation_status\030\004 \001(\rH"
+  "\001\210\001\001\022\"\n\025pse_evaluation_status\030\005 \001(\rH\002\210\001\001"
+  "\022&\n\032latest_equivalent_tcb_psvn\030\006 \003(\rB\002\020\001"
+  "\022\035\n\021latest_pse_isvsvn\030\007 \003(\rB\002\020\001\022\033\n\017lates"
+  "t_psda_svn\030\010 \003(\rB\002\020\001\022!\n\025performance_reke"
+  "y_gid\030\t \003(\rB\002\020\001\022\030\n\014ec_sign256_x\030\n \003(\rB\002\020"
+  "\001\022\030\n\014ec_sign256_y\030\013 \003(\rB\002\020\001\022\023\n\007mac_smk\030\014"
+  " \003(\rB\002\020\001\022\030\n\013result_size\030\r \001(\rH\003\210\001\001\022\024\n\010re"
+  "served\030\016 \003(\rB\002\020\001\022\027\n\013payload_tag\030\017 \003(\rB\002\020"
+  "\001\022\023\n\007payload\030\020 \003(\rB\002\020\001B\024\n\022_epid_group_st"
+  "atusB\030\n\026_tcb_evaluation_statusB\030\n\026_pse_e"
+  "valuation_statusB\016\n\014_result_size2\367\004\n\010sgx"
+  "_oram\0224\n\014init_enclave\022\021.oram.InitRequest"
+  "\032\017.oram.InitReply\"\000\022<\n\tinit_oram\022\025.oram."
+  "OramInitRequest\032\026.google.protobuf.Empty\""
+  "\000\022<\n\024generate_session_key\022\021.oram.InitReq"
+  "uest\032\017.oram.InitReply\"\000\022B\n\030remote_attest"
+  "ation_begin\022\024.oram.InitialMessage\032\016.oram"
+  ".Message0\"\000\022;\n\027remote_attestation_msg0\022\016"
+  ".oram.Message0\032\016.oram.Message1\"\000\022;\n\027remo"
+  "te_attestation_msg2\022\016.oram.Message2\032\016.or"
+  "am.Message3\"\000\022N\n\030remote_attestation_fina"
+  "l\022\030.oram.AttestationMessage\032\026.google.pro"
+  "tobuf.Empty\"\000\0222\n\nread_block\022\021.oram.ReadR"
+  "equest\032\017.oram.ReadReply\"\000\0225\n\013write_block"
+  "\022\022.oram.WriteRequest\032\020.oram.WriteReply\"\000"
+  "\022@\n\020close_connection\022\022.oram.CloseRequest"
+  "\032\026.google.protobuf.Empty\"\000b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_messages_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2fempty_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_messages_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_messages_2eproto = {
-  false, false, 2435, descriptor_table_protodef_messages_2eproto, "messages.proto", 
+  false, false, 2434, descriptor_table_protodef_messages_2eproto, "messages.proto", 
   &descriptor_table_messages_2eproto_once, descriptor_table_messages_2eproto_deps, 1, 14,
   schemas, file_default_instances, TableStruct_messages_2eproto::offsets,
   file_level_metadata_messages_2eproto, file_level_enum_descriptors_messages_2eproto, file_level_service_descriptors_messages_2eproto,
@@ -1648,12 +1648,12 @@ ReadReply::ReadReply(::PROTOBUF_NAMESPACE_ID::Arena* arena,
 ReadReply::ReadReply(const ReadReply& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  block_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-    block_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+    data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (!from._internal_block().empty()) {
-    block_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_block(), 
+  if (!from._internal_data().empty()) {
+    data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_data(), 
       GetArenaForAllocation());
   }
   success_ = from.success_;
@@ -1661,9 +1661,9 @@ ReadReply::ReadReply(const ReadReply& from)
 }
 
 inline void ReadReply::SharedCtor() {
-block_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+data_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  block_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 success_ = false;
 }
@@ -1677,7 +1677,7 @@ ReadReply::~ReadReply() {
 
 inline void ReadReply::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  block_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  data_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void ReadReply::ArenaDtor(void* object) {
@@ -1696,7 +1696,7 @@ void ReadReply::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  block_.ClearToEmpty();
+  data_.ClearToEmpty();
   success_ = false;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -1707,10 +1707,10 @@ const char* ReadReply::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
     uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // bytes block = 1;
+      // bytes data = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
-          auto str = _internal_mutable_block();
+          auto str = _internal_mutable_data();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(ptr);
         } else
@@ -1753,10 +1753,10 @@ uint8_t* ReadReply::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // bytes block = 1;
-  if (!this->_internal_block().empty()) {
+  // bytes data = 1;
+  if (!this->_internal_data().empty()) {
     target = stream->WriteBytesMaybeAliased(
-        1, this->_internal_block(), target);
+        1, this->_internal_data(), target);
   }
 
   // bool success = 2;
@@ -1781,11 +1781,11 @@ size_t ReadReply::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // bytes block = 1;
-  if (!this->_internal_block().empty()) {
+  // bytes data = 1;
+  if (!this->_internal_data().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
-        this->_internal_block());
+        this->_internal_data());
   }
 
   // bool success = 2;
@@ -1815,8 +1815,8 @@ void ReadReply::MergeFrom(const ReadReply& from) {
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (!from._internal_block().empty()) {
-    _internal_set_block(from._internal_block());
+  if (!from._internal_data().empty()) {
+    _internal_set_data(from._internal_data());
   }
   if (from._internal_success() != 0) {
     _internal_set_success(from._internal_success());
@@ -1842,8 +1842,8 @@ void ReadReply::InternalSwap(ReadReply* other) {
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      &block_, lhs_arena,
-      &other->block_, rhs_arena
+      &data_, lhs_arena,
+      &other->data_, rhs_arena
   );
   swap(success_, other->success_);
 }

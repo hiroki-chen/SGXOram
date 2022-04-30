@@ -69,6 +69,8 @@ class Client final : public oram::sgx_oram::Service {
   int generate_session_key(void);
 
   int init_oram(void);
+
+  int read_block(uint32_t address);
 };
 
 #endif

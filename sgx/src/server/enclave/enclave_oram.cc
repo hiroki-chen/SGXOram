@@ -27,6 +27,15 @@
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_crypto_manager.hh>
 
+bool constant = true;
+
+static inline bool is_in_range(uint32_t num,
+                               sgx_oram::oram_slot_header_t* slot) {
+  const uint32_t begin = slot->range_begin;
+  const uint32_t end = slot->range_end;
+  return num >= begin && num < end;
+}
+
 static inline bool check_slot_header(const char* const slot_header,
                                      uint32_t level) {
   const sgx_oram::oram_slot_header_t* header =
@@ -167,8 +176,8 @@ static sgx_status_t populate_leaf_slot(sgx_oram::oram_slot_leaf_t* const slot,
                                                position_str.size());
     check_sgx_status(status, "ocall_write_position()");
     // Then fill in the data.
-    status = sgx_read_rand(block_ptr->data, DEFAULT_ORAM_DATA_SIZE);
-    check_sgx_status(status, "sgx_read_rand()");
+    memset(block_ptr->data, 0, DEFAULT_ORAM_DATA_SIZE);
+    block_ptr->data[0] = block_ptr->header.address;
   }
 
   for (; i < slot_size; i++) {
@@ -245,7 +254,7 @@ static void get_slot_and_decrypt(uint32_t level, uint32_t offset,
       slot_size + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE;
   // Compute the hash value of the target slot.
   const std::string sid = enclave_strcat(std::to_string(level).c_str(), "_",
-                                         std::to_string(level).c_str());
+                                         std::to_string(offset).c_str());
   ENCLAVE_LOG("[enclave] sid: %s\n", sid.c_str());
   const std::string slot_hash = crypto_manager->enclave_sha_256(sid);
 
@@ -265,8 +274,8 @@ static void get_slot_and_decrypt(uint32_t level, uint32_t offset,
   check_sgx_status(status, "get_slot_and_decrypt()");
 
   // Test if cache works.
-  std::shared_ptr<EnclaveCache> cache = EnclaveCache::get_instance();
-  cache->read(slot_hash, 1);
+  // std::shared_ptr<EnclaveCache> cache = EnclaveCache::get_instance();
+  // cache->read(slot_hash, 1);
 
   // Check if the slot is valid.
   if (slot_size == 0) {
@@ -292,15 +301,15 @@ static void get_slot_and_decrypt(uint32_t level, uint32_t offset,
 // This function will calculate the offset for the slot at current level
 // based on the value of block id which indicates the path from the root
 // to the current slot. To determine the offset, the total level and the
-// ways of the ORAM tree are needed.
+// ways of the ORAM tree are needed. Level starts from 0, so the total level
+// should be subtracted by 1.
 static inline uint32_t calculate_offset(uint32_t block_id, uint32_t level_cur) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
 
   const uint32_t level = crypto_manager->get_oram_config()->level;
   const uint32_t way = crypto_manager->get_oram_config()->way;
-
-  return std::floor((block_id * 1.0 / std::pow(way, level - level_cur)));
+  return std::floor(block_id * 1.0 / std::pow(way, level - level_cur - 1));
 }
 
 // This function assembles the slot header by the given parameters.
@@ -410,6 +419,45 @@ static sgx_status_t init_so2_slots(uint32_t* const level_size_information,
   return SGX_SUCCESS;
 }
 
+static void sub_access_slot1(uint8_t* const s1,
+                             uint8_t* const block_slot1_target,
+                             uint8_t* const block_slot1_evict,
+                             uint8_t* slot_storage, const size_t slot_size,
+                             uint32_t* const counter,
+                             sgx_oram::oram_position_t* const position) {
+  // First, we do an one-pass on the slot S1.
+  for (size_t i = 0; i < slot_size; i++) {
+    // Reinterpret the memory space.
+    sgx_oram::oram_block_t* block = (sgx_oram::oram_block_t*)slot_storage;
+
+    ENCLAVE_LOG("[enclave] The address of the block is %u",
+                block->header.address);
+    // Initialize some bool variables.
+    bool condition_existing = (block->header.address == position->address);
+    bool condition_epsilon =
+        is_in_range(block->header.bid, (sgx_oram::oram_slot_header_t*)s1);
+    bool condition_this_normal =
+        (block->header.type ==
+         sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_NORMAL);
+
+    oblivious_assign(condition_existing && condition_this_normal,
+                     (uint8_t*)block_slot1_target, (uint8_t*)block,
+                     ORAM_BLOCK_SIZE, ORAM_BLOCK_SIZE);
+    oblivious_assign(condition_existing && condition_this_normal,
+                     (bool*)&block->header.type, &constant);
+
+    *counter += condition_existing;
+    bool condition_counter = (*counter <= 1);
+    // Copy the data to the target buffer.
+    oblivious_assign(condition_epsilon && condition_counter,
+                     (uint8_t*)block_slot1_evict, (uint8_t*)block,
+                     ORAM_BLOCK_SIZE, ORAM_BLOCK_SIZE);
+
+    // Increment the offset.
+    slot_storage += ORAM_BLOCK_SIZE;
+  }
+}
+
 static void sub_access(sgx_oram::oram_operation_t op_type, bool condition,
                        uint8_t* const s1, uint8_t* const s2,
                        uint8_t* const data_star, uint32_t level,
@@ -436,42 +484,26 @@ static void sub_access(sgx_oram::oram_operation_t op_type, bool condition,
   // Determine the size of the slot.
   const size_t slot_size = slot_header->slot_size;
   // The only difference between a leaf node and the internal node is their
-  // size. So headers are the same. We can just skip the header and directly
+  // size, so headers are the same. We can just skip the header and directly
   // access the data in the slot.
   uint8_t* slot_storage = (s1 + sizeof(sgx_oram::oram_slot_header_t));
-
-  // First, we do an one-pass on the slot S1.
-  for (size_t i = 0; i < slot_size; i++) {
-    // Reinterpret the memory space.
-    sgx_oram::oram_block_t* block = (sgx_oram::oram_block_t*)slot_storage;
-
-    // Initialize some bool variables.
-    bool condition_existing = (block->header.bid == position->bid);
-    bool condition_epsilon =
-        is_in_range(block->header.bid, (sgx_oram::oram_slot_header_t*)s1);
-    bool condition_this_dummy =
-        (block->header.type ==
-         sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_DUMMY);
-
-    oblivious_assign(condition_existing && condition_this_dummy,
-                     (uint8_t*)block_slot1_target, (uint8_t*)block,
-                     ORAM_BLOCK_SIZE, ORAM_BLOCK_SIZE);
-    bool constant = true;
-    oblivious_assign(condition_existing && condition_this_dummy,
-                     (bool*)&block->header.type, &constant);
-
-    counter += condition_existing;
-    bool condition_counter = (counter <= 1);
-    // Copy the data to the target buffer.
-    slot_storage += ORAM_BLOCK_SIZE;
-  }
-
+  sub_access_slot1(s1, (uint8_t*)block_slot1_target,
+                   (uint8_t*)block_slot1_evict, slot_storage, slot_size,
+                   &counter, position);
   // Test if oblivious_assign reads something from the source buffer.
-  ENCLAVE_LOG("[enclave] The bid of the block_slot1_target is %u", block_slot1_target->header.bid);
+  ENCLAVE_LOG(
+      "[enclave] The content of the block_slot1_target is:\n %s",
+      hex_to_string(block_slot1_target->data, DEFAULT_ORAM_DATA_SIZE).c_str());
+
+  // Set the type of the slot as per the counter.
+  oblivious_assign(counter == 0, (bool*)&slot_header->type, &constant);
+  // Copy the data to the data_star if current operation is read.
+  oblivious_assign(op_type == sgx_oram::oram_operation_t::ORAM_OPERATION_READ,
+                   data_star, (uint8_t*)block_slot1_target->data,
+                   DEFAULT_ORAM_DATA_SIZE, DEFAULT_ORAM_DATA_SIZE);
 
   // Eventually, destroy all the allocated memory.
-  safe_free(block_slot1_target);
-  safe_free(block_slot1_evict);
+  safe_free_all(2, block_slot1_target, block_slot1_evict);
 }
 
 // The main entry of the data access.
@@ -519,8 +551,7 @@ static void data_access(sgx_oram::oram_operation_t op_type,
   // Invoke sub_evict.
   // TODO.
 
-  safe_free(s1);
-  safe_free(s2);
+  safe_free_all(2, s1, s2);
 }
 
 sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
@@ -550,6 +581,12 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
     data_access(static_cast<sgx_oram::oram_operation_t>(op_type), i, data,
                 data_len, condition, position);
   }
+
+  // Encrypt the data.
+  const std::string encrypted_data =
+      crypto_manager->enclave_aes_128_gcm_encrypt(
+          std::string((char*)data, DEFAULT_ORAM_DATA_SIZE));
+  memcpy(data, encrypted_data.c_str(), encrypted_data.size());
 
   return SGX_SUCCESS;
 }

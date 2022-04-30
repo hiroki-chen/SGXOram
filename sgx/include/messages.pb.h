@@ -973,21 +973,21 @@ class ReadReply final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kBlockFieldNumber = 1,
+    kDataFieldNumber = 1,
     kSuccessFieldNumber = 2,
   };
-  // bytes block = 1;
-  void clear_block();
-  const std::string& block() const;
+  // bytes data = 1;
+  void clear_data();
+  const std::string& data() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_block(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_block();
-  PROTOBUF_NODISCARD std::string* release_block();
-  void set_allocated_block(std::string* block);
+  void set_data(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_data();
+  PROTOBUF_NODISCARD std::string* release_data();
+  void set_allocated_data(std::string* data);
   private:
-  const std::string& _internal_block() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_block(const std::string& value);
-  std::string* _internal_mutable_block();
+  const std::string& _internal_data() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_data(const std::string& value);
+  std::string* _internal_mutable_data();
   public:
 
   // bool success = 2;
@@ -1006,7 +1006,7 @@ class ReadReply final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr block_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
   bool success_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_messages_2eproto;
@@ -3583,55 +3583,55 @@ inline void ReadRequest::set_address(uint32_t value) {
 
 // ReadReply
 
-// bytes block = 1;
-inline void ReadReply::clear_block() {
-  block_.ClearToEmpty();
+// bytes data = 1;
+inline void ReadReply::clear_data() {
+  data_.ClearToEmpty();
 }
-inline const std::string& ReadReply::block() const {
-  // @@protoc_insertion_point(field_get:oram.ReadReply.block)
-  return _internal_block();
+inline const std::string& ReadReply::data() const {
+  // @@protoc_insertion_point(field_get:oram.ReadReply.data)
+  return _internal_data();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void ReadReply::set_block(ArgT0&& arg0, ArgT... args) {
+void ReadReply::set_data(ArgT0&& arg0, ArgT... args) {
  
- block_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:oram.ReadReply.block)
+ data_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:oram.ReadReply.data)
 }
-inline std::string* ReadReply::mutable_block() {
-  std::string* _s = _internal_mutable_block();
-  // @@protoc_insertion_point(field_mutable:oram.ReadReply.block)
+inline std::string* ReadReply::mutable_data() {
+  std::string* _s = _internal_mutable_data();
+  // @@protoc_insertion_point(field_mutable:oram.ReadReply.data)
   return _s;
 }
-inline const std::string& ReadReply::_internal_block() const {
-  return block_.Get();
+inline const std::string& ReadReply::_internal_data() const {
+  return data_.Get();
 }
-inline void ReadReply::_internal_set_block(const std::string& value) {
+inline void ReadReply::_internal_set_data(const std::string& value) {
   
-  block_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+  data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* ReadReply::_internal_mutable_block() {
+inline std::string* ReadReply::_internal_mutable_data() {
   
-  return block_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+  return data_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* ReadReply::release_block() {
-  // @@protoc_insertion_point(field_release:oram.ReadReply.block)
-  return block_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+inline std::string* ReadReply::release_data() {
+  // @@protoc_insertion_point(field_release:oram.ReadReply.data)
+  return data_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
-inline void ReadReply::set_allocated_block(std::string* block) {
-  if (block != nullptr) {
+inline void ReadReply::set_allocated_data(std::string* data) {
+  if (data != nullptr) {
     
   } else {
     
   }
-  block_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), block,
+  data_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), data,
       GetArenaForAllocation());
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (block_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
-    block_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  if (data_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
   }
 #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:oram.ReadReply.block)
+  // @@protoc_insertion_point(field_set_allocated:oram.ReadReply.data)
 }
 
 // bool success = 2;

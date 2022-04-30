@@ -72,7 +72,7 @@ message ReadRequest {
 }
 
 message ReadReply {
-  bytes block = 1;
+  bytes data = 1;
   bool success = 2;
 }
 

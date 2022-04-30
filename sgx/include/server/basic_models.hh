@@ -27,6 +27,8 @@
 #define ORAM_SLOT_INTERNAL_SIZE sizeof(sgx_oram::oram_slot_t)
 #define ORAM_SLOT_LEAF_SIZE sizeof(sgx_oram::oram_slot_leaf_t)
 
+#define WORD_SIZE 4
+
 #define ENCRYPTED_POSITION_SIZE \
   sizeof(sgx_oram::oram_position_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
 
@@ -71,7 +73,8 @@ typedef struct _oram_block_header_t {
   uint32_t address;
 } oram_block_header_t;
 
-// The ORAM block (4096 + 32 + 32) bytes in total.
+// The ORAM block of 4096 bytes in total.
+// It is enforced that the block size is a multiple of the word size.
 typedef struct _oram_block_t {
   // The block header.
   oram_block_header_t header;

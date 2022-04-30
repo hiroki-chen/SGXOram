@@ -248,7 +248,7 @@ std::string Client::decrypt(const std::string& ciphertext) {
   sample_status_t ret = sample_rijndael128GCM_encrypt(
       (sample_aes_gcm_128bit_key_t*)&secret_key_session,
       ciphertext_ptr + SAMPLE_AESGCM_MAC_SIZE + SAMPLE_AESGCM_IV_SIZE,
-      ciphertext.size(), plaintext, ciphertext_ptr + SAMPLE_AESGCM_MAC_SIZE,
+      plaintext_length, plaintext, ciphertext_ptr + SAMPLE_AESGCM_MAC_SIZE,
       SAMPLE_AESGCM_IV_SIZE, NULL, 0,
       (sample_aes_gcm_128bit_tag_t*)ciphertext_ptr);
 
@@ -257,5 +257,28 @@ std::string Client::decrypt(const std::string& ciphertext) {
     return "";
   }
 
-  return std::string((char*)plaintext, plaintext_length);
+  const std::string ans = std::string((char*)plaintext, plaintext_length);
+  safe_free(plaintext);
+  return ans;
+}
+
+int Client::read_block(uint32_t address) {
+  logger->info("Reading block {}.", address);
+  grpc::ClientContext context;
+  oram::ReadRequest request;
+  request.set_address(address);
+  oram::ReadReply reply;
+
+  grpc::Status status = stub_->read_block(&context, request, &reply);
+
+  if (!status.ok() || reply.success() != true) {
+    logger->error("Cannot read block {}.", address);
+    return -1;
+  }
+
+  // Decrypt the data.
+  std::string ciphertext = reply.data();
+  std::string plaintext = decrypt(ciphertext);
+  logger->info("The content of the block is {}", spdlog::to_hex(plaintext));
+  return 0;
 }

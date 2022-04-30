@@ -265,6 +265,28 @@ grpc::Status SGXORAMService::generate_session_key(
 grpc::Status SGXORAMService::read_block(grpc::ServerContext* server_context,
                                         const oram::ReadRequest* read_request,
                                         oram::ReadReply* read_reply) {
+  const uint32_t address = read_request->address();
+  logger->info("The client is trying to read the block at address {}.",
+               address);
+
+  // Prepare the buffer for holding the data.
+  const size_t encrypted_data_size =
+      DEFAULT_ORAM_DATA_SIZE + SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE;
+  uint8_t* data = (uint8_t*)malloc(encrypted_data_size);
+  memset(data, 0, encrypted_data_size);
+  status = ecall_access_data(*global_eid, &status, 0, address, data,
+                             encrypted_data_size);
+
+  if (status != SGX_SUCCESS) {
+    const std::string error_message = "Enclave cannot access the data!";
+    read_reply->set_success(false);
+    return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
+  }
+
+  logger->debug("The data is {}.", spdlog::to_hex(std::string(
+                                       (char*)data, encrypted_data_size)));
+  read_reply->set_data(data, encrypted_data_size);
+  read_reply->set_success(true);
   return grpc::Status::OK;
 }
 
@@ -499,12 +521,6 @@ grpc::Status SGXORAMService::init_oram(
     logger->info("The server has successfully initialized the ORAM.");
   }
 
-  // Test if data access works fine?
-  sgx_oram::oram_block_t* block =
-      (sgx_oram::oram_block_t*)malloc(sizeof(sgx_oram::oram_block_t));
-  status = ecall_access_data(*global_eid, &status, 0, 1, (uint8_t*)block,
-                             sizeof(block));
-  logger->debug("ecall_data_access seems to be found.");
   return grpc::Status::OK;
 }
 

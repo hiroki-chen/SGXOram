@@ -164,6 +164,4 @@ void oblivious_assign(bool condition, bool* lhs, bool* rhs);
  */
 std::string enclave_strcat(const std::string& str, ...);
 
-bool is_in_range(uint32_t num, sgx_oram::oram_slot_header_t* slot);
-
 #endif  // ENCLAVE_UTILS_HH

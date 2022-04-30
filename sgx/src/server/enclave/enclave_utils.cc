@@ -44,6 +44,7 @@ static sgx_error_list sgx_errlist = {
     {SGX_ERROR_MAC_MISMATCH, "The MAC verification failed."},
 };
 
+
 // A safe free is always used to free memory allocated by the enclave and is
 // very important to avoid memory leaks, especially in the enclave because
 // its memory is extremely limited.
@@ -75,7 +76,7 @@ std::string hex_to_string(const uint8_t* array, const size_t& len) {
     ans += digits[array[i] >> 4];
     ans += digits[array[i] & 0xf];
 
-    if (i % 20 == 19) {
+    if (i % 32 == 31) {
       ans += '\n';
       ans.append("00" + std::to_string(i + 1) + ": ");
     } else {
@@ -131,14 +132,16 @@ void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
   if (lhs_size != rhs_size) {
     ENCLAVE_LOG("[enclave] lhs_size != rhs_size.\n");
     return;
-  } else if (lhs_size % 32 != 0 || rhs_size % 32 != 0) {
+  } else if (lhs_size % WORD_SIZE != 0 || rhs_size % WORD_SIZE != 0) {
+    ENCLAVE_LOG("[enclave] size is %lu, which is not a multiple of 32.\n",
+                lhs_size);
     ENCLAVE_LOG("[enclave] lhs or rhs is not aligned to 32.\n");
     return;
   }
   // Performs bitwise AND operation on two arrays in 32-bit chunks.
   // We assume that the arrays are of the same size multiple of 32.
   // Please pad the arrays with zeros **in advance** if necessary.
-  for (size_t i = 0; i < lhs_size; i += 4) {
+  for (size_t i = 0; i < lhs_size; i += WORD_SIZE) {
     out[i] = lhs[i] & rhs[i];
     out[i + 1] = lhs[i + 1] & rhs[i + 1];
     out[i + 2] = lhs[i + 2] & rhs[i + 2];
@@ -152,14 +155,14 @@ void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
   if (lhs_size != rhs_size) {
     ENCLAVE_LOG("[enclave] lhs_size != rhs_size.\n");
     return;
-  } else if (lhs_size % 32 != 0 || rhs_size % 32 != 0) {
+  } else if (lhs_size % WORD_SIZE != 0 || rhs_size % WORD_SIZE != 0) {
     ENCLAVE_LOG("[enclave] lhs or rhs is not aligned to 32.\n");
     return;
   }
   // Performs bitwise OR operation on two arrays in 32-bit chunks.
   // We assume that the arrays are of the same size multiple of 32.
   // Please pad the arrays with zeros **in advance** if necessary.
-  for (size_t i = 0; i < lhs_size; i += 4) {
+  for (size_t i = 0; i < lhs_size; i += WORD_SIZE) {
     out[i] = lhs[i] | rhs[i];
     out[i + 1] = lhs[i + 1] | rhs[i + 1];
     out[i + 2] = lhs[i + 2] | rhs[i + 2];
@@ -189,12 +192,6 @@ std::string enclave_strcat(const std::string& str, ...) {
   }
   va_end(ap);
   return ans;
-}
-
-bool is_in_range(uint32_t num, sgx_oram::oram_slot_header_t* slot) {
-  const uint32_t begin = slot->range_begin;
-  const uint32_t end = slot->range_end;
-  return num >= begin && num < end;
 }
 
 void oblivious_assign(bool condition, uint8_t* __restrict__ lhs,
