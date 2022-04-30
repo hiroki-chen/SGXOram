@@ -27,10 +27,8 @@
 #include <basic_models.hh>
 
 #ifndef ENCLAVE_LOG
-#define ENCLAVE_LOG(format, ...)                 \
-  {                                             \
-    printf(format, ##__VA_ARGS__);              \
-  }
+#define ENCLAVE_LOG(format, ...) \
+  { printf(format, ##__VA_ARGS__); }
 #endif
 
 using sgx_error_list = std::unordered_map<sgx_status_t, std::string>;
@@ -113,32 +111,59 @@ void sprintf(const std::string& str, bool hex = false);
  */
 void safe_free(void* ptr);
 
+/**
+ * @brief Safe free the all memory.
+ * 
+ * @param count the number of pointers 
+ * @param ... 
+ */
+void safe_free_all(size_t count, ...);
+
+// NOTE: THE SIZE OF ALL BUFFERS IS MULTIPLE OF 32.
+// Potential acceleration can be SIMD or AVX2 instruction set.
 void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
-          uint8_t* __restrict__ out);
+          uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size);
 
 void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
-         uint8_t* __restrict__ out);
+         uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size);
 
-void bneg(const uint8_t* __restrict__ lhs, uint8_t* __restrict__ out);
-
-/**
- * @brief Read the slot using ocall.
- *
- * @param slot
- * @param fingerprint the fingerprint is the sha-256 hash of the path (floor(bid
- * / p^level)) + level.
- * @return size_t
- */
-size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint);
+void bneg(const uint8_t* __restrict__ lhs, uint8_t* __restrict__ out,
+          size_t lhs_size);
 
 void check_sgx_status(const sgx_status_t& status, const std::string& location);
 
 /**
- * @brief Concatenate arbitrary arguments into a string.
+ * @brief Assigns rhs to lhs when condition is true. We implicitly assume that
+ *        the size of the lhs variable is always the same as the size of the rhs
+ *        variable.
+ *
+ * @param condition
+ * @param lhs
+ * @param rhs
+ * @param lhs_size
+ * @param rhs_size
+ */
+void oblivious_assign(bool condition, uint8_t* __restrict__ lhs,
+                      uint8_t* __restrict__ rhs, size_t lhs_size,
+                      size_t rhs_size);
+
+/**
+ * @brief This is an alternative for boolean oblivious assignment.
  * 
+ * @param condition 
+ * @param lhs 
+ * @param rhs 
+ */
+void oblivious_assign(bool condition, bool* lhs, bool* rhs);
+
+/**
+ * @brief Concatenate arbitrary arguments into a string.
+ *
  * @param str ...
- * @return std::string 
+ * @return std::string
  */
 std::string enclave_strcat(const std::string& str, ...);
+
+bool is_in_range(uint32_t num, sgx_oram::oram_slot_header_t* slot);
 
 #endif  // ENCLAVE_UTILS_HH

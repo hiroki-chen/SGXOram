@@ -55,6 +55,16 @@ void safe_free(void* ptr) {
   }
 }
 
+void safe_free_all(size_t count, ...) {
+  va_list ap;
+  va_start(ap, count);
+  for (size_t i = 0; i < count; i++) {
+    void* ptr = va_arg(ap, void*);
+    safe_free(ptr);
+  }
+  va_end(ap);
+}
+
 std::string hex_to_string(const uint8_t* array, const size_t& len) {
   // Convert the array of bytes into a hex string.
   // The delimiter is the space character; also, we insert a linebreak every 20
@@ -105,27 +115,56 @@ void sprintf(const std::string& str, bool hex) {
   }
 }
 
-void band(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out) {
-  for (size_t i = 0; i < 32; i++) {
+static uint8_t populate_from_bool(bool condition) {
+  uint8_t ans;
+
+  for (size_t i = 0; i < 8; i++) {
+    ans |= condition << i;
+  }
+
+  return ans;
+}
+
+void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
+          uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size) {
+  // A sanity check.
+  if (lhs_size != rhs_size) {
+    ENCLAVE_LOG("[enclave] lhs_size != rhs_size.\n");
+    return;
+  } else if (lhs_size % 32 != 0 || rhs_size % 32 != 0) {
+    ENCLAVE_LOG("[enclave] lhs or rhs is not aligned to 32.\n");
+    return;
+  }
+  // Performs bitwise AND operation on two arrays in 32-bit chunks.
+  // We assume that the arrays are of the same size multiple of 32.
+  // Please pad the arrays with zeros **in advance** if necessary.
+  for (size_t i = 0; i < lhs_size; i += 4) {
     out[i] = lhs[i] & rhs[i];
+    out[i + 1] = lhs[i + 1] & rhs[i + 1];
+    out[i + 2] = lhs[i + 2] & rhs[i + 2];
+    out[i + 3] = lhs[i + 3] & rhs[i + 3];
   }
 }
 
-void bor(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out) {
-  for (size_t i = 0; i < 32; i++) {
+void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
+         uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size) {
+  // A sanity check.
+  if (lhs_size != rhs_size) {
+    ENCLAVE_LOG("[enclave] lhs_size != rhs_size.\n");
+    return;
+  } else if (lhs_size % 32 != 0 || rhs_size % 32 != 0) {
+    ENCLAVE_LOG("[enclave] lhs or rhs is not aligned to 32.\n");
+    return;
+  }
+  // Performs bitwise OR operation on two arrays in 32-bit chunks.
+  // We assume that the arrays are of the same size multiple of 32.
+  // Please pad the arrays with zeros **in advance** if necessary.
+  for (size_t i = 0; i < lhs_size; i += 4) {
     out[i] = lhs[i] | rhs[i];
+    out[i + 1] = lhs[i + 1] | rhs[i + 1];
+    out[i + 2] = lhs[i + 2] | rhs[i + 2];
+    out[i + 3] = lhs[i + 3] | rhs[i + 3];
   }
-}
-
-size_t read_slot(sgx_oram::oram_slot_t* slot, const char* fingerprint) {
-  const size_t size = ocall_read_slot(fingerprint, (uint8_t*)(slot),
-                                      sizeof(sgx_oram::oram_slot_t));
-
-  if (size == 0) {
-    // The slot is not found or something went wrong.
-    ENCLAVE_LOG("033[31m The slot for %s is not found.\n033[0m", fingerprint);
-  }
-  return size;
 }
 
 void check_sgx_status(const sgx_status_t& status, const std::string& reason) {
@@ -150,4 +189,34 @@ std::string enclave_strcat(const std::string& str, ...) {
   }
   va_end(ap);
   return ans;
+}
+
+bool is_in_range(uint32_t num, sgx_oram::oram_slot_header_t* slot) {
+  const uint32_t begin = slot->range_begin;
+  const uint32_t end = slot->range_end;
+  return num >= begin && num < end;
+}
+
+void oblivious_assign(bool condition, uint8_t* __restrict__ lhs,
+                      uint8_t* __restrict__ rhs, size_t lhs_size,
+                      size_t rhs_size) {
+  // Pre-allocate two buffers for receiving the final output.
+  uint8_t* res1 = (uint8_t*)malloc(lhs_size);
+  uint8_t* res2 = (uint8_t*)malloc(lhs_size);
+  // Convert condition to byte array.
+  uint8_t* cond_positive = (uint8_t*)malloc(lhs_size);
+  uint8_t* cond_negative = (uint8_t*)malloc(lhs_size);
+  memset(cond_positive, populate_from_bool(condition), lhs_size);
+  memset(cond_negative, populate_from_bool(!condition), lhs_size);
+
+  band(cond_positive, rhs, res1, rhs_size, rhs_size);
+  band(cond_negative, lhs, res2, lhs_size, lhs_size);
+
+  // This is equivalent to lhs = (~condition & lhs) | (condition & rhs).
+  bor(res1, res2, lhs, lhs_size, rhs_size);
+  safe_free_all(4, res1, res2, cond_positive, cond_negative);
+}
+
+void oblivious_assign(bool condition, bool* lhs, bool* rhs) {
+  *lhs = (!condition & *lhs) | (condition & *rhs);
 }
