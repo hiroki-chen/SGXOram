@@ -87,6 +87,7 @@ typedef struct _oram_slot_header_t {
   oram_slot_type_t type;
   // The level at which the slot is located.
   uint16_t level;
+  uint16_t offset;
   // The range of the slot.
   uint32_t range_begin;
   uint32_t range_end;

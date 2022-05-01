@@ -16,6 +16,8 @@
  */
 #include <enclave/enclave_utils.hh>
 
+#include <cassert>
+
 #include <sgx_urts.h>
 
 #include <enclave/enclave_u.h>
@@ -43,7 +45,6 @@ static sgx_error_list sgx_errlist = {
     {SGX_ERROR_MEMORY_MAP_FAILURE, "Failed to reserve memory for the enclave."},
     {SGX_ERROR_MAC_MISMATCH, "The MAC verification failed."},
 };
-
 
 // A safe free is always used to free memory allocated by the enclave and is
 // very important to avoid memory leaks, especially in the enclave because
@@ -216,4 +217,23 @@ void oblivious_assign(bool condition, uint8_t* __restrict__ lhs,
 
 void oblivious_assign(bool condition, bool* lhs, bool* rhs) {
   *lhs = (!condition & *lhs) | (condition & *rhs);
+}
+
+uint32_t uniform_random(uint32_t lower, uint32_t upper) {
+  assert(upper >= lower &&
+         "upper bound must be greater than or equal to lower "
+         "bound");
+  // We sample a random number and them map it to the range [lower, upper] in a
+  // uniform way by scaling.
+  uint32_t range = upper - lower;
+  uint32_t scale = RAND_MAX / range;
+
+  uint32_t ans = 0;
+  do {
+    // Generate random number from sgx_rand_read.
+    sgx_status_t status = sgx_read_rand((uint8_t*)&ans, sizeof(ans));
+    check_sgx_status(status, "sgx_read_rand()");
+  } while (ans >= scale * range);  // since scale is truncated, pick a new val
+                                   // until it's lower than scale * range
+  return ans / scale + lower;
 }

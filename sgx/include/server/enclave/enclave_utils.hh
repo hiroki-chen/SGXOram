@@ -164,4 +164,13 @@ void oblivious_assign(bool condition, bool* lhs, bool* rhs);
  */
 std::string enclave_strcat(const std::string& str, ...);
 
+/**
+ * @brief Sample a random number in [lower, upper] using SGX's random library.
+ * 
+ * @param lower 
+ * @param upper 
+ * @return uint32_t 
+ */
+uint32_t uniform_random(uint32_t lower, uint32_t upper);
+
 #endif  // ENCLAVE_UTILS_HH

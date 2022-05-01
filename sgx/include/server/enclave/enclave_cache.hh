@@ -25,8 +25,8 @@
 
 #define CACHE_DIRTY_BIT 0b1
 
-constexpr uint32_t maximum_cache_size_in_bytes = 96 * 1024 * 1024;
-constexpr uint32_t maximum_cache_size = 32;
+constexpr size_t maximum_cache_size_in_bytes = 96 * 1024 * 1024;
+constexpr size_t maximum_cache_size = 16;
 
 // The cache is implemented as a LRU cache.
 // Key type is the hashed fingerprint of the slot, and the value type is the
@@ -60,6 +60,9 @@ class EnclaveCache {
 
   // Update the cache with the new slot.
   // If the entry already exists, it will be moved to the front of the cache.
+  // Also, if the entry is dirty, it will be written back to the external memory;
+  // otherwise, it will be ignored and be replaced by the new slot.
+  // This is called write-back strategy.
   void write(const std::string& key, const std::string& value, bool leaf_type);
 
   // Get the value of the entry with the given key.

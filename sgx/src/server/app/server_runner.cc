@@ -176,6 +176,7 @@ static void assemble_attestation_message(
 grpc::Status SGXORAMService::init_enclave(grpc::ServerContext* server_context,
                                           const oram::InitRequest* init_request,
                                           oram::InitReply* init_reply) {
+  logger->info("Got connection from client: {}.", server_context->peer());
   // First check if the round number is zero.
   const uint32_t round = init_request->round();
   if (round == 0) {
@@ -283,8 +284,8 @@ grpc::Status SGXORAMService::read_block(grpc::ServerContext* server_context,
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   }
 
-  logger->debug("The data is {}.", spdlog::to_hex(std::string(
-                                       (char*)data, encrypted_data_size)));
+  logger->debug("The data is {}.",
+                spdlog::to_hex(std::string((char*)data, encrypted_data_size)));
   read_reply->set_data(data, encrypted_data_size);
   read_reply->set_success(true);
   return grpc::Status::OK;

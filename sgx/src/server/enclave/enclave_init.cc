@@ -324,29 +324,6 @@ sgx_status_t verify_secret_data(sgx_ra_context_t context, uint8_t* p_secret,
   return ret;
 }
 
-/* Hidden functions */
-/**
- * @brief Since enclave only allowes for a relatively restricted library which
- * does not include std::random, we need to generate random numbers by the
- * interface provided by the Intel SGX SDK.
- *
- * @param lower
- * @param upper
- * @return uint32_t A random number drawn from a uniform distribution?
- */
-static uint32_t uniform_random_helper(const uint32_t& lower,
-                                      const uint32_t& upper) {
-  uint32_t random_number;
-  // Read a random number.
-  sgx_read_rand((unsigned char*)&random_number, 4);
-  random_number = random_number % (upper + 1 - lower) + lower;
-  return random_number;
-}
-
-uint32_t uniform_random(uint32_t lower, uint32_t upper) {
-  return uniform_random_helper(lower, upper);
-}
-
 /**
  * @brief      Seals the plaintext given into the sgx_sealed_data_t structure
  *             given.
