@@ -58,6 +58,7 @@ int main(int argc, char** argv) {
     client->generate_session_key();
     client->init_oram();
     client->read_block(1);
+    client->read_block(2);
     // Put all the needed operations below.
     client->close_connection();
   } catch (const std::exception& e) {

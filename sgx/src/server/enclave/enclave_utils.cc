@@ -117,7 +117,14 @@ void sprintf(const std::string& str, bool hex) {
   }
 }
 
-static uint8_t populate_from_bool(bool condition) {
+void populate_from_bool(bool condition, uint8_t* __restrict__ out, size_t size) {
+  // Populate the output array with the condition.
+  for (size_t i = 0; i < size; i++) {
+    out[i] = populate_from_bool(condition);
+  }
+}
+
+uint8_t populate_from_bool(bool condition) {
   uint8_t ans;
 
   for (size_t i = 0; i < 8; i++) {

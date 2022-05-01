@@ -113,9 +113,9 @@ void safe_free(void* ptr);
 
 /**
  * @brief Safe free the all memory.
- * 
- * @param count the number of pointers 
- * @param ... 
+ *
+ * @param count the number of pointers
+ * @param ...
  */
 void safe_free_all(size_t count, ...);
 
@@ -129,6 +129,10 @@ void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
 
 void bneg(const uint8_t* __restrict__ lhs, uint8_t* __restrict__ out,
           size_t lhs_size);
+
+void populate_from_bool(bool condition, uint8_t* __restrict__ out, size_t size);
+
+uint8_t populate_from_bool(bool condition);
 
 void check_sgx_status(const sgx_status_t& status, const std::string& location);
 
@@ -149,10 +153,10 @@ void oblivious_assign(bool condition, uint8_t* __restrict__ lhs,
 
 /**
  * @brief This is an alternative for boolean oblivious assignment.
- * 
- * @param condition 
- * @param lhs 
- * @param rhs 
+ *
+ * @param condition
+ * @param lhs
+ * @param rhs
  */
 void oblivious_assign(bool condition, bool* lhs, bool* rhs);
 
@@ -166,10 +170,10 @@ std::string enclave_strcat(const std::string& str, ...);
 
 /**
  * @brief Sample a random number in [lower, upper] using SGX's random library.
- * 
- * @param lower 
- * @param upper 
- * @return uint32_t 
+ *
+ * @param lower
+ * @param upper
+ * @return uint32_t
  */
 uint32_t uniform_random(uint32_t lower, uint32_t upper);
 
