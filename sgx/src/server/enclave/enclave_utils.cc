@@ -117,7 +117,8 @@ void sprintf(const std::string& str, bool hex) {
   }
 }
 
-void populate_from_bool(bool condition, uint8_t* __restrict__ out, size_t size) {
+void populate_from_bool(bool condition, uint8_t* __restrict__ out,
+                        size_t size) {
   // Populate the output array with the condition.
   for (size_t i = 0; i < size; i++) {
     out[i] = populate_from_bool(condition);
@@ -125,7 +126,7 @@ void populate_from_bool(bool condition, uint8_t* __restrict__ out, size_t size) 
 }
 
 uint8_t populate_from_bool(bool condition) {
-  uint8_t ans;
+  uint8_t ans = 0;
 
   for (size_t i = 0; i < 8; i++) {
     ans |= condition << i;
@@ -227,9 +228,10 @@ void oblivious_assign(bool condition, bool* lhs, bool* rhs) {
 }
 
 uint32_t uniform_random(uint32_t lower, uint32_t upper) {
-  assert(upper >= lower &&
-         "upper bound must be greater than or equal to lower "
-         "bound");
+  if (upper < lower) {
+    ocall_panic_and_flush(
+        "Cannot perform uniform_random because upper < lower!");
+  }
   // We sample a random number and them map it to the range [lower, upper] in a
   // uniform way by scaling.
   uint32_t range = upper - lower;

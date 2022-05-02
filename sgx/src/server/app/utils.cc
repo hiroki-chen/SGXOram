@@ -136,8 +136,8 @@ void ocall_write_position(const char* position_fingerprint,
   // hash value.
   const std::string position_str(reinterpret_cast<const char*>(position),
                                  position_size);
-  logger->debug("Position: {}", position_fingerprint);
-  logger->debug("Ciphertext: {}", spdlog::to_hex(position_str));
+  // logger->debug("Position: {}", position_fingerprint);
+  // logger->debug("Ciphertext: {}", spdlog::to_hex(position_str));
   // Compress the position.
   const std::string compressed_position = compress_data(position_str);
   server_runner->store_position(position_fingerprint, compressed_position);

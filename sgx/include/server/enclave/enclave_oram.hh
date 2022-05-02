@@ -22,4 +22,12 @@
 
 sgx_status_t init_oram(uint32_t* permutation, size_t permutation_size);
 
+void encrypt_slot_and_store(uint8_t* const slot, size_t slot_size,
+                            uint32_t level, uint32_t offset);
+
+uint32_t calculate_offset(uint32_t block_id, uint32_t level_cur);
+
+void get_slot_and_decrypt(uint32_t level, uint32_t offset, uint8_t* slot_buffer,
+                          size_t slot_size);
+
 #endif  // ENCLAVE_ORAM_HH
