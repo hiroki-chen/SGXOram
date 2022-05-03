@@ -85,28 +85,27 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
 
   // Prepare a buffer for receiving the ciphertext.
   size_t cipher_len = message.size() + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE;
-  uint8_t* ciphertext = (uint8_t*)(malloc(cipher_len));
+  std::string ciphertext(cipher_len, 0);
   // Generate the IV (nonce). This is directly appended into the raw message and
   // is easy to be discarded.
-  status = sgx_read_rand(ciphertext + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE);
+  status = sgx_read_rand((uint8_t*)ciphertext.data() + SGX_AESGCM_MAC_SIZE,
+                         SGX_AESGCM_IV_SIZE);
   check_sgx_status(status, "sgx_read_rand()");
 
   // Encrypt the data and then MAC it.
   status = sgx_rijndael128GCM_encrypt(
       &shared_secret_key, plaintext, message.size(),
-      ciphertext + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,
-      ciphertext + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE, NULL, 0,
-      (sgx_aes_gcm_128bit_tag_t*)(ciphertext));
+      (uint8_t*)ciphertext.data() + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,
+      (uint8_t*)ciphertext.data() + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE,
+      NULL, 0, (sgx_aes_gcm_128bit_tag_t*)(ciphertext.data()));
 
   check_sgx_status(status, "enclave_aes_128_gcm_encrypt()");
 
   // Cast back to the std::string.
-  const std::string cipher_str = std::string((char*)(ciphertext), cipher_len);
-  safe_free(ciphertext);
   // We could extract the meaningful fields out of the ciphertext buffer and
   // then reconstruct a string from them. The buffer's layout is:
   //   <GCM_TAG> || <NONCE> || <CIPHERTEXT>
-  return cipher_str;
+  return ciphertext;
 }
 
 std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
@@ -121,11 +120,11 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
   // Prepare the buffer for storing the plaintext.
   size_t message_len =
       message.size() - SGX_AESGCM_MAC_SIZE - SGX_AESGCM_IV_SIZE;
-  uint8_t* plaintext = (uint8_t*)(malloc(message_len));
+  std::string plaintext(message_len, 0);
 
   sgx_status_t ret = sgx_rijndael128GCM_decrypt(
       &shared_secret_key, ciphertext + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,
-      message_len, plaintext, ciphertext + SGX_AESGCM_MAC_SIZE,
+      message_len, (uint8_t*)plaintext.data(), ciphertext + SGX_AESGCM_MAC_SIZE,
       SGX_AESGCM_IV_SIZE, NULL, 0, (const sgx_aes_gcm_128bit_tag_t*)ciphertext);
 
   // Check the integrity of the message.
@@ -134,11 +133,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
   check_sgx_status(ret, "enclave_aes_128_gcm_decrypt()");
 
   // Cast back to the std::string.
-  const std::string plaintext_str =
-      std::string((char*)(plaintext), message_len);
-  safe_free(plaintext);
-
-  return plaintext_str;
+  return plaintext;
 }
 
 void EnclaveCryptoManager::set_shared_key(
