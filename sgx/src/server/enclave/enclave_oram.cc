@@ -220,54 +220,71 @@ static size_t assemble_slot(uint8_t* slot,
 // This function fetches the target slot from the outside memory by calculting
 // its hash value and then decrypt it in the enclave. Finally, it writes the
 // decrypted target slot to the target slot buffer allocate by the caller.
+// Now it is cache-enabled.
 void get_slot_and_decrypt(uint32_t level, uint32_t offset, uint8_t* slot_buffer,
-                          size_t slot_size) {
+                          size_t slot_size, bool cache_enabled) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
-  // Determine the size of the target slot in ciphertext.
-  const size_t ciphertext_size =
-      slot_size + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE;
   // Compute the hash value of the target slot.
   const std::string slot_hash = calculate_slot_fingerprint(level, offset);
 
-  // Prepare a buffer for storing the ciphertext of the slot.
-  // Note that there are leaf and internal nodes, so we must allocate a buffer
-  // that is large enough to hold the worst-case ciphertext.
-  uint8_t* ciphertext = (uint8_t*)malloc(ciphertext_size);
-  memset(ciphertext, 0, ciphertext_size);
+  if (!cache_enabled) {
+    // Determine the size of the target slot in ciphertext.
+    const size_t ciphertext_size =
+        slot_size + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE;
 
-  // For safety reason, we use the same buffer to store the decrypted target.
-  // Note that the size of the buffer should be at least the size of the
-  // leaf slot to prevent buffer overflow.
-  // Here, the variable slot_size is useless, but we use it as sanity check.
-  sgx_status_t status = SGX_ERROR_UNEXPECTED;
-  status = ocall_read_slot(&slot_size, slot_hash.c_str(), ciphertext,
-                           ciphertext_size);
-  check_sgx_status(status, "get_slot_and_decrypt()");
+    // Prepare a buffer for storing the ciphertext of the slot.
+    // Note that there are leaf and internal nodes, so we must allocate a buffer
+    // that is large enough to hold the worst-case ciphertext.
+    uint8_t* ciphertext = (uint8_t*)malloc(ciphertext_size);
+    memset(ciphertext, 0, ciphertext_size);
 
-  // Test if cache works.
-  // std::shared_ptr<EnclaveCache> cache = EnclaveCache::get_instance();
-  // cache->read(slot_hash, 1);
+    // For safety reason, we use the same buffer to store the decrypted target.
+    // Note that the size of the buffer should be at least the size of the
+    // leaf slot to prevent buffer overflow.
+    // Here, the variable slot_size is useless, but we use it as sanity check.
+    sgx_status_t status = SGX_ERROR_UNEXPECTED;
+    status = ocall_read_slot(&slot_size, slot_hash.c_str(), ciphertext,
+                             ciphertext_size);
+    check_sgx_status(status, "get_slot_and_decrypt()");
 
-  // Check if the slot is valid.
-  if (slot_size == 0) {
-    ocall_panic_and_flush("The enclave proxy cannot fetch the target slot.");
+    // Test if cache works.
+    // std::shared_ptr<EnclaveCache> cache = EnclaveCache::get_instance();
+    // cache->read(slot_hash, 1);
+
+    // Check if the slot is valid.
+    if (slot_size == 0) {
+      ocall_panic_and_flush("The enclave proxy cannot fetch the target slot.");
+    }
+
+    // Decrypt the target slot.
+    const std::string decrypted_slot =
+        crypto_manager->enclave_aes_128_gcm_decrypt(
+            std::string(reinterpret_cast<char*>(ciphertext), ciphertext_size));
+    // Free the buffer we've just allocated.
+    safe_free(ciphertext);
+
+    // Sanity check: The header of the decrypted slot should not be corrupted
+    //               by something weird.
+    if (!check_slot_header(decrypted_slot.c_str(), level)) {
+      ocall_panic_and_flush("The slot header is invalid.");
+    }
+    // Copy back to the buffer.
+    memcpy(slot_buffer, decrypted_slot.c_str(), decrypted_slot.size());
+  } else {
+    // We fetch the target slot from the enclave cache.
+    std::shared_ptr<EnclaveCache> cache = EnclaveCache::get_instance();
+    const bool is_leaf =
+        (level == crypto_manager->get_oram_config()->level - 1);
+    std::string ans = cache->read(slot_hash, is_leaf);
+    // Then decrypt it.
+    ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
+    if (!check_slot_header(ans.c_str(), level)) {
+      ocall_panic_and_flush("The slot header is invalid (cache enabled).");
+    }
+    // Copy back to the buffer.
+    memcpy(slot_buffer, ans.c_str(), ans.size());
   }
-
-  // Decrypt the target slot.
-  const std::string decrypted_slot =
-      crypto_manager->enclave_aes_128_gcm_decrypt(
-          std::string(reinterpret_cast<char*>(ciphertext), ciphertext_size));
-  // Free the buffer we've just allocated.
-  safe_free(ciphertext);
-
-  // Sanity check: The header of the decrypted slot should not be corrupted
-  //               by something weird.
-  if (!check_slot_header(decrypted_slot.c_str(), level)) {
-    ocall_panic_and_flush("The slot header is invalid.");
-  }
-  // Copy back to the buffer.
-  memcpy(slot_buffer, decrypted_slot.c_str(), decrypted_slot.size());
 }
 
 // This function will calculate the offset for the slot at current level
@@ -346,7 +363,7 @@ static sgx_status_t init_so2_oram(uint32_t* const level_size_information) {
 static sgx_status_t init_so2_slots(uint32_t* const level_size_information,
                                    const uint32_t* const permutation,
                                    size_t permutation_size) {
-  print_permutation(permutation, permutation_size);
+  // print_permutation(permutation, permutation_size);
 
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
@@ -394,24 +411,33 @@ static sgx_status_t init_so2_slots(uint32_t* const level_size_information,
 
 // This function encrypts the given slot and then stores the result in the
 // external unstrusted memory. All the buffers are allocated by the caller.
+// FIXME: Store the slot to the cache pool.
 void encrypt_slot_and_store(uint8_t* const slot, size_t slot_size,
-                            uint32_t level, uint32_t offset) {
+                            uint32_t level, uint32_t offset,
+                            bool cache_enabled) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
   // Calculate the hash value of the slot by its current level and the
   // offset at the current level.
   const std::string slot_hash = calculate_slot_fingerprint(level, offset);
-
   // Encrypt the slot.
   const std::string encrypted_slot =
       crypto_manager->enclave_aes_128_gcm_encrypt(
           std::string(reinterpret_cast<char*>(slot), slot_size));
 
-  // Write the slot to the SGX storage.
-  sgx_status_t status =
-      ocall_write_slot(slot_hash.c_str(), (uint8_t*)encrypted_slot.c_str(),
-                       encrypted_slot.size());
-  check_sgx_status(status, "ocall_write_slot()");
+  if (!cache_enabled) {
+    // Write the slot to the SGX storage.
+    sgx_status_t status =
+        ocall_write_slot(slot_hash.c_str(), (uint8_t*)encrypted_slot.c_str(),
+                         encrypted_slot.size());
+    check_sgx_status(status, "ocall_write_slot()");
+  } else {
+    // Write the slot to the cache.
+    std::shared_ptr<EnclaveCache> cache_manager = EnclaveCache::get_instance();
+    const bool is_leaf =
+        (level == crypto_manager->get_oram_config()->level - 1);
+    cache_manager->write(slot_hash, encrypted_slot, is_leaf);
+  }
 }
 
 sgx_status_t ecall_access_data(int op_type, uint32_t block_address,

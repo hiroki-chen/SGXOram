@@ -542,7 +542,7 @@ const char descriptor_table_protodef_messages_2eproto[] PROTOBUF_SECTION_VARIABL
   "served\030\016 \003(\rB\002\020\001\022\027\n\013payload_tag\030\017 \003(\rB\002\020"
   "\001\022\023\n\007payload\030\020 \003(\rB\002\020\001B\024\n\022_epid_group_st"
   "atusB\030\n\026_tcb_evaluation_statusB\030\n\026_pse_e"
-  "valuation_statusB\016\n\014_result_size2\367\004\n\010sgx"
+  "valuation_statusB\016\n\014_result_size2\274\005\n\010sgx"
   "_oram\0224\n\014init_enclave\022\021.oram.InitRequest"
   "\032\017.oram.InitReply\"\000\022<\n\tinit_oram\022\025.oram."
   "OramInitRequest\032\026.google.protobuf.Empty\""
@@ -557,15 +557,17 @@ const char descriptor_table_protodef_messages_2eproto[] PROTOBUF_SECTION_VARIABL
   "tobuf.Empty\"\000\0222\n\nread_block\022\021.oram.ReadR"
   "equest\032\017.oram.ReadReply\"\000\0225\n\013write_block"
   "\022\022.oram.WriteRequest\032\020.oram.WriteReply\"\000"
-  "\022@\n\020close_connection\022\022.oram.CloseRequest"
-  "\032\026.google.protobuf.Empty\"\000b\006proto3"
+  "\022C\n\017test_oram_cache\022\026.google.protobuf.Em"
+  "pty\032\026.google.protobuf.Empty\"\000\022@\n\020close_c"
+  "onnection\022\022.oram.CloseRequest\032\026.google.p"
+  "rotobuf.Empty\"\000b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_messages_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2fempty_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_messages_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_messages_2eproto = {
-  false, false, 2434, descriptor_table_protodef_messages_2eproto, "messages.proto", 
+  false, false, 2503, descriptor_table_protodef_messages_2eproto, "messages.proto", 
   &descriptor_table_messages_2eproto_once, descriptor_table_messages_2eproto_deps, 1, 14,
   schemas, file_default_instances, TableStruct_messages_2eproto::offsets,
   file_level_metadata_messages_2eproto, file_level_enum_descriptors_messages_2eproto, file_level_service_descriptors_messages_2eproto,

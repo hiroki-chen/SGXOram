@@ -52,6 +52,14 @@ std::shared_ptr<EnclaveCryptoManager> EnclaveCryptoManager::get_instance() {
   return instance;
 }
 
+// One should note that the hash value should be immediately represented as a
+// hexical std::string since the inferface of OCalls only receive const char* as
+// input. So if the hash value is simply a byte array, some bytes will be
+// discarded if the application treats it as a const char*.
+//
+// To see why, please refer to SGX's edl definitions for const char* literal
+// strings. The length is implicitly calculated from the first null character to
+// the end of the string, which is '\0'.
 std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
   // Determine the length of the input message with a random numebr.
   const size_t message_length = message.size() + DEFAULT_RANDOM_LENGTH;
@@ -61,15 +69,16 @@ std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
   uint8_t* buf = (uint8_t*)malloc(message_length);
   memcpy(buf, message.c_str(), message.size());
   memcpy(buf + message.size(), random_number, DEFAULT_RANDOM_LENGTH);
-  sgx_sha256_hash_t ans = {0};
+  std::string ans;
+  ans.resize(SGX_SHA256_HASH_SIZE);
 
-  sgx_status_t status = sgx_sha256_msg(buf, message_length, &ans);
+  sgx_status_t status =
+      sgx_sha256_msg(buf, message_length, (sgx_sha256_hash_t*)ans.data());
 
   safe_free(buf);
   check_sgx_status(status, "enclave_sha_256()");
 
-  // Cast back to the std::string.
-  return hex_to_string(ans, SGX_SHA256_HASH_SIZE);
+  return to_hex((uint8_t*)ans.c_str(), SGX_SHA256_HASH_SIZE);
 }
 
 std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
@@ -120,7 +129,8 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
   // Prepare the buffer for storing the plaintext.
   size_t message_len =
       message.size() - SGX_AESGCM_MAC_SIZE - SGX_AESGCM_IV_SIZE;
-  std::string plaintext(message_len, 0);
+  std::string plaintext;
+  plaintext.resize(message_len);
 
   sgx_status_t ret = sgx_rijndael128GCM_decrypt(
       &shared_secret_key, ciphertext + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE,

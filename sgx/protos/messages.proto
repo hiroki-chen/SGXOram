@@ -19,7 +19,7 @@ service sgx_oram {
 
   // ===================================================== //
   // Functions for remote attestation and key derivation.
-  // FIXME: possibly error-prone :(.
+  // @note Deprecated.
   rpc remote_attestation_begin(InitialMessage) returns (Message0) {}
 
   rpc remote_attestation_msg0(Message0) returns (Message1) {}
@@ -32,6 +32,8 @@ service sgx_oram {
   rpc read_block(ReadRequest) returns (ReadReply) {}
 
   rpc write_block(WriteRequest) returns (WriteReply) {}
+
+  rpc test_oram_cache(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 
   rpc close_connection(CloseRequest) returns (google.protobuf.Empty) {}
 }

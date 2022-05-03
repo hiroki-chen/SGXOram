@@ -43,8 +43,8 @@ void sub_access_s1(bool condition, uint8_t* const s1, const size_t slot_size,
     // Reinterpret the memory space.
     sgx_oram::oram_block_t* block = (sgx_oram::oram_block_t*)slot_storage;
 
-    ENCLAVE_LOG("[enclave] The address of the block is %u",
-                block->header.address);
+    // ENCLAVE_LOG("[enclave] The address of the block is %u",
+    //             block->header.address);
     // Initialize some bool variables.
 
     // Variable condition_existing stands for whether the target block is
@@ -99,11 +99,10 @@ void sub_access_s1(bool condition, uint8_t* const s1, const size_t slot_size,
 }
 
 void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
-                          uint8_t* const s2, const size_t slot_size,
-                          sgx_oram::oram_block_t* const block_slot1_target,
-                          uint8_t* const data_star, uint32_t* const counter,
-                          uint32_t pos,
-                          sgx_oram::oram_position_t* const position) {
+                   uint8_t* const s2, const size_t slot_size,
+                   sgx_oram::oram_block_t* const block_slot1_target,
+                   uint8_t* const data_star, uint32_t* const counter,
+                   uint32_t pos, sgx_oram::oram_position_t* const position) {
   // Get the header in advance.
   sgx_oram::oram_slot_header_t* header = (sgx_oram::oram_slot_header_t*)s2;
   // Get the range of the slot.
@@ -112,44 +111,117 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
   // Get the slot storage.
   uint8_t* slot_storage = s2 + sizeof(sgx_oram::oram_slot_header_t);
   // Prepare a buffer for holding the populated boolean variable.
-  uint8_t* populated = (uint8_t*)malloc(DEFAULT_ORAM_DATA_SIZE);
+  uint8_t* populated_bool_for_data = (uint8_t*)malloc(DEFAULT_ORAM_DATA_SIZE);
+  uint8_t* populated_bool_for_bid = (uint8_t*)malloc(WORD_SIZE);
 
   // Then we do an one-pass on the slot S2.
   for (size_t i = 0; i < slot_size; i++) {
-    memset(populated, 0, DEFAULT_ORAM_DATA_SIZE);
+    // =========== Begin First Part: data processing =========== //
+    // Step 1: bl.data = bl.data & ~(pos = 0)
+    //  -> Clear the current block for holding the incoming data.
+    // Step 2: bl.data = bl.data | (bl1.data & ~pos)
+    //  -> Copy the data from the target block to the current block.
+    //     if (bl1.data & ~pos) is not zero.
+    // Step 3: bl.data = bl.data & ~(c_e & op)
+    //  -> Clear the current block for holding the incoming data from the
+    //     client.
+    // Step 4: bl.data = bl.data | (op & data*)
+    //  -> Copy the data from the client to the current block.
+    memset(populated_bool_for_data, 0, DEFAULT_ORAM_DATA_SIZE);
     const uint32_t nbid = uniform_random(begin, end);
     sgx_oram::oram_block_t* const block = (sgx_oram::oram_block_t*)slot_storage;
     pos -= (block->header.type ==
             sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_DUMMY);
+    // The variable bool_existing denotes whether there is a target block in the
+    // current slot. If there is, we want to read it or write something into it.
+    //
+    // condition_existing is true if and only if:
+    //  - bl.address = given address,
+    //  - bl.type = ORAM_BLOCK_TYPE_NORMAL, and
+    //  - this is not a fake operation.
     bool condition_existing =
-        (condition) && (block->header.address == position->address);
+        (condition) && (block->header.address == position->address) &&
+        (block->header.type ==
+         sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_NORMAL);
 
     // Populate the buffer.
-    populate_from_bool(!(pos == 0), populated, DEFAULT_ORAM_DATA_SIZE);
-    band(block->data, populated, block->data, DEFAULT_ORAM_DATA_SIZE,
-         DEFAULT_ORAM_DATA_SIZE);
-
-    populate_from_bool((pos == 0), populated, DEFAULT_ORAM_DATA_SIZE);
-    band(block_slot1_target->data, populated, block_slot1_target->data,
+    populate_from_bool(!(pos == 0), populated_bool_for_data,
+                       DEFAULT_ORAM_DATA_SIZE);
+    band(block->data, populated_bool_for_data, block->data,
          DEFAULT_ORAM_DATA_SIZE, DEFAULT_ORAM_DATA_SIZE);
+
+    populate_from_bool((pos == 0), populated_bool_for_data,
+                       DEFAULT_ORAM_DATA_SIZE);
+    band(block_slot1_target->data, populated_bool_for_data,
+         block_slot1_target->data, DEFAULT_ORAM_DATA_SIZE,
+         DEFAULT_ORAM_DATA_SIZE);
     bor(block->data, block_slot1_target->data, block->data,
         DEFAULT_ORAM_DATA_SIZE, DEFAULT_ORAM_DATA_SIZE);
 
-    populate_from_bool(!(condition_existing && op_type), populated,
+    populate_from_bool(!(condition_existing && op_type),
+                       populated_bool_for_data, DEFAULT_ORAM_DATA_SIZE);
+    band(block->data, populated_bool_for_data, block->data,
+         DEFAULT_ORAM_DATA_SIZE, DEFAULT_ORAM_DATA_SIZE);
+
+    populate_from_bool(op_type, populated_bool_for_data,
                        DEFAULT_ORAM_DATA_SIZE);
-    band(block->data, populated, block->data, DEFAULT_ORAM_DATA_SIZE,
-         DEFAULT_ORAM_DATA_SIZE);
+    band(data_star, populated_bool_for_data, populated_bool_for_data,
+         DEFAULT_ORAM_DATA_SIZE, DEFAULT_ORAM_DATA_SIZE);
+    bor(block->data, populated_bool_for_data, block->data,
+        DEFAULT_ORAM_DATA_SIZE, DEFAULT_ORAM_DATA_SIZE);
+    // =========== End First Part: data processing =========== //
 
-    populate_from_bool(op_type, populated, DEFAULT_ORAM_DATA_SIZE);
-    band(data_star, populated, populated, DEFAULT_ORAM_DATA_SIZE,
-         DEFAULT_ORAM_DATA_SIZE);
-    bor(block->data, populated, block->data, DEFAULT_ORAM_DATA_SIZE,
-        DEFAULT_ORAM_DATA_SIZE);
+    // =========== Begin Second Part: bid processing =========== //
+    uint32_t bid_a = 0, bid_b = 0, bid_c = 0;
+    // bid1 ← (pos = 0) ∧ bl1.bid
+    populate_from_bool((pos == 0), populated_bool_for_bid, WORD_SIZE);
+    band((uint8_t*)(&(block_slot1_target->header.bid)), populated_bool_for_bid,
+         (uint8_t*)(&bid_a), WORD_SIZE, WORD_SIZE);
+    // bid2 ← (pos ̸ = 0) ∧ ce ∧ op ∧ nbid
+    populate_from_bool(
+        (pos != 0) && (condition_existing) &&
+            (op_type == sgx_oram::oram_operation_t::ORAM_OPERATION_WRITE),
+        populated_bool_for_bid, WORD_SIZE);
+    band((uint8_t*)(&(nbid)), populated_bool_for_bid, (uint8_t*)(&bid_b),
+         WORD_SIZE, WORD_SIZE);
+    // bid3 ← (pos ̸ = 0) ∧ ¬ce ∧ bl.bid
+    populate_from_bool((pos != 0) && (!condition_existing),
+                       populated_bool_for_bid, WORD_SIZE);
+    band((uint8_t*)(&(block->header.bid)), populated_bool_for_bid,
+         (uint8_t*)(&bid_c), WORD_SIZE, WORD_SIZE);
+    // bl.bid ← bid1 ∨ bid2 ∨ bid3
+    bor((uint8_t*)(&bid_a), (uint8_t*)(&bid_b), (uint8_t*)(&bid_a), WORD_SIZE,
+        WORD_SIZE);
+    bor((uint8_t*)(&bid_a), (uint8_t*)(&bid_c), (uint8_t*)(&bid_a), WORD_SIZE,
+        WORD_SIZE);
+    bor((uint8_t*)(&(block->header.bid)), (uint8_t*)(&bid_a),
+        (uint8_t*)(&(block->header.bid)), WORD_SIZE, WORD_SIZE);
+    // =========== End Second Part: bid processing =========== //
 
+    // =========== Begin Third Part: is_dummy processing =========== //
+    bool delta_a =
+        (pos == 0) && (block_slot1_target->header.type ==
+                       sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_DUMMY);
+    bool delta_b = (pos != 0) && !(condition_existing) &&
+                   (block->header.type ==
+                    sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_DUMMY);
+    bool delta_c =
+        (pos != 0) && (condition_existing) &&
+        (op_type == sgx_oram::oram_operation_t::ORAM_OPERATION_WRITE);
+    block->header.type =
+        static_cast<sgx_oram::oram_block_type_t>(delta_a || delta_b || delta_c);
+    // =========== End Third Part: is_dummy processing =========== //
     slot_storage += ORAM_BLOCK_SIZE;
   }
 
-  safe_free(populated);
+  safe_free_all(2, populated_bool_for_data, populated_bool_for_bid);
+
+  // Finally, we do the one-pass again and read the target data to the client.
+  // This time, there is nothing for us to do, i.e., the only thing we need to
+  // do is check whether the target block exists.
+  for (size_t i = 0; i < slot_size; i++) {
+    //TODO.
+  }
 }
 
 // This functions performs some necessary clean-ups and variables assignments
@@ -396,7 +468,10 @@ void sub_evict(uint8_t* const s2, uint32_t current_level,
   ENCLAVE_LOG(
       "[enclave] Slot 2 is accessed!"
       " Now storing it to the outside memory...");
-  // TODO: After access, we need store the modified slot to the external memory.
+  // After access, we need store the modified slot to the external memory.
+  const uint32_t s2_level = slot_header_s2->level;
+  const uint32_t s2_offset = slot_header_s2->offset;
+  encrypt_slot_and_store(s2, slot_size, s2_level, s2_offset);
 
   uint32_t pos;
   uint32_t bid = block->header.bid;
@@ -413,10 +488,15 @@ void sub_evict(uint8_t* const s2, uint32_t current_level,
   uint8_t* const s3 = (uint8_t*)malloc(s3_size);
   const uint32_t offset = calculate_offset(bid, current_level + 1);
   get_slot_and_decrypt(current_level + 1, offset, s3, s3_size);
+  sgx_oram::oram_slot_header_t* const slot_header_s3 =
+      (sgx_oram::oram_slot_header_t*)s3;
 
   // Then we access the slot S3.
   sub_evict_s3(s3, s3_size, block, pos);
-  // TODO: After access, we store the slot to the external memory.
+  // After access, we store the slot to the external memory.
+  const uint32_t s3_level = slot_header_s3->level;
+  const uint32_t s3_offset = slot_header_s3->offset;
+  encrypt_slot_and_store(s3, s3_size, s3_level, s3_offset);
 
   // Prepare a dummy buffer for dummy operations.
   uint8_t* const dummy_buffer = (uint8_t*)malloc(DEFAULT_ORAM_DATA_SIZE);

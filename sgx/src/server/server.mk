@@ -32,8 +32,9 @@ GRPC_PATH := /usr/local
 
 # Must recompile the project if these parameters are changed.
 BUCKET_SIZE ?= 32
-# FIXME: Maybe this should be multipled with a constant c.
+# Maybe this should be multipled with a constant c.
 SLOT_SIZE ?= 16
+CONSTANT ?= 16
 
 # Include the SGX's official buildenv.mk
 include $(SGX_SDK)/buildenv.mk

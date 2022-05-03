@@ -39,6 +39,7 @@ DECLARE_uint32(type);
 DECLARE_double(constant);
 DECLARE_uint32(round);
 DECLARE_uint32(oram_type);
+DECLARE_uint32(cache_type);
 
 static std::string read_keycert(const std::string& path) {
   std::ifstream file(path, std::ifstream::in);
@@ -281,4 +282,22 @@ int Client::read_block(uint32_t address) {
   std::string plaintext = decrypt(ciphertext);
   logger->info("The content of the block is {}", spdlog::to_hex(plaintext));
   return 0;
+}
+
+int Client::test_oram_cache(void) {
+  logger->info("Begin testing the cache!");
+  grpc::ClientContext context;
+  google::protobuf::Empty request;
+  google::protobuf::Empty empty_response;
+
+  grpc::Status status =
+      stub_->test_oram_cache(&context, request, &empty_response);
+
+  if (!status.ok()) {
+    logger->error("Cannot test the cache!");
+    return -1;
+  } else {
+    logger->info("The cache functions well!");
+    return 0;
+  }
 }

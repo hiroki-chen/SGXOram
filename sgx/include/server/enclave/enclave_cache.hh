@@ -28,10 +28,12 @@
 constexpr size_t maximum_cache_size_in_bytes = 96 * 1024 * 1024;
 constexpr size_t maximum_cache_size = 16;
 
-// The cache is implemented as a LRU cache.
-// Key type is the hashed fingerprint of the slot, and the value type is the
-// slot itself in byte array (or std::string for convenience, because we don't
-// need check the buffer length).
+// - The cache is implemented as a LRU cache.
+// - Key type is the hashed fingerprint of the slot, and the value type is the
+//   slot itself in byte array (or std::string for convenience, because we don't
+//   need check the buffer length).
+// - The cache DOES NOT do any cryptographic operations. It only stores the
+//   fingerprint of the slot and the slot itself.
 class EnclaveCache {
   using value_t = std::pair<uint32_t, std::string>;
   using cache_entry_t =  std::pair<std::string, value_t>;

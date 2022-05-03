@@ -263,6 +263,21 @@ grpc::Status SGXORAMService::generate_session_key(
   }
 }
 
+grpc::Status SGXORAMService::test_oram_cache(
+    grpc::ServerContext* server_context, const google::protobuf::Empty* empty,
+    google::protobuf::Empty* empty_response) {
+  logger->info("Begin testing the oram cache...");
+
+  status = ecall_test_oram_cache(*global_eid, &status);
+
+  if (status != SGX_SUCCESS) {
+    const std::string error_message = "Cannot test oram cache!";
+    return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
+  }
+
+  return grpc::Status::OK;
+}
+
 grpc::Status SGXORAMService::read_block(grpc::ServerContext* server_context,
                                         const oram::ReadRequest* read_request,
                                         oram::ReadReply* read_reply) {
@@ -301,8 +316,15 @@ grpc::Status SGXORAMService::close_connection(
     grpc::ServerContext* server_context,
     const oram::CloseRequest* close_request, google::protobuf::Empty* empty) {
   logger->info(server_context->peer(), " - Closing connection... Goodbye!");
-  server_running = false;
-  return grpc::Status::OK;
+
+  // Destroy the enclave.
+  if (sgx_destroy_enclave(*global_eid) != SGX_SUCCESS) {
+    const std::string error_message = "Cannot destroy the enclave!";
+    return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
+  } else {
+    server_running = false;
+    return grpc::Status::OK;
+  }
 }
 
 grpc::Status SGXORAMService::remote_attestation_begin(

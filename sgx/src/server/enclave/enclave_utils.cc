@@ -99,6 +99,17 @@ void string_to_hex(const std::string& in, uint8_t* out) {
   }
 }
 
+std::string to_hex(const uint8_t* array, const size_t& len) {
+  // Convert the array of bytes into a hex string.
+  std::string ans;
+  for (size_t i = 0; i < len; i++) {
+    // Convert every byte into a hex string.
+    ans += digits[array[i] >> 4];
+    ans += digits[array[i] & 0xf];
+  }
+  return ans;
+}
+
 void printf(const char* fmt, ...) {
   char buf[BUFSIZ] = {'\0'};
   va_list ap;
@@ -232,17 +243,20 @@ uint32_t uniform_random(uint32_t lower, uint32_t upper) {
     ocall_panic_and_flush(
         "Cannot perform uniform_random because upper < lower!");
   }
-  // We sample a random number and them map it to the range [lower, upper] in a
-  // uniform way by scaling.
-  uint32_t range = upper - lower;
-  uint32_t scale = RAND_MAX / range;
 
-  uint32_t ans = 0;
+  // @ref Chromium's base/rand_util.cc for the implementation.
+  uint32_t range = upper - lower + 1;
+  uint32_t max_acceptable_value =
+      (std::numeric_limits<uint32_t>::max() / range) * range - 1;
+  // We sample a random number and them map it to the range [lower, upper]
+  // (inclusive) in a uniform way by scaling.
+  uint32_t value;
   do {
-    // Generate random number from sgx_rand_read.
-    sgx_status_t status = sgx_read_rand((uint8_t*)&ans, sizeof(ans));
-    check_sgx_status(status, "sgx_read_rand()");
-  } while (ans >= scale * range);  // since scale is truncated, pick a new val
-                                   // until it's lower than scale * range
-  return ans / scale + lower;
+    // Use a strong RNG to generate a random number.
+    sgx_status_t status = sgx_read_rand((uint8_t*)&value, sizeof(value));
+    check_sgx_status(status, "sgx_read_rand");
+  } while (value > max_acceptable_value);
+
+  value = value % range + lower;
+  return value;
 }

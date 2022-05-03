@@ -106,7 +106,7 @@ std::string decompress_data(const std::string& data) {
   return decompressed_data;
 }
 
-// FIXME: The position map is non-recursive, so it is not safe!
+// The position map is non-recursive, so it is not safe!
 // We need to store the position map in a recursive manner.
 // Use with care!!
 size_t ocall_read_position(const char* position_fingerprint, uint8_t* position,
@@ -145,7 +145,8 @@ void ocall_write_position(const char* position_fingerprint,
 
 void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
                       size_t data_len) {
-  logger->debug("The fingerprint for the slot is: {}", slot_finger_print);
+  logger->debug("The fingerprint for the slot is: {}",
+                std::string(slot_finger_print));
 
   // Compress the data and then store it to the server.
   std::string compressed_data =
@@ -155,7 +156,8 @@ void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
 
 size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
                        size_t data_len) {
-  logger->debug("The fingerprint for the slot is: {}", slot_finger_print);
+  logger->debug("The fingerprint for the slot is: {}",
+                std::string(slot_finger_print));
 
   // Check if the slot is in the memory.
   bool is_in_memory = server_runner->is_in_storage(slot_finger_print);
@@ -173,6 +175,10 @@ size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
     // The enclave will simply crash or handle the error.
     return 0;
   }
+}
+
+int ocall_is_in_memory(const char* slot_finger_print) {
+  return server_runner->is_in_storage(slot_finger_print);
 }
 
 namespace sgx_oram {

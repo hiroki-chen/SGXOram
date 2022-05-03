@@ -102,9 +102,14 @@ enclave {
                                         uint32_t secret_size,
                                         [ in, count = 16 ] uint8_t *gcm_mac);
     // End Remote Attestation Interfaces //
+
+    public sgx_status_t ecall_test_oram_cache();
   };
 
   untrusted {
+    // This function checks if the target slot is in the external memory.
+    int ocall_is_in_memory([ in, string] const char* slot_fingerprint);
+
 		// A function for printing the buffer inside the enclave to the console.
 		// Only invoked by the enclave.
     void ocall_printf([ in, string ] const char *str);

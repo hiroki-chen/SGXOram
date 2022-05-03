@@ -113,6 +113,10 @@ class SGXORAMService final : public oram::sgx_oram::Service {
                          const oram::OramInitRequest* oram_init_request,
                          google::protobuf::Empty* empty) override;
 
+  grpc::Status test_oram_cache(
+      grpc::ServerContext* server_context, const google::protobuf::Empty* empty,
+      google::protobuf::Empty* empty_response) override;
+
   // ===================================================== //
   // Functions for remote attestation.
   grpc::Status remote_attestation_begin(
@@ -164,7 +168,7 @@ class Server final {
   }
 
   bool is_in_storage(const char* const fingerprint) {
-    return service->storage.count(fingerprint) > 0;
+    return service->storage.find(fingerprint) != service->storage.end();
   }
 
   std::string get_position(const std::string& address) {

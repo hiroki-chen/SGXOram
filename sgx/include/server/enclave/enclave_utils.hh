@@ -72,13 +72,22 @@ inline std::string enclave_strcat(Args&&... args) {
 #endif
 
 /**
- * @brief Cast an unsigned char array to hexical std::string.
+ * @brief Cast an unsigned char array to hexical std::string with format.
  *
  * @param array
  * @param len
  * @return std::string
  */
 std::string hex_to_string(const uint8_t* array, const size_t& len = 32);
+
+/**
+ * @brief Cast a char array to the hexical std::string without format.
+ * 
+ * @param array 
+ * @param len 
+ * @return std::string 
+ */
+std::string to_hex(const uint8_t* array, const size_t& len = 32);
 
 /**
  * @brief Cast a hexcial string to char array.
