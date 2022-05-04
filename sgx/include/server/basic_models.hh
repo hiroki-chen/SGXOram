@@ -40,7 +40,11 @@
 #define ENCRYPTED_BLOCK_SIZE \
   sizeof(sgx_oram::oram_block_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
 
-// If the compiler does not give the macro, use the default value.
+// - If the compiler does not give the macro, use the default value.
+// - Note that these two macros MUST BE pre-determined in order to give the size
+//   of the buffer we need to allocate in advance. They can be changed in the
+//   Makefile. 
+// - Also, it should be noted that the size of the slots at each level is different.
 #ifndef DEFAULT_SLOT_SIZE
 #define DEFAULT_SLOT_SIZE 32
 #endif

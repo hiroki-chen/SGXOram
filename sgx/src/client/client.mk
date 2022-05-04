@@ -24,8 +24,11 @@ GRPC_PATH := /usr/local
 
 SRC_FILE := $(wildcard $(SRC_PATH)/*.cc)
 OBJ_FILE := $(patsubst $(SRC_PATH)/%.cc, $(BUILD_PATH)/%.o, $(SRC_FILE))
+DEPENDENCIES := $(patsubst $(SRC_PATH)/%.cc, $(BUILD_PATH)/%.d, $(SRC_FILE))
 PROTO_OBJ :=  $(wildcard ../../build/proto/*.o)
 APP_NAME := $(BUILD_PATH)/../bin/client.bin
+
+-include $(DEPENDENCIES)
 
 CXX ?= g++
 CXX_FLAGS ?= -std=c++17 -Wall -Wextra -fPIC -I$(COMMON_INCLUDE_PATH) -I$(CLIENT_INCLUDE_PATH) -DSUPPLIED_KEY_DERIVATION
@@ -57,5 +60,5 @@ $(APP_NAME): $(OBJ_FILE) $(PROTO_OBJ)
 	@printf "\033[1;93;49mLINK => $@\033[0m\n"
 
 $(BUILD_PATH)/%.o: $(SRC_PATH)/%.cc
-	@$(CXX) -o $@ -c $< $(CXX_FLAGS)
+	@$(CXX) -MMD -MP -o $@ -c $< $(CXX_FLAGS)
 	@printf "\033[1;93;49mCXX => $@\033[0m\n"

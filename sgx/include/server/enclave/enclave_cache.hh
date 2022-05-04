@@ -46,8 +46,6 @@ class EnclaveCache {
   cache_list_t cache_list_;
   key_map_t key_map_;
 
-  static std::shared_ptr<EnclaveCache> instance_;
-
   bool status = 0;
 
   // The constructor is private to ensure that the cache is created
@@ -55,7 +53,7 @@ class EnclaveCache {
   // instances of the cache, which does not make sense.
   EnclaveCache(size_t max_size = maximum_cache_size);
 
-  void replace_item(const std::string& key, const std::string& value);
+  void replace_item(const std::string& key, const std::string& value, bool is_dirty);
 
  public:
   static std::shared_ptr<EnclaveCache> get_instance(void);

@@ -12,10 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
-.PHONY: clean all check_sgx protobuf
+.PHONY: clean all check_sgx
 
 PROTO_PATH := $(CURDIR)/protos
-PROTO_SRC := $(wildcard $(PROTO_PATH)/messages.proto)
+PROTO_SRC := $(PROTO_PATH)/messages.proto
 INCLUDE_PATH := $(CURDIR)/include
 BUILD_PATH := $(CURDIR)/build
 PROTOC := $(shell which protoc)
@@ -32,11 +32,8 @@ else
 	CXX_FLAGS += -O2 -g
 endif
 
-all: mkdir $(SRC_FILE) server client
+all: mkdir server client
 	@printf "\033[1;93;49mCreated server and client.\033[0m\n"
-
-protobuf: $(SRC_FILE)
-	
 
 mkdir:
 ifeq ("$(wildcard $(BUILD_PATH))", "")

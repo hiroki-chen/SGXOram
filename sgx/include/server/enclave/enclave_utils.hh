@@ -82,10 +82,10 @@ std::string hex_to_string(const uint8_t* array, const size_t& len = 32);
 
 /**
  * @brief Cast a char array to the hexical std::string without format.
- * 
- * @param array 
- * @param len 
- * @return std::string 
+ *
+ * @param array
+ * @param len
+ * @return std::string
  */
 std::string to_hex(const uint8_t* array, const size_t& len = 32);
 
@@ -128,18 +128,22 @@ void safe_free(void* ptr);
  */
 void safe_free_all(size_t count, ...);
 
+bool is_equal(uint8_t* const lhs, uint8_t* const rhs, const size_t& len);
+
 // NOTE: THE SIZE OF ALL BUFFERS IS MULTIPLE OF 32.
 // Potential acceleration can be SIMD or AVX2 instruction set.
-void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
-          uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size);
+// FIXME: All these functions cannot be declared as '' within the
+// enclave
+//        because the enclave is not compiled with -fno-strict-aliasing.
+void band(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out, size_t lhs_size,
+          size_t rhs_size);
 
-void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
-         uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size);
+void bor(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out, size_t lhs_size,
+         size_t rhs_size);
 
-void bneg(const uint8_t* __restrict__ lhs, uint8_t* __restrict__ out,
-          size_t lhs_size);
+void bneg(const uint8_t* lhs, uint8_t* out, size_t lhs_size);
 
-void populate_from_bool(bool condition, uint8_t* __restrict__ out, size_t size);
+void populate_from_bool(bool condition, uint8_t* out, size_t size);
 
 uint8_t populate_from_bool(bool condition);
 
@@ -156,9 +160,8 @@ void check_sgx_status(const sgx_status_t& status, const std::string& location);
  * @param lhs_size
  * @param rhs_size
  */
-void oblivious_assign(bool condition, uint8_t* __restrict__ lhs,
-                      uint8_t* __restrict__ rhs, size_t lhs_size,
-                      size_t rhs_size);
+void oblivious_assign(bool condition, uint8_t* lhs, uint8_t* rhs,
+                      size_t lhs_size, size_t rhs_size);
 
 /**
  * @brief This is an alternative for boolean oblivious assignment.

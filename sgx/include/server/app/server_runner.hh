@@ -178,6 +178,8 @@ class Server final {
   void store_position(const std::string& address, const std::string& position) {
     service->position_map[address] = position;
   }
+
+  sgx_enclave_id_t* get_enclave_id(void) { return service->global_eid; }
 };
 
 #endif  // SERVER_RUNNER_HH

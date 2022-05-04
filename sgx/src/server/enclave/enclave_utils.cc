@@ -128,8 +128,7 @@ void sprintf(const std::string& str, bool hex) {
   }
 }
 
-void populate_from_bool(bool condition, uint8_t* __restrict__ out,
-                        size_t size) {
+void populate_from_bool(bool condition, uint8_t* out, size_t size) {
   // Populate the output array with the condition.
   for (size_t i = 0; i < size; i++) {
     out[i] = populate_from_bool(condition);
@@ -146,8 +145,8 @@ uint8_t populate_from_bool(bool condition) {
   return ans;
 }
 
-void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
-          uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size) {
+void band(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out, size_t lhs_size,
+          size_t rhs_size) {
   // A sanity check.
   if (lhs_size != rhs_size) {
     ENCLAVE_LOG("[enclave] lhs_size != rhs_size.\n");
@@ -169,8 +168,8 @@ void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
   }
 }
 
-void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
-         uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size) {
+void bor(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out, size_t lhs_size,
+         size_t rhs_size) {
   // A sanity check.
   if (lhs_size != rhs_size) {
     ENCLAVE_LOG("[enclave] lhs_size != rhs_size.\n");
@@ -214,9 +213,8 @@ std::string enclave_strcat(const std::string& str, ...) {
   return ans;
 }
 
-void oblivious_assign(bool condition, uint8_t* __restrict__ lhs,
-                      uint8_t* __restrict__ rhs, size_t lhs_size,
-                      size_t rhs_size) {
+void oblivious_assign(bool condition, uint8_t* lhs, uint8_t* rhs,
+                      size_t lhs_size, size_t rhs_size) {
   // Pre-allocate two buffers for receiving the final output.
   uint8_t* res1 = (uint8_t*)malloc(lhs_size);
   uint8_t* res2 = (uint8_t*)malloc(lhs_size);
@@ -259,4 +257,14 @@ uint32_t uniform_random(uint32_t lower, uint32_t upper) {
 
   value = value % range + lower;
   return value;
+}
+
+bool is_equal(uint8_t* const lhs, uint8_t* const rhs, const size_t& len) {
+  for (size_t i = 0; i < len; i++) {
+    if (lhs[i] != rhs[i]) {
+      ENCLAVE_LOG("[enclave] Different bytes at index %zu.\n", i);
+      return false;
+    }
+  }
+  return true;
 }

@@ -108,6 +108,9 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
   // Get the range of the slot.
   const uint32_t begin = header->range_begin;
   const uint32_t end = header->range_end;
+  ENCLAVE_LOG(
+      "[enclave] Invoking sub_access_s2 for slot at level %u, offset %u... And the slot size is %zu\n",
+      header->level, header->offset, slot_size);
   // Get the slot storage.
   uint8_t* slot_storage = s2 + sizeof(sgx_oram::oram_slot_header_t);
   // Prepare a buffer for holding the populated boolean variable.
@@ -220,7 +223,7 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
   // This time, there is nothing for us to do, i.e., the only thing we need to
   // do is check whether the target block exists.
   for (size_t i = 0; i < slot_size; i++) {
-    //TODO.
+    // TODO.
   }
 }
 
@@ -304,14 +307,17 @@ void sub_access(sgx_oram::oram_operation_t op_type, bool condition_s1,
                          block_slot1_target, block_slot1_evict, &counter, &pos);
 
   // After accessing, we need to update the slot.
-  ENCLAVE_LOG(
-      "[enclave] Slot 1 is accessed!"
-      " Now storing it to the outside memory...");
+  // ENCLAVE_LOG(
+  //     "[enclave] Slot 1 is accessed!"
+  //     " Now storing it to the cache / memory...");
   encrypt_slot_and_store(s1, s1_size, slot_header_s1->level,
                          slot_header_s1->offset);
   slot_size = slot_header_s2->slot_size;
   sub_access_s2(op_type, condition_s2, s2, slot_size, block_slot1_target,
                 data_star, &counter, pos, position);
+  encrypt_slot_and_store(s2, s2_size, slot_header_s2->level,
+                         slot_header_s2->offset);
+
   // Eventually, destroy all the allocated memory.
   safe_free_all(2, block_slot1_target, block_slot1_evict);
 }
@@ -427,8 +433,8 @@ void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
   size_t slot_size_s2 = ORAM_SLOT_INTERNAL_SIZE;
   uint8_t* s1 = (uint8_t*)malloc(slot_size_s1);
   uint8_t* s2 = (uint8_t*)malloc(slot_size_s2);
-  size_t s1_size = 0;
-  size_t s2_size = 0;
+  memset(s1, 0, slot_size_s1);
+  memset(s2, 0, slot_size_s2);
 
   // Read the slots from the SGX storage.
   // We may need to put all the slots in a buffer pool so that we can
@@ -438,7 +444,6 @@ void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
   get_slot_and_decrypt(current_level, offset_s2, s2, slot_size_s2);
 
   // Invoke sub_access.
-  ENCLAVE_LOG("[enclave] Invoking sub_access for level %d...", current_level);
   sub_access(op_type, condition_s1, condition_s2, s1, slot_size_s1, s2,
              slot_size_s2, data, current_level, position);
   // ENCLAVE_LOG("[enclave] Invoking sub_evict for level %d...", current_level);
@@ -467,7 +472,7 @@ void sub_evict(uint8_t* const s2, uint32_t current_level,
 
   ENCLAVE_LOG(
       "[enclave] Slot 2 is accessed!"
-      " Now storing it to the outside memory...");
+      " Now storing it to the cache / memory...");
   // After access, we need store the modified slot to the external memory.
   const uint32_t s2_level = slot_header_s2->level;
   const uint32_t s2_offset = slot_header_s2->offset;

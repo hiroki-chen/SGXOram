@@ -37,9 +37,6 @@
 // 0x01,0x02,0x03,0x04,0x0x5,0x0x6,0x0x7
 uint8_t g_secret[8] = {0};
 
-std::shared_ptr<EnclaveCryptoManager> crypto_manager =
-    EnclaveCryptoManager::get_instance();
-
 #ifdef SUPPLIED_KEY_DERIVATION
 
 #pragma message("Supplied key derivation function is used.")
@@ -382,6 +379,8 @@ sgx_status_t SGXAPI ecall_unseal(const sgx_sealed_data_t* sealed_data,
  * @return sgx_status_t
  */
 sgx_status_t SGXAPI ecall_begin_DHKE() {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
   // Create a ecc system for this session.
   ENCLAVE_LOG("[enclave] Creating a new ECC system...\n");
   sgx_status_t status =
@@ -397,6 +396,8 @@ sgx_status_t SGXAPI ecall_begin_DHKE() {
  * @return sgx_status_t
  */
 sgx_status_t SGXAPI ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
   // Sample the key pairs.
   sgx_status_t status = sgx_ecc256_create_key_pair(
       crypto_manager->get_secret_key(), crypto_manager->get_public_key(),
@@ -419,6 +420,8 @@ sgx_status_t SGXAPI ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
 
 sgx_status_t SGXAPI ecall_compute_shared_key(const uint8_t* pubkey,
                                              size_t pubkey_size) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
   sgx_ec256_dh_shared_t shared_key;
   sgx_ec256_public_t client_public_key;
   memcpy(&client_public_key, pubkey, sizeof(sgx_ec256_public_t));
@@ -456,6 +459,8 @@ sgx_status_t SGXAPI ecall_compute_shared_key(const uint8_t* pubkey,
 
 sgx_status_t SGXAPI ecall_check_verification_message(uint8_t* message,
                                                      size_t message_size) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
   const std::string decrypted_message =
       crypto_manager->enclave_aes_128_gcm_decrypt(
           std::string((char*)message, message_size));

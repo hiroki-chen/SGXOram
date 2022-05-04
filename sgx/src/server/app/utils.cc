@@ -45,6 +45,9 @@ void ocall_panic_and_flush(const char* reason) {
   logger->error("An fatal error happened in the enclave, the reason is: {}.",
                 reason);
   logger->flush();
+
+  // Destroy the enclave.
+  sgx_destroy_enclave(*server_runner->get_enclave_id());
   abort();
 }
 
@@ -88,7 +91,7 @@ std::string compress_data(const std::string& data) {
   const size_t max_allowed_size = LZ4_compressBound(data.size());
   compressed_data.resize(max_allowed_size);
   const size_t compressed_size =
-      LZ4_compress_default(data.c_str(), compressed_data.data(), data.size(),
+      LZ4_compress_default(data.data(), compressed_data.data(), data.size(),
                            compressed_data.size());
   compressed_data.resize(compressed_size);
   return compressed_data;
@@ -100,7 +103,7 @@ std::string decompress_data(const std::string& data) {
   const size_t max_allowed_size = data.size() * 2;
   decompressed_data.resize(max_allowed_size);
   const size_t decompressed_size =
-      LZ4_decompress_safe(data.c_str(), decompressed_data.data(), data.size(),
+      LZ4_decompress_safe(data.data(), decompressed_data.data(), data.size(),
                           decompressed_data.size());
   decompressed_data.resize(decompressed_size);
   return decompressed_data;

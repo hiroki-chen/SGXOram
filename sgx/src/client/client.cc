@@ -212,7 +212,7 @@ std::string Client::encrypt(const std::string& plaintext) {
     return "";
   }
 
-  const uint8_t* plaintext_ptr = (uint8_t*)plaintext.c_str();
+  const uint8_t* plaintext_ptr = (uint8_t*)plaintext.data();
   size_t ciphertext_length =
       plaintext.size() + SAMPLE_AESGCM_MAC_SIZE + SAMPLE_AESGCM_IV_SIZE;
   uint8_t* ciphertext = (uint8_t*)malloc(ciphertext_length);

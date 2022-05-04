@@ -87,7 +87,10 @@ App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpth
            				-ldl -lgflags -llz4 -lglog
 
 App_Cpp_Objects := $(patsubst $(SRC_PATH)/app/%.cc, $(BUILD_PATH)/app/%.o, $(App_Cpp_Files))
+App_Dependencies := $(patsubst %.o,%.d,$(App_Cpp_Objects))
 App_Name := $(BUILD_PATH)/../bin/server.bin
+
+-include $(App_Dependencies)
 
 ifneq ($(SGX_MODE), HW)
 	App_Link_Flags += -lsgx_epid_sim -lsgx_quote_ex_sim
@@ -104,6 +107,9 @@ Crypto_Library_Name := sgx_tcrypto
 
 Enclave_Cpp_Files := $(wildcard $(SRC_PATH)/enclave/*.cc)
 Enclave_Cpp_Objects := $(patsubst $(SRC_PATH)/enclave/%.cc, $(BUILD_PATH)/enclave/%.o, $(Enclave_Cpp_Files))
+Enclave_Denpendencies := $(patsubst %.o,%.d,$(Enclave_Cpp_Objects))
+
+-include $(Enclave_Denpendencies)
 
 Enclave_Include_Paths := -I$(INCLUDE_PATH) -I$(INCLUDE_PATH)/enclave -I$(SGX_SDK)/include \
 						 -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/libcxx
@@ -198,16 +204,16 @@ create_proxy: $(SRC_PATH)/enclave/enclave.edl
 
 # Compile proxy functions.
 $(BUILD_PATH)/enclave/enclave_t.o: $(SRC_PATH)/enclave/enclave_t.c
-	@$(CC) $(Enclave_C_Flags) $(SGX_COMMON_CFLAGS) -c $< -o $@
+	@$(CC) $(Enclave_C_Flags) -MMD -MP $(SGX_COMMON_CFLAGS) -c $< -o $@
 	@printf "\033[1;93;49mCC  =>  $@\033[0m\n"
 
 $(BUILD_PATH)/enclave/enclave_u.o: $(SRC_PATH)/enclave/enclave_u.c
-	@$(CC) $(Enclave_C_Flags) $(SGX_COMMON_CFLAGS) -c $< -o $@
+	@$(CC) $(Enclave_C_Flags) -MMD -MP $(SGX_COMMON_CFLAGS) -c $< -o $@
 	@printf "\033[1;93;49mCC  =>  $@\033[0m\n"
 
 # Compile the enclave.
 $(BUILD_PATH)/enclave/%.o: $(SRC_PATH)/enclave/%.cc
-	@$(CXX) $(Enclave_Cpp_Flags) $(SGX_COMMON_CXXFLAGS) -c $< -o $@
+	@$(CXX) $(Enclave_Cpp_Flags) -MMD -MP $(SGX_COMMON_CXXFLAGS) -c $< -o $@
 	@printf "\033[1;93;49mCXX =>  $@\033[0m\n"
 
 # Link the object files and generate a shared object.
@@ -216,7 +222,7 @@ $(Enclave_Name): $(BUILD_PATH)/enclave/enclave_t.o $(Enclave_Cpp_Objects)
 	@printf "\033[1;93;49mLINK =>  $@\033[0m\n"
 
 $(BUILD_PATH)/app/%.o: $(SRC_PATH)/app/%.cc
-	@$(CXX) $(SGX_COMMON_CXXFLAGS) $(App_Cpp_Flags) -c $< -o $@
+	@$(CXX) $(SGX_COMMON_CXXFLAGS) -MMD -MP $(App_Cpp_Flags) -c $< -o $@
 	@printf "\033[1;93;49mCXX  <=  $<\033[0m\n"
 
 $(App_Name): $(BUILD_PATH)/enclave/enclave_u.o $(App_Cpp_Objects)

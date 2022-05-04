@@ -34,9 +34,6 @@
  */
 class EnclaveCryptoManager final {
  private:
-  // The instance of the class.
-  static std::shared_ptr<EnclaveCryptoManager> instance;
-
   // This key is derived after Diffie-Hellman Key Exchange procedure.
   sgx_aes_gcm_128bit_key_t shared_secret_key;
 

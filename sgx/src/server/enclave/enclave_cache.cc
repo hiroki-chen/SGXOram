@@ -25,8 +25,6 @@
 #include <enclave/enclave_crypto_manager.hh>
 #include <enclave/enclave_utils.hh>
 
-std::shared_ptr<EnclaveCache> EnclaveCache::instance_;
-
 EnclaveCache::EnclaveCache(size_t max_size)
     : max_size_(max_size), cache_list_(), key_map_(), status(true) {
   // Check the maximum size of the cache, just a sanity check.
@@ -39,15 +37,16 @@ EnclaveCache::EnclaveCache(size_t max_size)
   ENCLAVE_LOG("[enclave] Cache pool created.");
 }
 
+// Create an instance within the function body is thread-safe and is guaranteed
+// to return the same instance once. Different threads will not get different
+// instances.
 std::shared_ptr<EnclaveCache> EnclaveCache::get_instance(void) {
-  if (instance_ == nullptr) {
-    instance_ = std::shared_ptr<EnclaveCache>(new EnclaveCache());
-  }
+  static std::shared_ptr<EnclaveCache> instance_(new EnclaveCache());
   return instance_;
 }
 
 void EnclaveCache::replace_item(const std::string& key,
-                                const std::string& value) {
+                                const std::string& value, bool is_dirty) {
   // First check if the cache is full.
   if (cache_list_.size() >= max_size_) {
     // Need to write back to the external memory if the dirty bit is set.
@@ -69,9 +68,10 @@ void EnclaveCache::replace_item(const std::string& key,
       std::string old_key = last_item.first;
       std::string old_value = last_item.second.second;
       ENCLAVE_LOG(
-          "[enclave] Write back the last item %s to the external memory.",
-          old_key.c_str());
-      ocall_write_slot(old_key.c_str(), (uint8_t*)old_value.c_str(),
+          "[enclave] Write back the last item %s to the external memory. The "
+          "size of the old value is %zu",
+          old_key.c_str(), old_value.size());
+      ocall_write_slot(old_key.c_str(), (uint8_t*)old_value.data(),
                        old_value.size());
     }
 
@@ -79,7 +79,7 @@ void EnclaveCache::replace_item(const std::string& key,
     cache_list_.pop_back();
   }
   // Insert the new item to the front of the cache.
-  cache_list_.push_front(std::make_pair(key, std::make_pair(0, value)));
+  cache_list_.emplace_front(std::make_pair(key, std::make_pair(is_dirty, value)));
   key_map_[key] = cache_list_.begin();
 }
 
@@ -87,12 +87,13 @@ void EnclaveCache::write(const std::string& key, const std::string& value,
                          bool leaf_type) {
   auto it = key_map_.find(key);
   if (it != key_map_.end()) {
-    ENCLAVE_LOG("[enclave] Cache hit on key %s.", key.c_str());
+    ENCLAVE_LOG("[enclave] W Cache hit on key %s.", key.c_str());
+    // Update the item.
+    it->second->second.second = value;
     cache_list_.splice(cache_list_.begin(), cache_list_, it->second);
-    it->second = cache_list_.begin();
   } else {
-    ENCLAVE_LOG("[enclave] Cache miss on key %s.", key.c_str());
-    replace_item(key, value);
+    ENCLAVE_LOG("[enclave] W Cache miss on key %s.", key.c_str());
+    replace_item(key, value, true);
   }
 
   // Set the dirty bit of the first element because we have updated it.
@@ -105,8 +106,8 @@ std::string EnclaveCache::read(const std::string& key, bool leaf_type) {
   auto it = key_map_.find(key);
 
   if (it == key_map_.end()) {
-    ENCLAVE_LOG("[enclave] Cache miss on key %s", key.c_str());
-    ENCLAVE_LOG("[enclave] Fetching from external memory...");
+    ENCLAVE_LOG("[enclave] R Cache miss on key %s", key.c_str());
+    ENCLAVE_LOG("[enclave] R Fetching from external memory...");
 
     // If the target key value is not in the cache, fetch it from the external
     // memory. We assume the external memory is always available.
@@ -114,19 +115,20 @@ std::string EnclaveCache::read(const std::string& key, bool leaf_type) {
                                 : sizeof(sgx_oram::oram_slot_t);
     // Always remember to add the size for IV and MAC tag.
     buf_size += SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE;
-    std::string slot(buf_size, 0);
+    std::string slot;
+    slot.resize(buf_size);
     sgx_status_t status = ocall_read_slot(&buf_size, key.c_str(),
                                           (uint8_t*)slot.data(), buf_size);
     check_sgx_status(status, "ocall_read_slot()");
 
     // Insert into the cache.
-    replace_item(key, slot);
+    replace_item(key, slot, false);
     return slot;
   } else {
-    ENCLAVE_LOG("[enclave] Cache hit on key %s", key.c_str());
+    ENCLAVE_LOG("[enclave] R Cache hit on key %s", key.c_str());
+    const std::string ans = it->second->second.second;
     cache_list_.splice(cache_list_.begin(), cache_list_, it->second);
-    it->second = cache_list_.begin();
-    return it->second->second.second;
+    return ans;
   }
 }
 
@@ -214,35 +216,44 @@ sgx_status_t SGXAPI ecall_test_oram_cache() {
   // }
   // ENCLAVE_LOG("[enclave] -- Cache test for random access is passed.\n");
 
-  ENCLAVE_LOG(
-      "[enclave] ++ Start testing the cache: type = sequential write.\n");
-  for (uint32_t i = 0; i < level; i++) {
-    const uint32_t level_size = std::pow(way, i);
-    size_t slot_size = (i == level - 1) ? sizeof(sgx_oram::oram_slot_leaf_t)
-                                        : sizeof(sgx_oram::oram_slot_t);
-    uint8_t* const slot_buf = (uint8_t*)malloc(slot_size);
+  // ENCLAVE_LOG(
+  //     "[enclave] ++ Start testing the cache: type = sequential write.\n");
+  // for (uint32_t i = 0; i < level; i++) {
+  //   const uint32_t level_size = std::pow(way, i);
+  //   size_t slot_size = (i == level - 1) ? sizeof(sgx_oram::oram_slot_leaf_t)
+  //                                       : sizeof(sgx_oram::oram_slot_t);
+  //   uint8_t* const slot_buf = (uint8_t*)malloc(slot_size);
 
-    for (uint32_t j = 0; j < level_size; j++) {
-      // First read the content of the slot.
-      const std::string key = crypto_manager->enclave_sha_256(enclave_strcat(
-          std::to_string(i).c_str(), "_", std::to_string(j).c_str()));
-      std::string ans = cache->read(key, i == level - 1);
-      ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
-      memcpy(slot_buf, ans.data(), slot_size);
+  //   for (uint32_t j = 0; j < level_size; j++) {
+  //     // First read the content of the slot.
+  //     const std::string key = crypto_manager->enclave_sha_256(enclave_strcat(
+  //         std::to_string(i).c_str(), "_", std::to_string(j).c_str()));
+  //     std::string ans = cache->read(key, i == level - 1);
+  //     ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
+  //     memcpy(slot_buf, ans.data(), slot_size);
 
-      sgx_oram::oram_block_t* const block =
-          (sgx_oram::oram_block_t*)(slot_buf +
-                                    sizeof(sgx_oram::oram_slot_header_t));
-      block->data[0] = std::to_string(i).c_str()[0];
+  //     sgx_oram::oram_block_t* const block =
+  //         (sgx_oram::oram_block_t*)(slot_buf +
+  //                                   sizeof(sgx_oram::oram_slot_header_t));
+  //     block->data[0] = std::to_string(i).c_str()[0];
 
-      // Write back the content.
-      std::string cipher_text = crypto_manager->enclave_aes_128_gcm_encrypt(
-          std::string((char*)slot_buf, slot_size));
-      cache->write(key, cipher_text, i == level - 1);
-    }
-    safe_free(slot_buf);
+  //     // Write back the content.
+  //     std::string cipher_text = crypto_manager->enclave_aes_128_gcm_encrypt(
+  //         std::string((char*)slot_buf, slot_size));
+  //     cache->write(key, cipher_text, i == level - 1);
+  //   }
+  //   safe_free(slot_buf);
+  // }
+  // ENCLAVE_LOG("[enclave] -- Cache test for sequential write is passed.\n");
+
+  ENCLAVE_LOG("[enclave] ++ Start testing the cache: type = read.\n");
+  int n = 100;
+  while (n--) {
+    const std::string key = crypto_manager->enclave_sha_256(enclave_strcat(
+        std::to_string(1).c_str(), "_", std::to_string(2).c_str()));
+    std::string ans = cache->read(key, false);
+    ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
   }
-  ENCLAVE_LOG("[enclave] -- Cache test for sequential write is passed.\n");
-
+  ENCLAVE_LOG("[enclave] -- Cache test for read is passed.\n");
   return SGX_SUCCESS;
 }

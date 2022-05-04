@@ -26,8 +26,6 @@
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_t.h>
 
-std::shared_ptr<EnclaveCryptoManager> EnclaveCryptoManager::instance;
-
 EnclaveCryptoManager::EnclaveCryptoManager() {
   memset(shared_secret_key, 0, SGX_AESGCM_KEY_SIZE);
   is_initialized = false;
@@ -40,15 +38,12 @@ EnclaveCryptoManager::EnclaveCryptoManager() {
   check_sgx_status(ret, "enclave_crypto_mananger init()");
 }
 
+// Do not use std::make_shared here, because the constructor of
+// EnclaveCryptoManager is private, and we cannot call it by
+// std::make_shared.
 std::shared_ptr<EnclaveCryptoManager> EnclaveCryptoManager::get_instance() {
-  if (instance == nullptr) {
-    // Do not use std::make_shared here, because the constructor of
-    // EnclaveCryptoManager is private, and we cannot call it by
-    // std::make_shared.
-    instance =
-        std::shared_ptr<EnclaveCryptoManager>(new EnclaveCryptoManager());
-  }
-
+  static std::shared_ptr<EnclaveCryptoManager> instance(
+      new EnclaveCryptoManager());
   return instance;
 }
 
@@ -67,7 +62,7 @@ std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
   // to store the message and the random number. Note
   // that the random number is appended to the message.
   uint8_t* buf = (uint8_t*)malloc(message_length);
-  memcpy(buf, message.c_str(), message.size());
+  memcpy(buf, message.data(), message.size());
   memcpy(buf + message.size(), random_number, DEFAULT_RANDOM_LENGTH);
   std::string ans;
   ans.resize(SGX_SHA256_HASH_SIZE);
