@@ -46,11 +46,11 @@ void sub_access_s1_epilogue(bool condition, uint32_t dummy_number,
                             sgx_oram::oram_block_t* block_slot1_evict,
                             uint32_t* const counter, uint32_t* const position);
 
-void sub_evict_s2(uint8_t* const s2, size_t slot_size,
+void sub_evict_s2(sgx_oram::oram_slot_header_t* const header, uint8_t* const s2,
                   sgx_oram::oram_block_t* const block_evict,
                   uint32_t current_level, uint32_t* const counter);
 
-void sub_evict_s3(uint8_t* const s3, size_t slot_size,
+void sub_evict_s3(sgx_oram::oram_slot_header_t* const header, uint8_t* const s3,
                   sgx_oram::oram_block_t* const block_evict, uint32_t position);
 
 void sub_evict_s2_epilogue(uint32_t dummy_number, uint32_t begin, uint32_t end,
@@ -63,7 +63,7 @@ void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
                  bool condition_s2, sgx_oram::oram_position_t* const position);
 
 void sub_evict(sgx_oram::oram_slot_header_t* const s2_header, uint8_t* const s2,
-               uint32_t current_level,
+               size_t s2_size, uint32_t current_level,
                sgx_oram::oram_position_t* const position);
 
 #endif
