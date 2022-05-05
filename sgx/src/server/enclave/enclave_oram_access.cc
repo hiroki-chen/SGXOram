@@ -25,7 +25,7 @@
 bool constant = true;
 
 static inline bool is_in_range(uint32_t num,
-                               sgx_oram::oram_slot_header_t* slot) {
+                               sgx_oram::oram_slot_header_t* const slot) {
   const uint32_t begin = slot->range_begin;
   const uint32_t end = slot->range_end;
   return num >= begin && num < end;
@@ -35,12 +35,13 @@ void sub_access_s1(bool condition, sgx_oram::oram_slot_header_t* const header,
                    uint8_t* const s1, uint8_t* const block_slot1_target,
                    uint8_t* const block_slot1_evict, uint32_t* const counter,
                    sgx_oram::oram_position_t* const position) {
-  sgx_oram::oram_block_t* block = (sgx_oram::oram_block_t*)s1;
+  sgx_oram::oram_block_t* slot_storage = (sgx_oram::oram_block_t*)s1;
   const size_t slot_size = header->slot_size;
 
   for (size_t i = 0; i < slot_size; i++) {
+    // Locate the blocks.
+    sgx_oram::oram_block_t* block = slot_storage + i;
     // Initialize some bool variables.
-
     // Variable condition_existing stands for whether the target block is
     // existing:
     //  - true: the target block is existing and we want it.
@@ -59,7 +60,7 @@ void sub_access_s1(bool condition, sgx_oram::oram_slot_header_t* const header,
     // Here, "epsilon" stands for the block is not dummy and the block id is not
     // in the range of this slot.
     bool condition_epsilon =
-        !(is_in_range(block->header.bid, (sgx_oram::oram_slot_header_t*)s1)) &&
+        !(is_in_range(block->header.bid, header)) &&
         (block->header.type ==
          sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_NORMAL);
 
@@ -88,8 +89,6 @@ void sub_access_s1(bool condition, sgx_oram::oram_slot_header_t* const header,
     //  - The slot is not dummy and this slot can be evicted.
     header->dummy_number +=
         condition_existing || (condition_epsilon && condition_counter);
-    // Increment the offset.
-    block += ORAM_BLOCK_SIZE;
   }
 }
 
@@ -420,7 +419,6 @@ void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
   const uint32_t level = crypto_manager->get_oram_config()->level;
 
   // Fetch the slot header at first.
-  // FIXME: BUG
   sgx_oram::oram_slot_header_t* s1_header =
       (sgx_oram::oram_slot_header_t*)malloc(ORAM_SLOT_HEADER_SIZE);
   sgx_oram::oram_slot_header_t* s2_header =
@@ -509,7 +507,7 @@ void sub_evict(sgx_oram::oram_slot_header_t* const s2_header, uint8_t* const s2,
 
   // Finally, recursively access all the levels below it.
   const uint32_t level = crypto_manager->get_oram_config()->level;
-  for (uint32_t i = current_level; i < level - 1; i++) {
+  for (uint32_t i = current_level + 1; i < level - 1; i++) {
     data_access(sgx_oram::oram_operation_t::ORAM_OPERATION_READ, i,
                 dummy_buffer, DEFAULT_ORAM_DATA_SIZE, 0, 0, position);
   }

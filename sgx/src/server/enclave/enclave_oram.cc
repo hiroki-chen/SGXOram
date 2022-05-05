@@ -531,7 +531,9 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
   ENCLAVE_LOG("[enclave] block_level: %u, bid_cur: %u", block_level, bid_cur);
 
   // We start from 0.
+  //FIXME: Seems like there are some infinite loops?
   for (uint32_t i = 0; i < level - 1; i++) {
+    ENCLAVE_LOG("[enclave] Traversing level %u...\n", i);
     // If the current level is the same as the block level, then we should
     // directly access the data; otherwise, we should perform fake access.
     bool condition_s1 = (i + 1 == block_level);
