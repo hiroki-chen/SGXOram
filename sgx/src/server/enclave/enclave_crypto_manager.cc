@@ -35,7 +35,7 @@ EnclaveCryptoManager::EnclaveCryptoManager() {
   // to prevent that the adversary can observe the
   // hash fingerprint of each slot.
   sgx_status_t ret = sgx_read_rand(random_number, DEFAULT_RANDOM_LENGTH);
-  check_sgx_status(ret, "enclave_crypto_mananger init()");
+  enclave_utils::check_sgx_status(ret, "enclave_crypto_mananger init()");
 }
 
 // Do not use std::make_shared here, because the constructor of
@@ -70,10 +70,10 @@ std::string EnclaveCryptoManager::enclave_sha_256(const std::string& message) {
   sgx_status_t status =
       sgx_sha256_msg(buf, message_length, (sgx_sha256_hash_t*)ans.data());
 
-  safe_free(buf);
-  check_sgx_status(status, "enclave_sha_256()");
+  enclave_utils::safe_free(buf);
+  enclave_utils::check_sgx_status(status, "enclave_sha_256()");
 
-  return to_hex((uint8_t*)ans.c_str(), SGX_SHA256_HASH_SIZE);
+  return enclave_utils::to_hex((uint8_t*)ans.c_str(), SGX_SHA256_HASH_SIZE);
 }
 
 std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
@@ -94,7 +94,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
   // is easy to be discarded.
   status = sgx_read_rand((uint8_t*)ciphertext.data() + SGX_AESGCM_MAC_SIZE,
                          SGX_AESGCM_IV_SIZE);
-  check_sgx_status(status, "sgx_read_rand()");
+  enclave_utils::check_sgx_status(status, "sgx_read_rand()");
 
   // Encrypt the data and then MAC it.
   status = sgx_rijndael128GCM_encrypt(
@@ -103,7 +103,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_encrypt(
       (uint8_t*)ciphertext.data() + SGX_AESGCM_MAC_SIZE, SGX_AESGCM_IV_SIZE,
       NULL, 0, (sgx_aes_gcm_128bit_tag_t*)(ciphertext.data()));
 
-  check_sgx_status(status, "enclave_aes_128_gcm_encrypt()");
+  enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_encrypt()");
 
   // Cast back to the std::string.
   // We could extract the meaningful fields out of the ciphertext buffer and
@@ -135,7 +135,7 @@ std::string EnclaveCryptoManager::enclave_aes_128_gcm_decrypt(
   // Check the integrity of the message.
   // If sanity check fails, we throw an exception, indicating that the message
   // is corrupted, and the client should end the connection.
-  check_sgx_status(ret, "enclave_aes_128_gcm_decrypt()");
+  enclave_utils::check_sgx_status(ret, "enclave_aes_128_gcm_decrypt()");
 
   // Cast back to the std::string.
   return plaintext;

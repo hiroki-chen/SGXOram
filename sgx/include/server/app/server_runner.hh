@@ -52,8 +52,15 @@ class SGXORAMService final : public oram::sgx_oram::Service {
  private:
   // This will be the storage for all the slots on the server.
   // The storage is organized as a unordered map where the key is the
-  // fingerprint.
-  std::unordered_map<std::string, std::string> storage;
+  // fingerprint. Note that we will maintain two maps, one for the
+  // storage of the header, and one for the storage of the data.
+  //
+  // The enclave first asks for the header and then decrypts it within its
+  // trusted memory, and then it asks for the data and decrypts it within
+  // its trusted memory according to the header as it could prepare a buffer
+  // with suitable size.
+  std::unordered_map<std::string, std::string> storage_slot_body;
+  std::unordered_map<std::string, std::string> storage_slot_header;
 
   // FIXME: A non-access-pattern-hiding position map.
   std::unordered_map<std::string, std::string> position_map;
@@ -160,15 +167,30 @@ class Server final {
 
   void store_compressed_slot(const char* const fingerprint,
                              const std::string& compressed_slot) {
-    service->storage[fingerprint] = compressed_slot;
+    service->storage_slot_body[fingerprint] = compressed_slot;
+  }
+
+  void store_compressed_slot_header(const char* const fingerprint,
+                                    const std::string& compressed_slot_header) {
+    service->storage_slot_header[fingerprint] = compressed_slot_header;
   }
 
   std::string get_compressed_slot(const char* const fingerprint) {
-    return service->storage[fingerprint];
+    return service->storage_slot_body[fingerprint];
   }
 
-  bool is_in_storage(const char* const fingerprint) {
-    return service->storage.find(fingerprint) != service->storage.end();
+  std::string get_compressed_slot_header(const char* const fingerprint) {
+    return service->storage_slot_header[fingerprint];
+  }
+
+  bool is_header_in_storage(const char* fingerprint) {
+    return service->storage_slot_header.find(fingerprint) !=
+           service->storage_slot_header.end();
+  }
+
+  bool is_body_in_storage(const char* fingerprint) {
+    return service->storage_slot_body.find(fingerprint) !=
+           service->storage_slot_body.end();
   }
 
   std::string get_position(const std::string& address) {

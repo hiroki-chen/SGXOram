@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
     client->init_enclave();
     client->generate_session_key();
     client->init_oram();
-    client->test_oram_cache();
+    // client->test_oram_cache();
     client->read_block(1);
     // client->read_block(2);
     // Put all the needed operations below.

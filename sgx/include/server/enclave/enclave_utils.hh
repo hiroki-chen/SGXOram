@@ -28,8 +28,10 @@
 
 #ifndef ENCLAVE_LOG
 #define ENCLAVE_LOG(format, ...) \
-  { printf(format, ##__VA_ARGS__); }
+  { enclave_utils::printf(format, ##__VA_ARGS__); }
 #endif
+
+namespace enclave_utils {
 
 using sgx_error_list = std::unordered_map<sgx_status_t, std::string>;
 
@@ -135,13 +137,14 @@ bool is_equal(uint8_t* const lhs, uint8_t* const rhs, const size_t& len);
 // FIXME: All these functions cannot be declared as '' within the
 // enclave
 //        because the enclave is not compiled with -fno-strict-aliasing.
-void band(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out, size_t lhs_size,
-          size_t rhs_size);
+void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
+          uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size);
 
-void bor(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out, size_t lhs_size,
-         size_t rhs_size);
+void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
+         uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size);
 
-void bneg(const uint8_t* lhs, uint8_t* out, size_t lhs_size);
+void bneg(const uint8_t* __restrict__ lhs, uint8_t* __restrict__ out,
+          size_t lhs_size);
 
 void populate_from_bool(bool condition, uint8_t* out, size_t size);
 
@@ -160,8 +163,9 @@ void check_sgx_status(const sgx_status_t& status, const std::string& location);
  * @param lhs_size
  * @param rhs_size
  */
-void oblivious_assign(bool condition, uint8_t* lhs, uint8_t* rhs,
-                      size_t lhs_size, size_t rhs_size);
+void oblivious_assign(bool condition, uint8_t* __restrict__ lhs,
+                      uint8_t* __restrict__ rhs, size_t lhs_size,
+                      size_t rhs_size);
 
 /**
  * @brief This is an alternative for boolean oblivious assignment.
@@ -189,4 +193,5 @@ std::string enclave_strcat(const std::string& str, ...);
  */
 uint32_t uniform_random(uint32_t lower, uint32_t upper);
 
+}  // namespace enclave_utils
 #endif  // ENCLAVE_UTILS_HH

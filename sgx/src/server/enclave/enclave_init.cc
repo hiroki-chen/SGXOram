@@ -407,10 +407,10 @@ sgx_status_t SGXAPI ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
   memcpy(pubkey, crypto_manager->get_public_key(), sizeof(sgx_ec256_public_t));
 
   // Print debug information.
-  std::string pk =
-      std::move(hex_to_string((uint8_t*)(crypto_manager->get_public_key()),
-                              sizeof(sgx_ec256_public_t)));
-  std::string sk = std::move(hex_to_string(
+  std::string pk = std::move(
+      enclave_utils::hex_to_string((uint8_t*)(crypto_manager->get_public_key()),
+                                   sizeof(sgx_ec256_public_t)));
+  std::string sk = std::move(enclave_utils::hex_to_string(
       (uint8_t*)(crypto_manager->get_secret_key()), SGX_ECP256_KEY_SIZE));
   ENCLAVE_LOG("[enclave] Key pair sampled! PK: %s, SK: %s", pk.data(),
               sk.data());
@@ -426,15 +426,15 @@ sgx_status_t SGXAPI ecall_compute_shared_key(const uint8_t* pubkey,
   sgx_ec256_public_t client_public_key;
   memcpy(&client_public_key, pubkey, sizeof(sgx_ec256_public_t));
 
-  std::string pub = std::move(hex_to_string((uint8_t*)(&client_public_key),
-                                            sizeof(sgx_ec256_public_t)));
+  std::string pub = std::move(enclave_utils::hex_to_string(
+      (uint8_t*)(&client_public_key), sizeof(sgx_ec256_public_t)));
   ENCLAVE_LOG("[enclave] Client public key: %s", pub.data());
 
   sgx_status_t status = sgx_ecc256_compute_shared_dhkey(
       crypto_manager->get_secret_key(), &client_public_key, &shared_key,
       *crypto_manager->get_state_handle());
-  std::string shared =
-      std::move(hex_to_string((uint8_t*)(&shared_key), SGX_ECP256_KEY_SIZE));
+  std::string shared = std::move(enclave_utils::hex_to_string(
+      (uint8_t*)(&shared_key), SGX_ECP256_KEY_SIZE));
   ENCLAVE_LOG("[enclave] Shared key computed: %s", shared.data());
 
   // Derive secret keys from the shared key.
@@ -450,8 +450,8 @@ sgx_status_t SGXAPI ecall_compute_shared_key(const uint8_t* pubkey,
 
   crypto_manager->set_shared_key(&second_derived_key);
   ENCLAVE_LOG("[enclave] The session key is established! The key is %s",
-              hex_to_string((uint8_t*)(&second_derived_key),
-                            sizeof(sgx_ec_key_128bit_t))
+              enclave_utils::hex_to_string((uint8_t*)(&second_derived_key),
+                                           sizeof(sgx_ec_key_128bit_t))
                   .data());
 
   return status;
@@ -474,4 +474,13 @@ sgx_status_t SGXAPI ecall_check_verification_message(uint8_t* message,
     ENCLAVE_LOG("[enclave] The verification message is correct!");
     return SGX_SUCCESS;
   }
+}
+
+sgx_status_t ecall_should_enable_cache(int should_enable) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
+  crypto_manager->set_cache_enabled(should_enable);
+  ENCLAVE_LOG("[enclave] Successfully set the cache status to %d!",
+              should_enable);
+  return SGX_SUCCESS;
 }

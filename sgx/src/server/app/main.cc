@@ -14,6 +14,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#include <chrono>
+
 #include <gflags/gflags.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
@@ -25,10 +27,11 @@
 #include <unistd.h>
 
 #include <configs.hh>
-#include <utils.hh>
+#include <app/utils.hh>
 #include <app/server_runner.hh>
 
 using sgx_oram::get_log_file_name;
+using std::literals::chrono_literals::operator""s;
 
 // Defines an error handler.
 void handler(int sig) {
@@ -51,6 +54,7 @@ void handler(int sig) {
 DEFINE_string(address, "localhost", "The server's IP address");
 DEFINE_string(port, "1234", "The server's port");
 DEFINE_bool(verbose, true, "Whether to print verbose information");
+DEFINE_bool(cache_enabled, true, "Whether to enable the enclave cache");
 
 // Configurations for the enclave.
 static sgx_enclave_id_t global_eid = 0;
@@ -65,6 +69,7 @@ std::shared_ptr<spdlog::logger> logger = spdlog::rotating_logger_mt(
 int SGX_CDECL main(int argc, char** argv) {
   signal(SIGSEGV, handler);
   signal(SIGABRT, handler);
+  signal(SIGINT, handler);
   // Parse the command line arguments.
   gflags::SetUsageMessage(
       "The SGX-Based Doubly Oblibvious RAM by Nankai University.");
@@ -75,6 +80,7 @@ int SGX_CDECL main(int argc, char** argv) {
   spdlog::set_default_logger(logger);
   spdlog::set_level(spdlog::level::debug);
   spdlog::set_pattern(log_pattern);
+  spdlog::flush_every(3s);
 
   spdlog::info("Hello");
   logger->flush();

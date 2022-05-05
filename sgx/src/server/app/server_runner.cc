@@ -21,16 +21,19 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/bin_to_hex.h>
+#include <gflags/gflags.h>
 #include <sgx_uae_launch.h>
 #include <sgx_uae_epid.h>
 #include <sgx_uae_quote_ex.h>
 #include <sgx_ukey_exchange.h>
 
 #include <configs.hh>
-#include <utils.hh>
+#include <app/utils.hh>
 #include <service_provider/service_provider.h>
 #include <basic_models.hh>
 #include <enclave/enclave_u.h>
+
+DECLARE_bool(cache_enabled);
 
 std::atomic_bool server_running;
 
@@ -531,6 +534,12 @@ grpc::Status SGXORAMService::init_oram(
   print_oram_config(oram_config);
 
   logger->info("The server has properly configured the ORAM.");
+
+  // Enable the cache.
+  status = ecall_should_enable_cache(*global_eid, &status, FLAGS_cache_enabled);
+  if (status != SGX_SUCCESS) {
+    logger->error("Cannot set the cache enabled flag!");
+  }
 
   status = ecall_init_oram_controller(
       *global_eid, &status, (uint8_t*)&oram_config, sizeof(oram_config),

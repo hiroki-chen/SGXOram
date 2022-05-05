@@ -43,8 +43,14 @@
 // - If the compiler does not give the macro, use the default value.
 // - Note that these two macros MUST BE pre-determined in order to give the size
 //   of the buffer we need to allocate in advance. They can be changed in the
-//   Makefile. 
-// - Also, it should be noted that the size of the slots at each level is different.
+//   Makefile.
+// - Also, it should be noted that the size of the slots at each level is
+//   different. So it is hard for us to define the struct size in advance. To
+//   load and unload data, we need to allocate a buffer that is large enough to
+//   hold the largest slot, and then you can truncate the buffer.
+//
+// FIXME: We can first read the header and then allocate the buffer according to
+// the header, and then read the data into the buffer.
 #ifndef DEFAULT_SLOT_SIZE
 #define DEFAULT_SLOT_SIZE 32
 #endif
@@ -105,6 +111,7 @@ typedef struct _oram_slot_header_t {
   uint32_t slot_size;
 } oram_slot_header_t;
 
+// @deprecated
 typedef struct _oram_slot_t {
   // The slot header.
   oram_slot_header_t header;
@@ -112,6 +119,7 @@ typedef struct _oram_slot_t {
   oram_block_t blocks[DEFAULT_SLOT_SIZE];
 } oram_slot_t;
 
+// @deprecated
 typedef struct _oram_slot_leaf_t {
   // The slot header.
   oram_slot_header_t header;
@@ -144,6 +152,12 @@ typedef enum _oram_operation_t {
   ORAM_OPERATION_WRITE = 1,
   ORAM_OPERATION_INVALID = 2
 } oram_operation_t;
+
+typedef enum _cache_type_t {
+  ENCLAVE_CACHE_SLOT_BODY= 0,
+  ENCLAVE_CACHE_SLOT_HEADER = 1,
+  ENCLAVE_CACHE_INVALID = 2,
+} cache_type_t;
 
 }  // namespace sgx_oram
 

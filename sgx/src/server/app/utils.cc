@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <utils.hh>
+#include <app/utils.hh>
 
 #include <cstring>
 #include <algorithm>
@@ -51,7 +51,10 @@ void ocall_panic_and_flush(const char* reason) {
   abort();
 }
 
-void ocall_flush_log() { logger->flush(); }
+void ocall_flush_log() {
+  logger->info("logger is forced to flush here.");
+  logger->flush();
+}
 
 static const std::string get_machine_name(void) {
   char hostname[256];
@@ -90,9 +93,8 @@ std::string compress_data(const std::string& data) {
   std::string compressed_data;
   const size_t max_allowed_size = LZ4_compressBound(data.size());
   compressed_data.resize(max_allowed_size);
-  const size_t compressed_size =
-      LZ4_compress_default(data.data(), compressed_data.data(), data.size(),
-                           compressed_data.size());
+  const size_t compressed_size = LZ4_compress_default(
+      data.data(), compressed_data.data(), data.size(), compressed_data.size());
   compressed_data.resize(compressed_size);
   return compressed_data;
 }
@@ -148,8 +150,7 @@ void ocall_write_position(const char* position_fingerprint,
 
 void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
                       size_t data_len) {
-  logger->debug("The fingerprint for the slot is: {}",
-                std::string(slot_finger_print));
+  logger->debug("[OCall] Writing slot for {}", std::string(slot_finger_print));
 
   // Compress the data and then store it to the server.
   std::string compressed_data =
@@ -157,13 +158,23 @@ void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
   server_runner->store_compressed_slot(slot_finger_print, compressed_data);
 }
 
-size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
-                       size_t data_len) {
-  logger->debug("The fingerprint for the slot is: {}",
+void ocall_write_slot_header(const char* slot_finger_print, const uint8_t* data,
+                             size_t data_len) {
+  logger->debug("[OCall] Writing slot header for {}",
                 std::string(slot_finger_print));
 
+  // Compress the data and then store it to the server.
+  std::string compressed_data =
+      compress_data(std::string((char*)data, data_len));
+  server_runner->store_compressed_slot_header(slot_finger_print,
+                                              compressed_data);
+}
+
+size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
+                       size_t data_len) {
+  logger->debug("[OCall] Reading slot: {}", std::string(slot_finger_print));
   // Check if the slot is in the memory.
-  bool is_in_memory = server_runner->is_in_storage(slot_finger_print);
+  bool is_in_memory = server_runner->is_body_in_storage(slot_finger_print);
 
   if (is_in_memory) {
     std::string compressed_data =
@@ -173,15 +184,38 @@ size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
     memcpy(data, decompressed_data.data(), decompressed_size);
     return decompressed_size;
   } else {
-    logger->error("Slot not found in memory.");
+    logger->error("The requested slot is not in the memory!");
     // Returns 0 to indicate that the slot is not found.
     // The enclave will simply crash or handle the error.
     return 0;
   }
 }
 
-int ocall_is_in_memory(const char* slot_finger_print) {
-  return server_runner->is_in_storage(slot_finger_print);
+size_t ocall_read_slot_header(const char* slot_finger_print, uint8_t* data,
+                              size_t size) {
+  logger->debug("[OCall] Reading slot header: {}",
+                std::string(slot_finger_print));
+  // Check if the slot header is in the memory.
+  bool is_in_memory = server_runner->is_header_in_storage(slot_finger_print);
+  if (is_in_memory) {
+    std::string compressed_data =
+        server_runner->get_compressed_slot_header(slot_finger_print);
+    std::string decompressed_data = decompress_data(compressed_data);
+    const size_t decompressed_size = decompressed_data.size();
+    memcpy(data, decompressed_data.data(), decompressed_size);
+    return decompressed_size;
+  } else {
+    logger->error("The requested slot header is not in the memory!");
+    return 0;
+  }
+}
+
+int ocall_is_body_in_storage(const char* slog_fingerprint) {
+  return server_runner->is_body_in_storage(slog_fingerprint);
+}
+
+int ocall_is_header_in_storage(const char* slog_fingerprint) {
+  return server_runner->is_header_in_storage(slog_fingerprint);
 }
 
 namespace sgx_oram {

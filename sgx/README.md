@@ -111,6 +111,8 @@ Finally, you could run the client and the server by
 # If you want to specify the parameters, run ./build/bin/server.bin --help
 ```
 
+Make sure that your system does not use any proxy; otherwise the client cannot connect to the local server.
+
 All the logs will be output to the directory `./log`.
 
 ## Debug the project

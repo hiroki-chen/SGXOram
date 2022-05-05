@@ -104,11 +104,14 @@ enclave {
     // End Remote Attestation Interfaces //
 
     public sgx_status_t ecall_test_oram_cache();
+
+    public sgx_status_t ecall_should_enable_cache(int should_enable);
   };
 
   untrusted {
-    // This function checks if the target slot is in the external memory.
-    int ocall_is_in_memory([ in, string] const char* slot_fingerprint);
+    // These functions checks if the target slot is in the external memory.
+    int ocall_is_header_in_storage([ in, string] const char* slot_fingerprint);
+    int ocall_is_body_in_storage([ in, string] const char* slot_fingerprint);
 
 		// A function for printing the buffer inside the enclave to the console.
 		// Only invoked by the enclave.
@@ -123,11 +126,17 @@ enclave {
     size_t ocall_read_slot([ in, string ] const char *slot_finderprint,
                            [ out, size = slot_size ] uint8_t *slot,
                            size_t slot_size);
+    size_t ocall_read_slot_header([ in, string ]const char* slot_finger_print,
+                                  [ out, size = size ] uint8_t* header,
+                                  size_t size);
 
     // Write to the slot.
     void ocall_write_slot([ in, string ] const char *slot_finderprint,
-                          [ in, size = slot_size ] const uint8_t* slot,
-                          size_t slot_size);
+                          [ in, size = size ] const uint8_t* slot,
+                          size_t size);
+    void ocall_write_slot_header([ in, string ] const char *slot_finderprint,
+                                 [ in, size = size ] const uint8_t* header,
+                                  size_t size);
 
     // Exception handler.
     void ocall_exception_handler([ in, string ] const char* err_msg);

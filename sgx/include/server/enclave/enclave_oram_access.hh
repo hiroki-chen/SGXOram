@@ -22,17 +22,21 @@
 #include <basic_models.hh>
 
 void sub_access(sgx_oram::oram_operation_t op_type, bool condition_s1,
-                bool condition_s2, uint8_t* const s1, size_t s1_size,
-                uint8_t* const s2, size_t s2_size, uint8_t* const data_star,
-                uint32_t level, sgx_oram::oram_position_t* const position);
+                bool condition_s2,
+                sgx_oram::oram_slot_header_t* const s1_header,
+                sgx_oram::oram_slot_header_t* const s2_header,
+                uint8_t* const s1, size_t s1_size, uint8_t* const s2,
+                size_t s2_size, uint8_t* const data_star, uint32_t level,
+                sgx_oram::oram_position_t* const position);
 
-void sub_access_s1(bool condition, uint8_t* const s1, const size_t slot_size,
-                   uint8_t* const block_slot1_target,
+void sub_access_s1(bool condition, sgx_oram::oram_slot_header_t* const header,
+                   uint8_t* const s1, uint8_t* const block_slot1_target,
                    uint8_t* const block_slot1_evict, uint32_t* const counter,
                    sgx_oram::oram_position_t* const position);
 
 void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
-                   uint8_t* const s2, const size_t slot_size,
+                   sgx_oram::oram_slot_header_t* const header,
+                   uint8_t* const s2,
                    sgx_oram::oram_block_t* const block_slot1_target,
                    uint8_t* const data_star, uint32_t* const counter,
                    uint32_t pos, sgx_oram::oram_position_t* const position);
@@ -58,7 +62,8 @@ void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
                  uint8_t* const data, size_t data_size, bool condition_s1,
                  bool condition_s2, sgx_oram::oram_position_t* const position);
 
-void sub_evict(uint8_t* const s2, uint32_t current_level,
+void sub_evict(sgx_oram::oram_slot_header_t* const s2_header, uint8_t* const s2,
+               uint32_t current_level,
                sgx_oram::oram_position_t* const position);
 
 #endif

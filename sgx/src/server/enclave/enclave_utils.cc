@@ -21,7 +21,7 @@
 #include <sgx_urts.h>
 
 #include <enclave/enclave_u.h>
-
+namespace enclave_utils {
 // Error code for SGX API calls
 static sgx_error_list sgx_errlist = {
     {SGX_ERROR_UNEXPECTED, "Unexpected error occurred."},
@@ -121,8 +121,7 @@ void printf(const char* fmt, ...) {
 
 void sprintf(const std::string& str, bool hex) {
   if (hex) {
-    ENCLAVE_LOG("%s",
-                hex_to_string((const uint8_t*)str.data(), str.size()).data());
+    ENCLAVE_LOG("%s", hex_to_string((const uint8_t*)str.data(), str.size()).data());
   } else {
     ENCLAVE_LOG("%s", str.data());
   }
@@ -145,8 +144,8 @@ uint8_t populate_from_bool(bool condition) {
   return ans;
 }
 
-void band(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out, size_t lhs_size,
-          size_t rhs_size) {
+void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
+          uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size) {
   // A sanity check.
   if (lhs_size != rhs_size) {
     ENCLAVE_LOG("[enclave] lhs_size != rhs_size.\n");
@@ -168,8 +167,8 @@ void band(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out, size_t lhs_size,
   }
 }
 
-void bor(const uint8_t* lhs, const uint8_t* rhs, uint8_t* out, size_t lhs_size,
-         size_t rhs_size) {
+void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
+         uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size) {
   // A sanity check.
   if (lhs_size != rhs_size) {
     ENCLAVE_LOG("[enclave] lhs_size != rhs_size.\n");
@@ -213,8 +212,9 @@ std::string enclave_strcat(const std::string& str, ...) {
   return ans;
 }
 
-void oblivious_assign(bool condition, uint8_t* lhs, uint8_t* rhs,
-                      size_t lhs_size, size_t rhs_size) {
+void oblivious_assign(bool condition, uint8_t* __restrict__ lhs,
+                      uint8_t* __restrict__ rhs, size_t lhs_size,
+                      size_t rhs_size) {
   // Pre-allocate two buffers for receiving the final output.
   uint8_t* res1 = (uint8_t*)malloc(lhs_size);
   uint8_t* res2 = (uint8_t*)malloc(lhs_size);
@@ -268,3 +268,5 @@ bool is_equal(uint8_t* const lhs, uint8_t* const rhs, const size_t& len) {
   }
   return true;
 }
+
+}  // namespace enclave_utils

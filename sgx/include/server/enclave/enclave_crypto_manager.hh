@@ -48,12 +48,15 @@ class EnclaveCryptoManager final {
   // Is fully initialized
   bool is_initialized;
 
+  bool is_cache_enabled;
+
   uint8_t random_number[DEFAULT_RANDOM_LENGTH];
 
   // The configuration of the ORAM.
   sgx_oram::oram_configuration_t* oram_config;
 
   EnclaveCryptoManager();
+
  public:
   static std::shared_ptr<EnclaveCryptoManager> get_instance(void);
 
@@ -65,6 +68,15 @@ class EnclaveCryptoManager final {
 
   sgx_oram::oram_configuration_t* get_oram_config(void) { return oram_config; }
 
+  bool cache_enabled(void) { return is_cache_enabled; }
+
+  /**
+   * @brief Set the cache enabled object
+   *
+   * @param enabled
+   */
+  void set_cache_enabled(bool enabled) { is_cache_enabled = enabled; }
+
   /**
    * @brief Set the shared key object
    *
@@ -74,9 +86,9 @@ class EnclaveCryptoManager final {
 
   /**
    * @brief Set the oram config object
-   * 
-   * @param config 
-   * @param config_size 
+   *
+   * @param config
+   * @param config_size
    */
   void set_oram_config(uint8_t* config, size_t config_size);
 
@@ -109,4 +121,4 @@ class EnclaveCryptoManager final {
 static const std::string candidate =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-#endif // ENCLAVE_CRYPTO_MANAGER_HH
+#endif  // ENCLAVE_CRYPTO_MANAGER_HH
