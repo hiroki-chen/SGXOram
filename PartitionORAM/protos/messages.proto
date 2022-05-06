@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package partition_oram;
+
+import "google/protobuf/empty.proto";
+
+// The Oram interface is the interface that must be implemented by
+// any ORAM implementation. It is used to interact with the ORAM.
+service server {
+  // Initialize the ORAM by sending the client's configurations.
+  rpc init_oram(InitOramRequest) returns (google.protobuf.Empty) {}
+
+  rpc read_block(ReadBlockRequest) returns (ReadBlockResponse) {}
+
+  rpc write_block(WriteBlockRequest) returns (WriteBlockResponse) {}
+
+  // ============ Key Exchange Using Diffie-Hellman ============ //
+  // For evaluating the performance when encryption is introduced, 
+  // we do not verify the public key sent from the client, i.e., 
+  // we assume that there is no man-in-the-middle attacker :)
+  rpc key_exchange(KeyExchangeRequest) returns (KeyExchangeResponse) {}
+}
+
+enum Type {
+  Sequential = 0;
+  Random = 1;
+}
+
+message KeyExchangeRequest {
+  bytes public_key_client = 1;
+};
+
+message KeyExchangeResponse {
+  bytes public_key_server = 1;
+};
+
+message InitOramRequest {
+  uint32 parition_num = 1;
+  uint32 block_num = 2;
+}
+
+message ReadBlockRequest {
+
+}
+
+message ReadBlockResponse {
+  bytes data = 1;
+}
+
+message WriteBlockRequest {
+  // Whether this write operation is triggered by an eviction operation.
+  optional Type type = 1;
+}
+
+message WriteBlockResponse {
+
+}
