@@ -49,7 +49,7 @@ struct TableStruct_messages_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[7]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -57,6 +57,9 @@ struct TableStruct_messages_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_messages_2eproto;
 namespace partition_oram {
+class HelloMessage;
+struct HelloMessageDefaultTypeInternal;
+extern HelloMessageDefaultTypeInternal _HelloMessage_default_instance_;
 class InitOramRequest;
 struct InitOramRequestDefaultTypeInternal;
 extern InitOramRequestDefaultTypeInternal _InitOramRequest_default_instance_;
@@ -66,27 +69,28 @@ extern KeyExchangeRequestDefaultTypeInternal _KeyExchangeRequest_default_instanc
 class KeyExchangeResponse;
 struct KeyExchangeResponseDefaultTypeInternal;
 extern KeyExchangeResponseDefaultTypeInternal _KeyExchangeResponse_default_instance_;
-class ReadBlockRequest;
-struct ReadBlockRequestDefaultTypeInternal;
-extern ReadBlockRequestDefaultTypeInternal _ReadBlockRequest_default_instance_;
-class ReadBlockResponse;
-struct ReadBlockResponseDefaultTypeInternal;
-extern ReadBlockResponseDefaultTypeInternal _ReadBlockResponse_default_instance_;
-class WriteBlockRequest;
-struct WriteBlockRequestDefaultTypeInternal;
-extern WriteBlockRequestDefaultTypeInternal _WriteBlockRequest_default_instance_;
-class WriteBlockResponse;
-struct WriteBlockResponseDefaultTypeInternal;
-extern WriteBlockResponseDefaultTypeInternal _WriteBlockResponse_default_instance_;
+class ReadPathRequest;
+struct ReadPathRequestDefaultTypeInternal;
+extern ReadPathRequestDefaultTypeInternal _ReadPathRequest_default_instance_;
+class ReadPathResponse;
+struct ReadPathResponseDefaultTypeInternal;
+extern ReadPathResponseDefaultTypeInternal _ReadPathResponse_default_instance_;
+class WritePathRequest;
+struct WritePathRequestDefaultTypeInternal;
+extern WritePathRequestDefaultTypeInternal _WritePathRequest_default_instance_;
+class WritePathResponse;
+struct WritePathResponseDefaultTypeInternal;
+extern WritePathResponseDefaultTypeInternal _WritePathResponse_default_instance_;
 }  // namespace partition_oram
 PROTOBUF_NAMESPACE_OPEN
+template<> ::partition_oram::HelloMessage* Arena::CreateMaybeMessage<::partition_oram::HelloMessage>(Arena*);
 template<> ::partition_oram::InitOramRequest* Arena::CreateMaybeMessage<::partition_oram::InitOramRequest>(Arena*);
 template<> ::partition_oram::KeyExchangeRequest* Arena::CreateMaybeMessage<::partition_oram::KeyExchangeRequest>(Arena*);
 template<> ::partition_oram::KeyExchangeResponse* Arena::CreateMaybeMessage<::partition_oram::KeyExchangeResponse>(Arena*);
-template<> ::partition_oram::ReadBlockRequest* Arena::CreateMaybeMessage<::partition_oram::ReadBlockRequest>(Arena*);
-template<> ::partition_oram::ReadBlockResponse* Arena::CreateMaybeMessage<::partition_oram::ReadBlockResponse>(Arena*);
-template<> ::partition_oram::WriteBlockRequest* Arena::CreateMaybeMessage<::partition_oram::WriteBlockRequest>(Arena*);
-template<> ::partition_oram::WriteBlockResponse* Arena::CreateMaybeMessage<::partition_oram::WriteBlockResponse>(Arena*);
+template<> ::partition_oram::ReadPathRequest* Arena::CreateMaybeMessage<::partition_oram::ReadPathRequest>(Arena*);
+template<> ::partition_oram::ReadPathResponse* Arena::CreateMaybeMessage<::partition_oram::ReadPathResponse>(Arena*);
+template<> ::partition_oram::WritePathRequest* Arena::CreateMaybeMessage<::partition_oram::WritePathRequest>(Arena*);
+template<> ::partition_oram::WritePathResponse* Arena::CreateMaybeMessage<::partition_oram::WritePathResponse>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace partition_oram {
 
@@ -116,6 +120,173 @@ inline bool Type_Parse(
     Type_descriptor(), name, value);
 }
 // ===================================================================
+
+class HelloMessage final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:partition_oram.HelloMessage) */ {
+ public:
+  inline HelloMessage() : HelloMessage(nullptr) {}
+  ~HelloMessage() override;
+  explicit constexpr HelloMessage(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  HelloMessage(const HelloMessage& from);
+  HelloMessage(HelloMessage&& from) noexcept
+    : HelloMessage() {
+    *this = ::std::move(from);
+  }
+
+  inline HelloMessage& operator=(const HelloMessage& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline HelloMessage& operator=(HelloMessage&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const HelloMessage& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const HelloMessage* internal_default_instance() {
+    return reinterpret_cast<const HelloMessage*>(
+               &_HelloMessage_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(HelloMessage& a, HelloMessage& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(HelloMessage* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(HelloMessage* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  HelloMessage* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<HelloMessage>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const HelloMessage& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const HelloMessage& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(HelloMessage* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "partition_oram.HelloMessage";
+  }
+  protected:
+  explicit HelloMessage(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kContentFieldNumber = 1,
+    kIvFieldNumber = 2,
+  };
+  // bytes content = 1;
+  void clear_content();
+  const std::string& content() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_content(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_content();
+  PROTOBUF_NODISCARD std::string* release_content();
+  void set_allocated_content(std::string* content);
+  private:
+  const std::string& _internal_content() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_content(const std::string& value);
+  std::string* _internal_mutable_content();
+  public:
+
+  // bytes iv = 2;
+  void clear_iv();
+  const std::string& iv() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_iv(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_iv();
+  PROTOBUF_NODISCARD std::string* release_iv();
+  void set_allocated_iv(std::string* iv);
+  private:
+  const std::string& _internal_iv() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_iv(const std::string& value);
+  std::string* _internal_mutable_iv();
+  public:
+
+  // @@protoc_insertion_point(class_scope:partition_oram.HelloMessage)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr content_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr iv_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_messages_2eproto;
+};
+// -------------------------------------------------------------------
 
 class KeyExchangeRequest final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:partition_oram.KeyExchangeRequest) */ {
@@ -165,7 +336,7 @@ class KeyExchangeRequest final :
                &_KeyExchangeRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    1;
 
   friend void swap(KeyExchangeRequest& a, KeyExchangeRequest& b) {
     a.Swap(&b);
@@ -316,7 +487,7 @@ class KeyExchangeResponse final :
                &_KeyExchangeResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   friend void swap(KeyExchangeResponse& a, KeyExchangeResponse& b) {
     a.Swap(&b);
@@ -467,7 +638,7 @@ class InitOramRequest final :
                &_InitOramRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(InitOramRequest& a, InitOramRequest& b) {
     a.Swap(&b);
@@ -576,23 +747,24 @@ class InitOramRequest final :
 };
 // -------------------------------------------------------------------
 
-class ReadBlockRequest final :
-    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:partition_oram.ReadBlockRequest) */ {
+class ReadPathRequest final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:partition_oram.ReadPathRequest) */ {
  public:
-  inline ReadBlockRequest() : ReadBlockRequest(nullptr) {}
-  explicit constexpr ReadBlockRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  inline ReadPathRequest() : ReadPathRequest(nullptr) {}
+  ~ReadPathRequest() override;
+  explicit constexpr ReadPathRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
-  ReadBlockRequest(const ReadBlockRequest& from);
-  ReadBlockRequest(ReadBlockRequest&& from) noexcept
-    : ReadBlockRequest() {
+  ReadPathRequest(const ReadPathRequest& from);
+  ReadPathRequest(ReadPathRequest&& from) noexcept
+    : ReadPathRequest() {
     *this = ::std::move(from);
   }
 
-  inline ReadBlockRequest& operator=(const ReadBlockRequest& from) {
+  inline ReadPathRequest& operator=(const ReadPathRequest& from) {
     CopyFrom(from);
     return *this;
   }
-  inline ReadBlockRequest& operator=(ReadBlockRequest&& from) noexcept {
+  inline ReadPathRequest& operator=(ReadPathRequest&& from) noexcept {
     if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
   #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
@@ -615,139 +787,20 @@ class ReadBlockRequest final :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const ReadBlockRequest& default_instance() {
+  static const ReadPathRequest& default_instance() {
     return *internal_default_instance();
   }
-  static inline const ReadBlockRequest* internal_default_instance() {
-    return reinterpret_cast<const ReadBlockRequest*>(
-               &_ReadBlockRequest_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    3;
-
-  friend void swap(ReadBlockRequest& a, ReadBlockRequest& b) {
-    a.Swap(&b);
-  }
-  inline void Swap(ReadBlockRequest* other) {
-    if (other == this) return;
-  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
-    if (GetOwningArena() != nullptr &&
-        GetOwningArena() == other->GetOwningArena()) {
-   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
-    if (GetOwningArena() == other->GetOwningArena()) {
-  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
-      InternalSwap(other);
-    } else {
-      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
-    }
-  }
-  void UnsafeArenaSwap(ReadBlockRequest* other) {
-    if (other == this) return;
-    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
-    InternalSwap(other);
-  }
-
-  // implements Message ----------------------------------------------
-
-  ReadBlockRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<ReadBlockRequest>(arena);
-  }
-  using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyFrom;
-  inline void CopyFrom(const ReadBlockRequest& from) {
-    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyImpl(this, from);
-  }
-  using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeFrom;
-  void MergeFrom(const ReadBlockRequest& from) {
-    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl(this, from);
-  }
-  public:
-
-  private:
-  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
-  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "partition_oram.ReadBlockRequest";
-  }
-  protected:
-  explicit ReadBlockRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                       bool is_message_owned = false);
-  private:
-  public:
-
-  static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
-
-  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // @@protoc_insertion_point(class_scope:partition_oram.ReadBlockRequest)
- private:
-  class _Internal;
-
-  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
-  typedef void InternalArenaConstructable_;
-  typedef void DestructorSkippable_;
-  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_messages_2eproto;
-};
-// -------------------------------------------------------------------
-
-class ReadBlockResponse final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:partition_oram.ReadBlockResponse) */ {
- public:
-  inline ReadBlockResponse() : ReadBlockResponse(nullptr) {}
-  ~ReadBlockResponse() override;
-  explicit constexpr ReadBlockResponse(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
-
-  ReadBlockResponse(const ReadBlockResponse& from);
-  ReadBlockResponse(ReadBlockResponse&& from) noexcept
-    : ReadBlockResponse() {
-    *this = ::std::move(from);
-  }
-
-  inline ReadBlockResponse& operator=(const ReadBlockResponse& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  inline ReadBlockResponse& operator=(ReadBlockResponse&& from) noexcept {
-    if (this == &from) return *this;
-    if (GetOwningArena() == from.GetOwningArena()
-  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
-        && GetOwningArena() != nullptr
-  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
-    ) {
-      InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
-    return GetDescriptor();
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
-    return default_instance().GetMetadata().descriptor;
-  }
-  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
-    return default_instance().GetMetadata().reflection;
-  }
-  static const ReadBlockResponse& default_instance() {
-    return *internal_default_instance();
-  }
-  static inline const ReadBlockResponse* internal_default_instance() {
-    return reinterpret_cast<const ReadBlockResponse*>(
-               &_ReadBlockResponse_default_instance_);
+  static inline const ReadPathRequest* internal_default_instance() {
+    return reinterpret_cast<const ReadPathRequest*>(
+               &_ReadPathRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     4;
 
-  friend void swap(ReadBlockResponse& a, ReadBlockResponse& b) {
+  friend void swap(ReadPathRequest& a, ReadPathRequest& b) {
     a.Swap(&b);
   }
-  inline void Swap(ReadBlockResponse* other) {
+  inline void Swap(ReadPathRequest* other) {
     if (other == this) return;
   #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
@@ -760,7 +813,7 @@ class ReadBlockResponse final :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(ReadBlockResponse* other) {
+  void UnsafeArenaSwap(ReadPathRequest* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
@@ -768,13 +821,13 @@ class ReadBlockResponse final :
 
   // implements Message ----------------------------------------------
 
-  ReadBlockResponse* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<ReadBlockResponse>(arena);
+  ReadPathRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<ReadPathRequest>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
-  void CopyFrom(const ReadBlockResponse& from);
+  void CopyFrom(const ReadPathRequest& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const ReadBlockResponse& from);
+  void MergeFrom(const ReadPathRequest& from);
   private:
   static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
   public:
@@ -791,15 +844,15 @@ class ReadBlockResponse final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(ReadBlockResponse* other);
+  void InternalSwap(ReadPathRequest* other);
 
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "partition_oram.ReadBlockResponse";
+    return "partition_oram.ReadPathRequest";
   }
   protected:
-  explicit ReadBlockResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+  explicit ReadPathRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                        bool is_message_owned = false);
   private:
   static void ArenaDtor(void* object);
@@ -816,53 +869,59 @@ class ReadBlockResponse final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kDataFieldNumber = 1,
+    kPathFieldNumber = 1,
+    kLevelFieldNumber = 2,
   };
-  // bytes data = 1;
-  void clear_data();
-  const std::string& data() const;
-  template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_data(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_data();
-  PROTOBUF_NODISCARD std::string* release_data();
-  void set_allocated_data(std::string* data);
+  // uint32 path = 1;
+  void clear_path();
+  uint32_t path() const;
+  void set_path(uint32_t value);
   private:
-  const std::string& _internal_data() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_data(const std::string& value);
-  std::string* _internal_mutable_data();
+  uint32_t _internal_path() const;
+  void _internal_set_path(uint32_t value);
   public:
 
-  // @@protoc_insertion_point(class_scope:partition_oram.ReadBlockResponse)
+  // uint32 level = 2;
+  void clear_level();
+  uint32_t level() const;
+  void set_level(uint32_t value);
+  private:
+  uint32_t _internal_level() const;
+  void _internal_set_level(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:partition_oram.ReadPathRequest)
  private:
   class _Internal;
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr data_;
+  uint32_t path_;
+  uint32_t level_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_messages_2eproto;
 };
 // -------------------------------------------------------------------
 
-class WriteBlockRequest final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:partition_oram.WriteBlockRequest) */ {
+class ReadPathResponse final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:partition_oram.ReadPathResponse) */ {
  public:
-  inline WriteBlockRequest() : WriteBlockRequest(nullptr) {}
-  ~WriteBlockRequest() override;
-  explicit constexpr WriteBlockRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  inline ReadPathResponse() : ReadPathResponse(nullptr) {}
+  ~ReadPathResponse() override;
+  explicit constexpr ReadPathResponse(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
-  WriteBlockRequest(const WriteBlockRequest& from);
-  WriteBlockRequest(WriteBlockRequest&& from) noexcept
-    : WriteBlockRequest() {
+  ReadPathResponse(const ReadPathResponse& from);
+  ReadPathResponse(ReadPathResponse&& from) noexcept
+    : ReadPathResponse() {
     *this = ::std::move(from);
   }
 
-  inline WriteBlockRequest& operator=(const WriteBlockRequest& from) {
+  inline ReadPathResponse& operator=(const ReadPathResponse& from) {
     CopyFrom(from);
     return *this;
   }
-  inline WriteBlockRequest& operator=(WriteBlockRequest&& from) noexcept {
+  inline ReadPathResponse& operator=(ReadPathResponse&& from) noexcept {
     if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
   #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
@@ -885,20 +944,20 @@ class WriteBlockRequest final :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const WriteBlockRequest& default_instance() {
+  static const ReadPathResponse& default_instance() {
     return *internal_default_instance();
   }
-  static inline const WriteBlockRequest* internal_default_instance() {
-    return reinterpret_cast<const WriteBlockRequest*>(
-               &_WriteBlockRequest_default_instance_);
+  static inline const ReadPathResponse* internal_default_instance() {
+    return reinterpret_cast<const ReadPathResponse*>(
+               &_ReadPathResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     5;
 
-  friend void swap(WriteBlockRequest& a, WriteBlockRequest& b) {
+  friend void swap(ReadPathResponse& a, ReadPathResponse& b) {
     a.Swap(&b);
   }
-  inline void Swap(WriteBlockRequest* other) {
+  inline void Swap(ReadPathResponse* other) {
     if (other == this) return;
   #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
@@ -911,7 +970,7 @@ class WriteBlockRequest final :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(WriteBlockRequest* other) {
+  void UnsafeArenaSwap(ReadPathResponse* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
@@ -919,13 +978,13 @@ class WriteBlockRequest final :
 
   // implements Message ----------------------------------------------
 
-  WriteBlockRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<WriteBlockRequest>(arena);
+  ReadPathResponse* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<ReadPathResponse>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
-  void CopyFrom(const WriteBlockRequest& from);
+  void CopyFrom(const ReadPathResponse& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const WriteBlockRequest& from);
+  void MergeFrom(const ReadPathResponse& from);
   private:
   static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
   public:
@@ -942,15 +1001,176 @@ class WriteBlockRequest final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(WriteBlockRequest* other);
+  void InternalSwap(ReadPathResponse* other);
 
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "partition_oram.WriteBlockRequest";
+    return "partition_oram.ReadPathResponse";
   }
   protected:
-  explicit WriteBlockRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+  explicit ReadPathResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kBucketFieldNumber = 1,
+  };
+  // repeated bytes bucket = 1;
+  int bucket_size() const;
+  private:
+  int _internal_bucket_size() const;
+  public:
+  void clear_bucket();
+  const std::string& bucket(int index) const;
+  std::string* mutable_bucket(int index);
+  void set_bucket(int index, const std::string& value);
+  void set_bucket(int index, std::string&& value);
+  void set_bucket(int index, const char* value);
+  void set_bucket(int index, const void* value, size_t size);
+  std::string* add_bucket();
+  void add_bucket(const std::string& value);
+  void add_bucket(std::string&& value);
+  void add_bucket(const char* value);
+  void add_bucket(const void* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& bucket() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_bucket();
+  private:
+  const std::string& _internal_bucket(int index) const;
+  std::string* _internal_add_bucket();
+  public:
+
+  // @@protoc_insertion_point(class_scope:partition_oram.ReadPathResponse)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> bucket_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_messages_2eproto;
+};
+// -------------------------------------------------------------------
+
+class WritePathRequest final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:partition_oram.WritePathRequest) */ {
+ public:
+  inline WritePathRequest() : WritePathRequest(nullptr) {}
+  ~WritePathRequest() override;
+  explicit constexpr WritePathRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  WritePathRequest(const WritePathRequest& from);
+  WritePathRequest(WritePathRequest&& from) noexcept
+    : WritePathRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline WritePathRequest& operator=(const WritePathRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline WritePathRequest& operator=(WritePathRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const WritePathRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const WritePathRequest* internal_default_instance() {
+    return reinterpret_cast<const WritePathRequest*>(
+               &_WritePathRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  friend void swap(WritePathRequest& a, WritePathRequest& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(WritePathRequest* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(WritePathRequest* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  WritePathRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<WritePathRequest>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const WritePathRequest& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const WritePathRequest& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(WritePathRequest* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "partition_oram.WritePathRequest";
+  }
+  protected:
+  explicit WritePathRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                        bool is_message_owned = false);
   private:
   static void ArenaDtor(void* object);
@@ -968,6 +1188,8 @@ class WriteBlockRequest final :
 
   enum : int {
     kTypeFieldNumber = 1,
+    kPathFieldNumber = 2,
+    kLevelFieldNumber = 3,
   };
   // optional .partition_oram.Type type = 1;
   bool has_type() const;
@@ -982,7 +1204,25 @@ class WriteBlockRequest final :
   void _internal_set_type(::partition_oram::Type value);
   public:
 
-  // @@protoc_insertion_point(class_scope:partition_oram.WriteBlockRequest)
+  // uint32 path = 2;
+  void clear_path();
+  uint32_t path() const;
+  void set_path(uint32_t value);
+  private:
+  uint32_t _internal_path() const;
+  void _internal_set_path(uint32_t value);
+  public:
+
+  // uint32 level = 3;
+  void clear_level();
+  uint32_t level() const;
+  void set_level(uint32_t value);
+  private:
+  uint32_t _internal_level() const;
+  void _internal_set_level(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:partition_oram.WritePathRequest)
  private:
   class _Internal;
 
@@ -992,27 +1232,29 @@ class WriteBlockRequest final :
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   int type_;
+  uint32_t path_;
+  uint32_t level_;
   friend struct ::TableStruct_messages_2eproto;
 };
 // -------------------------------------------------------------------
 
-class WriteBlockResponse final :
-    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:partition_oram.WriteBlockResponse) */ {
+class WritePathResponse final :
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:partition_oram.WritePathResponse) */ {
  public:
-  inline WriteBlockResponse() : WriteBlockResponse(nullptr) {}
-  explicit constexpr WriteBlockResponse(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  inline WritePathResponse() : WritePathResponse(nullptr) {}
+  explicit constexpr WritePathResponse(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
-  WriteBlockResponse(const WriteBlockResponse& from);
-  WriteBlockResponse(WriteBlockResponse&& from) noexcept
-    : WriteBlockResponse() {
+  WritePathResponse(const WritePathResponse& from);
+  WritePathResponse(WritePathResponse&& from) noexcept
+    : WritePathResponse() {
     *this = ::std::move(from);
   }
 
-  inline WriteBlockResponse& operator=(const WriteBlockResponse& from) {
+  inline WritePathResponse& operator=(const WritePathResponse& from) {
     CopyFrom(from);
     return *this;
   }
-  inline WriteBlockResponse& operator=(WriteBlockResponse&& from) noexcept {
+  inline WritePathResponse& operator=(WritePathResponse&& from) noexcept {
     if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
   #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
@@ -1035,20 +1277,20 @@ class WriteBlockResponse final :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const WriteBlockResponse& default_instance() {
+  static const WritePathResponse& default_instance() {
     return *internal_default_instance();
   }
-  static inline const WriteBlockResponse* internal_default_instance() {
-    return reinterpret_cast<const WriteBlockResponse*>(
-               &_WriteBlockResponse_default_instance_);
+  static inline const WritePathResponse* internal_default_instance() {
+    return reinterpret_cast<const WritePathResponse*>(
+               &_WritePathResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
-  friend void swap(WriteBlockResponse& a, WriteBlockResponse& b) {
+  friend void swap(WritePathResponse& a, WritePathResponse& b) {
     a.Swap(&b);
   }
-  inline void Swap(WriteBlockResponse* other) {
+  inline void Swap(WritePathResponse* other) {
     if (other == this) return;
   #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
@@ -1061,7 +1303,7 @@ class WriteBlockResponse final :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(WriteBlockResponse* other) {
+  void UnsafeArenaSwap(WritePathResponse* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
@@ -1069,15 +1311,15 @@ class WriteBlockResponse final :
 
   // implements Message ----------------------------------------------
 
-  WriteBlockResponse* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
-    return CreateMaybeMessage<WriteBlockResponse>(arena);
+  WritePathResponse* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<WritePathResponse>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyFrom;
-  inline void CopyFrom(const WriteBlockResponse& from) {
+  inline void CopyFrom(const WritePathResponse& from) {
     ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyImpl(this, from);
   }
   using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeFrom;
-  void MergeFrom(const WriteBlockResponse& from) {
+  void MergeFrom(const WritePathResponse& from) {
     ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl(this, from);
   }
   public:
@@ -1085,10 +1327,10 @@ class WriteBlockResponse final :
   private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "partition_oram.WriteBlockResponse";
+    return "partition_oram.WritePathResponse";
   }
   protected:
-  explicit WriteBlockResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+  explicit WritePathResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                        bool is_message_owned = false);
   private:
   public:
@@ -1102,7 +1344,7 @@ class WriteBlockResponse final :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:partition_oram.WriteBlockResponse)
+  // @@protoc_insertion_point(class_scope:partition_oram.WritePathResponse)
  private:
   class _Internal;
 
@@ -1121,6 +1363,112 @@ class WriteBlockResponse final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// HelloMessage
+
+// bytes content = 1;
+inline void HelloMessage::clear_content() {
+  content_.ClearToEmpty();
+}
+inline const std::string& HelloMessage::content() const {
+  // @@protoc_insertion_point(field_get:partition_oram.HelloMessage.content)
+  return _internal_content();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void HelloMessage::set_content(ArgT0&& arg0, ArgT... args) {
+ 
+ content_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:partition_oram.HelloMessage.content)
+}
+inline std::string* HelloMessage::mutable_content() {
+  std::string* _s = _internal_mutable_content();
+  // @@protoc_insertion_point(field_mutable:partition_oram.HelloMessage.content)
+  return _s;
+}
+inline const std::string& HelloMessage::_internal_content() const {
+  return content_.Get();
+}
+inline void HelloMessage::_internal_set_content(const std::string& value) {
+  
+  content_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* HelloMessage::_internal_mutable_content() {
+  
+  return content_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* HelloMessage::release_content() {
+  // @@protoc_insertion_point(field_release:partition_oram.HelloMessage.content)
+  return content_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void HelloMessage::set_allocated_content(std::string* content) {
+  if (content != nullptr) {
+    
+  } else {
+    
+  }
+  content_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), content,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (content_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    content_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:partition_oram.HelloMessage.content)
+}
+
+// bytes iv = 2;
+inline void HelloMessage::clear_iv() {
+  iv_.ClearToEmpty();
+}
+inline const std::string& HelloMessage::iv() const {
+  // @@protoc_insertion_point(field_get:partition_oram.HelloMessage.iv)
+  return _internal_iv();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void HelloMessage::set_iv(ArgT0&& arg0, ArgT... args) {
+ 
+ iv_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:partition_oram.HelloMessage.iv)
+}
+inline std::string* HelloMessage::mutable_iv() {
+  std::string* _s = _internal_mutable_iv();
+  // @@protoc_insertion_point(field_mutable:partition_oram.HelloMessage.iv)
+  return _s;
+}
+inline const std::string& HelloMessage::_internal_iv() const {
+  return iv_.Get();
+}
+inline void HelloMessage::_internal_set_iv(const std::string& value) {
+  
+  iv_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* HelloMessage::_internal_mutable_iv() {
+  
+  return iv_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* HelloMessage::release_iv() {
+  // @@protoc_insertion_point(field_release:partition_oram.HelloMessage.iv)
+  return iv_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void HelloMessage::set_allocated_iv(std::string* iv) {
+  if (iv != nullptr) {
+    
+  } else {
+    
+  }
+  iv_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), iv,
+      GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (iv_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
+    iv_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:partition_oram.HelloMessage.iv)
+}
+
+// -------------------------------------------------------------------
+
 // KeyExchangeRequest
 
 // bytes public_key_client = 1;
@@ -1275,102 +1623,208 @@ inline void InitOramRequest::set_block_num(uint32_t value) {
 
 // -------------------------------------------------------------------
 
-// ReadBlockRequest
+// ReadPathRequest
+
+// uint32 path = 1;
+inline void ReadPathRequest::clear_path() {
+  path_ = 0u;
+}
+inline uint32_t ReadPathRequest::_internal_path() const {
+  return path_;
+}
+inline uint32_t ReadPathRequest::path() const {
+  // @@protoc_insertion_point(field_get:partition_oram.ReadPathRequest.path)
+  return _internal_path();
+}
+inline void ReadPathRequest::_internal_set_path(uint32_t value) {
+  
+  path_ = value;
+}
+inline void ReadPathRequest::set_path(uint32_t value) {
+  _internal_set_path(value);
+  // @@protoc_insertion_point(field_set:partition_oram.ReadPathRequest.path)
+}
+
+// uint32 level = 2;
+inline void ReadPathRequest::clear_level() {
+  level_ = 0u;
+}
+inline uint32_t ReadPathRequest::_internal_level() const {
+  return level_;
+}
+inline uint32_t ReadPathRequest::level() const {
+  // @@protoc_insertion_point(field_get:partition_oram.ReadPathRequest.level)
+  return _internal_level();
+}
+inline void ReadPathRequest::_internal_set_level(uint32_t value) {
+  
+  level_ = value;
+}
+inline void ReadPathRequest::set_level(uint32_t value) {
+  _internal_set_level(value);
+  // @@protoc_insertion_point(field_set:partition_oram.ReadPathRequest.level)
+}
 
 // -------------------------------------------------------------------
 
-// ReadBlockResponse
+// ReadPathResponse
 
-// bytes data = 1;
-inline void ReadBlockResponse::clear_data() {
-  data_.ClearToEmpty();
+// repeated bytes bucket = 1;
+inline int ReadPathResponse::_internal_bucket_size() const {
+  return bucket_.size();
 }
-inline const std::string& ReadBlockResponse::data() const {
-  // @@protoc_insertion_point(field_get:partition_oram.ReadBlockResponse.data)
-  return _internal_data();
+inline int ReadPathResponse::bucket_size() const {
+  return _internal_bucket_size();
 }
-template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE
-void ReadBlockResponse::set_data(ArgT0&& arg0, ArgT... args) {
- 
- data_.SetBytes(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:partition_oram.ReadBlockResponse.data)
+inline void ReadPathResponse::clear_bucket() {
+  bucket_.Clear();
 }
-inline std::string* ReadBlockResponse::mutable_data() {
-  std::string* _s = _internal_mutable_data();
-  // @@protoc_insertion_point(field_mutable:partition_oram.ReadBlockResponse.data)
+inline std::string* ReadPathResponse::add_bucket() {
+  std::string* _s = _internal_add_bucket();
+  // @@protoc_insertion_point(field_add_mutable:partition_oram.ReadPathResponse.bucket)
   return _s;
 }
-inline const std::string& ReadBlockResponse::_internal_data() const {
-  return data_.Get();
+inline const std::string& ReadPathResponse::_internal_bucket(int index) const {
+  return bucket_.Get(index);
 }
-inline void ReadBlockResponse::_internal_set_data(const std::string& value) {
-  
-  data_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+inline const std::string& ReadPathResponse::bucket(int index) const {
+  // @@protoc_insertion_point(field_get:partition_oram.ReadPathResponse.bucket)
+  return _internal_bucket(index);
 }
-inline std::string* ReadBlockResponse::_internal_mutable_data() {
-  
-  return data_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+inline std::string* ReadPathResponse::mutable_bucket(int index) {
+  // @@protoc_insertion_point(field_mutable:partition_oram.ReadPathResponse.bucket)
+  return bucket_.Mutable(index);
 }
-inline std::string* ReadBlockResponse::release_data() {
-  // @@protoc_insertion_point(field_release:partition_oram.ReadBlockResponse.data)
-  return data_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+inline void ReadPathResponse::set_bucket(int index, const std::string& value) {
+  bucket_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set:partition_oram.ReadPathResponse.bucket)
 }
-inline void ReadBlockResponse::set_allocated_data(std::string* data) {
-  if (data != nullptr) {
-    
-  } else {
-    
-  }
-  data_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), data,
-      GetArenaForAllocation());
-#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  if (data_.IsDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited())) {
-    data_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
-  }
-#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
-  // @@protoc_insertion_point(field_set_allocated:partition_oram.ReadBlockResponse.data)
+inline void ReadPathResponse::set_bucket(int index, std::string&& value) {
+  bucket_.Mutable(index)->assign(std::move(value));
+  // @@protoc_insertion_point(field_set:partition_oram.ReadPathResponse.bucket)
+}
+inline void ReadPathResponse::set_bucket(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  bucket_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:partition_oram.ReadPathResponse.bucket)
+}
+inline void ReadPathResponse::set_bucket(int index, const void* value, size_t size) {
+  bucket_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:partition_oram.ReadPathResponse.bucket)
+}
+inline std::string* ReadPathResponse::_internal_add_bucket() {
+  return bucket_.Add();
+}
+inline void ReadPathResponse::add_bucket(const std::string& value) {
+  bucket_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:partition_oram.ReadPathResponse.bucket)
+}
+inline void ReadPathResponse::add_bucket(std::string&& value) {
+  bucket_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:partition_oram.ReadPathResponse.bucket)
+}
+inline void ReadPathResponse::add_bucket(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  bucket_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:partition_oram.ReadPathResponse.bucket)
+}
+inline void ReadPathResponse::add_bucket(const void* value, size_t size) {
+  bucket_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:partition_oram.ReadPathResponse.bucket)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+ReadPathResponse::bucket() const {
+  // @@protoc_insertion_point(field_list:partition_oram.ReadPathResponse.bucket)
+  return bucket_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+ReadPathResponse::mutable_bucket() {
+  // @@protoc_insertion_point(field_mutable_list:partition_oram.ReadPathResponse.bucket)
+  return &bucket_;
 }
 
 // -------------------------------------------------------------------
 
-// WriteBlockRequest
+// WritePathRequest
 
 // optional .partition_oram.Type type = 1;
-inline bool WriteBlockRequest::_internal_has_type() const {
+inline bool WritePathRequest::_internal_has_type() const {
   bool value = (_has_bits_[0] & 0x00000001u) != 0;
   return value;
 }
-inline bool WriteBlockRequest::has_type() const {
+inline bool WritePathRequest::has_type() const {
   return _internal_has_type();
 }
-inline void WriteBlockRequest::clear_type() {
+inline void WritePathRequest::clear_type() {
   type_ = 0;
   _has_bits_[0] &= ~0x00000001u;
 }
-inline ::partition_oram::Type WriteBlockRequest::_internal_type() const {
+inline ::partition_oram::Type WritePathRequest::_internal_type() const {
   return static_cast< ::partition_oram::Type >(type_);
 }
-inline ::partition_oram::Type WriteBlockRequest::type() const {
-  // @@protoc_insertion_point(field_get:partition_oram.WriteBlockRequest.type)
+inline ::partition_oram::Type WritePathRequest::type() const {
+  // @@protoc_insertion_point(field_get:partition_oram.WritePathRequest.type)
   return _internal_type();
 }
-inline void WriteBlockRequest::_internal_set_type(::partition_oram::Type value) {
+inline void WritePathRequest::_internal_set_type(::partition_oram::Type value) {
   _has_bits_[0] |= 0x00000001u;
   type_ = value;
 }
-inline void WriteBlockRequest::set_type(::partition_oram::Type value) {
+inline void WritePathRequest::set_type(::partition_oram::Type value) {
   _internal_set_type(value);
-  // @@protoc_insertion_point(field_set:partition_oram.WriteBlockRequest.type)
+  // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.type)
+}
+
+// uint32 path = 2;
+inline void WritePathRequest::clear_path() {
+  path_ = 0u;
+}
+inline uint32_t WritePathRequest::_internal_path() const {
+  return path_;
+}
+inline uint32_t WritePathRequest::path() const {
+  // @@protoc_insertion_point(field_get:partition_oram.WritePathRequest.path)
+  return _internal_path();
+}
+inline void WritePathRequest::_internal_set_path(uint32_t value) {
+  
+  path_ = value;
+}
+inline void WritePathRequest::set_path(uint32_t value) {
+  _internal_set_path(value);
+  // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.path)
+}
+
+// uint32 level = 3;
+inline void WritePathRequest::clear_level() {
+  level_ = 0u;
+}
+inline uint32_t WritePathRequest::_internal_level() const {
+  return level_;
+}
+inline uint32_t WritePathRequest::level() const {
+  // @@protoc_insertion_point(field_get:partition_oram.WritePathRequest.level)
+  return _internal_level();
+}
+inline void WritePathRequest::_internal_set_level(uint32_t value) {
+  
+  level_ = value;
+}
+inline void WritePathRequest::set_level(uint32_t value) {
+  _internal_set_level(value);
+  // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.level)
 }
 
 // -------------------------------------------------------------------
 
-// WriteBlockResponse
+// WritePathResponse
 
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

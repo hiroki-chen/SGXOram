@@ -45,19 +45,26 @@ class server final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncinit_oram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncinit_oramRaw(context, request, cq));
     }
-    virtual ::grpc::Status read_block(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest& request, ::partition_oram::ReadBlockResponse* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadBlockResponse>> Asyncread_block(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadBlockResponse>>(Asyncread_blockRaw(context, request, cq));
+    virtual ::grpc::Status read_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::partition_oram::ReadPathResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadPathResponse>> Asyncread_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadPathResponse>>(Asyncread_pathRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadBlockResponse>> PrepareAsyncread_block(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadBlockResponse>>(PrepareAsyncread_blockRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadPathResponse>> PrepareAsyncread_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadPathResponse>>(PrepareAsyncread_pathRaw(context, request, cq));
     }
-    virtual ::grpc::Status write_block(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest& request, ::partition_oram::WriteBlockResponse* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WriteBlockResponse>> Asyncwrite_block(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WriteBlockResponse>>(Asyncwrite_blockRaw(context, request, cq));
+    virtual ::grpc::Status write_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::partition_oram::WritePathResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WritePathResponse>> Asyncwrite_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WritePathResponse>>(Asyncwrite_pathRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WriteBlockResponse>> PrepareAsyncwrite_block(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WriteBlockResponse>>(PrepareAsyncwrite_blockRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WritePathResponse>> PrepareAsyncwrite_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WritePathResponse>>(PrepareAsyncwrite_pathRaw(context, request, cq));
+    }
+    virtual ::grpc::Status close_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::google::protobuf::Empty* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> Asyncclose_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(Asyncclose_connectionRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncclose_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncclose_connectionRaw(context, request, cq));
     }
     // ============ Key Exchange Using Diffie-Hellman ============ //
     // For evaluating the performance when encryption is introduced, 
@@ -70,22 +77,33 @@ class server final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::KeyExchangeResponse>> PrepareAsynckey_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::KeyExchangeResponse>>(PrepareAsynckey_exchangeRaw(context, request, cq));
     }
+    virtual ::grpc::Status send_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::google::protobuf::Empty* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> Asyncsend_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(Asyncsend_helloRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncsend_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncsend_helloRaw(context, request, cq));
+    }
     class async_interface {
      public:
       virtual ~async_interface() {}
       // Initialize the ORAM by sending the client's configurations.
       virtual void init_oram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
       virtual void init_oram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void read_block(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest* request, ::partition_oram::ReadBlockResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void read_block(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest* request, ::partition_oram::ReadBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
-      virtual void write_block(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest* request, ::partition_oram::WriteBlockResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void write_block(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest* request, ::partition_oram::WriteBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void read_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void read_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void write_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void write_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void close_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void close_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       // ============ Key Exchange Using Diffie-Hellman ============ //
       // For evaluating the performance when encryption is introduced, 
       // we do not verify the public key sent from the client, i.e., 
       // we assume that there is no man-in-the-middle attacker :)
       virtual void key_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void key_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void send_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void send_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
@@ -93,12 +111,16 @@ class server final {
    private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* Asyncinit_oramRaw(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncinit_oramRaw(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadBlockResponse>* Asyncread_blockRaw(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadBlockResponse>* PrepareAsyncread_blockRaw(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WriteBlockResponse>* Asyncwrite_blockRaw(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WriteBlockResponse>* PrepareAsyncwrite_blockRaw(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadPathResponse>* Asyncread_pathRaw(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::ReadPathResponse>* PrepareAsyncread_pathRaw(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WritePathResponse>* Asyncwrite_pathRaw(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::WritePathResponse>* PrepareAsyncwrite_pathRaw(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* Asyncclose_connectionRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncclose_connectionRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::KeyExchangeResponse>* Asynckey_exchangeRaw(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::partition_oram::KeyExchangeResponse>* PrepareAsynckey_exchangeRaw(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* Asyncsend_helloRaw(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncsend_helloRaw(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -110,19 +132,26 @@ class server final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncinit_oram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncinit_oramRaw(context, request, cq));
     }
-    ::grpc::Status read_block(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest& request, ::partition_oram::ReadBlockResponse* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadBlockResponse>> Asyncread_block(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadBlockResponse>>(Asyncread_blockRaw(context, request, cq));
+    ::grpc::Status read_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::partition_oram::ReadPathResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadPathResponse>> Asyncread_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadPathResponse>>(Asyncread_pathRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadBlockResponse>> PrepareAsyncread_block(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadBlockResponse>>(PrepareAsyncread_blockRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadPathResponse>> PrepareAsyncread_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadPathResponse>>(PrepareAsyncread_pathRaw(context, request, cq));
     }
-    ::grpc::Status write_block(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest& request, ::partition_oram::WriteBlockResponse* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::WriteBlockResponse>> Asyncwrite_block(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::WriteBlockResponse>>(Asyncwrite_blockRaw(context, request, cq));
+    ::grpc::Status write_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::partition_oram::WritePathResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::WritePathResponse>> Asyncwrite_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::WritePathResponse>>(Asyncwrite_pathRaw(context, request, cq));
     }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::WriteBlockResponse>> PrepareAsyncwrite_block(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::WriteBlockResponse>>(PrepareAsyncwrite_blockRaw(context, request, cq));
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::WritePathResponse>> PrepareAsyncwrite_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::WritePathResponse>>(PrepareAsyncwrite_pathRaw(context, request, cq));
+    }
+    ::grpc::Status close_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::google::protobuf::Empty* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> Asyncclose_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(Asyncclose_connectionRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncclose_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncclose_connectionRaw(context, request, cq));
     }
     ::grpc::Status key_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::partition_oram::KeyExchangeResponse* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::KeyExchangeResponse>> Asynckey_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) {
@@ -131,17 +160,28 @@ class server final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::KeyExchangeResponse>> PrepareAsynckey_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::partition_oram::KeyExchangeResponse>>(PrepareAsynckey_exchangeRaw(context, request, cq));
     }
+    ::grpc::Status send_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::google::protobuf::Empty* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> Asyncsend_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(Asyncsend_helloRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncsend_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncsend_helloRaw(context, request, cq));
+    }
     class async final :
       public StubInterface::async_interface {
      public:
       void init_oram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
       void init_oram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void read_block(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest* request, ::partition_oram::ReadBlockResponse* response, std::function<void(::grpc::Status)>) override;
-      void read_block(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest* request, ::partition_oram::ReadBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
-      void write_block(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest* request, ::partition_oram::WriteBlockResponse* response, std::function<void(::grpc::Status)>) override;
-      void write_block(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest* request, ::partition_oram::WriteBlockResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void read_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response, std::function<void(::grpc::Status)>) override;
+      void read_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void write_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response, std::function<void(::grpc::Status)>) override;
+      void write_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void close_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
+      void close_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
       void key_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response, std::function<void(::grpc::Status)>) override;
       void key_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void send_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
+      void send_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -155,16 +195,22 @@ class server final {
     class async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* Asyncinit_oramRaw(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncinit_oramRaw(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadBlockResponse>* Asyncread_blockRaw(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadBlockResponse>* PrepareAsyncread_blockRaw(::grpc::ClientContext* context, const ::partition_oram::ReadBlockRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::partition_oram::WriteBlockResponse>* Asyncwrite_blockRaw(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::partition_oram::WriteBlockResponse>* PrepareAsyncwrite_blockRaw(::grpc::ClientContext* context, const ::partition_oram::WriteBlockRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadPathResponse>* Asyncread_pathRaw(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::partition_oram::ReadPathResponse>* PrepareAsyncread_pathRaw(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::partition_oram::WritePathResponse>* Asyncwrite_pathRaw(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::partition_oram::WritePathResponse>* PrepareAsyncwrite_pathRaw(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* Asyncclose_connectionRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncclose_connectionRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::partition_oram::KeyExchangeResponse>* Asynckey_exchangeRaw(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::partition_oram::KeyExchangeResponse>* PrepareAsynckey_exchangeRaw(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* Asyncsend_helloRaw(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncsend_helloRaw(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_init_oram_;
-    const ::grpc::internal::RpcMethod rpcmethod_read_block_;
-    const ::grpc::internal::RpcMethod rpcmethod_write_block_;
+    const ::grpc::internal::RpcMethod rpcmethod_read_path_;
+    const ::grpc::internal::RpcMethod rpcmethod_write_path_;
+    const ::grpc::internal::RpcMethod rpcmethod_close_connection_;
     const ::grpc::internal::RpcMethod rpcmethod_key_exchange_;
+    const ::grpc::internal::RpcMethod rpcmethod_send_hello_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -174,13 +220,15 @@ class server final {
     virtual ~Service();
     // Initialize the ORAM by sending the client's configurations.
     virtual ::grpc::Status init_oram(::grpc::ServerContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response);
-    virtual ::grpc::Status read_block(::grpc::ServerContext* context, const ::partition_oram::ReadBlockRequest* request, ::partition_oram::ReadBlockResponse* response);
-    virtual ::grpc::Status write_block(::grpc::ServerContext* context, const ::partition_oram::WriteBlockRequest* request, ::partition_oram::WriteBlockResponse* response);
+    virtual ::grpc::Status read_path(::grpc::ServerContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response);
+    virtual ::grpc::Status write_path(::grpc::ServerContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response);
+    virtual ::grpc::Status close_connection(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response);
     // ============ Key Exchange Using Diffie-Hellman ============ //
     // For evaluating the performance when encryption is introduced, 
     // we do not verify the public key sent from the client, i.e., 
     // we assume that there is no man-in-the-middle attacker :)
     virtual ::grpc::Status key_exchange(::grpc::ServerContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response);
+    virtual ::grpc::Status send_hello(::grpc::ServerContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_init_oram : public BaseClass {
@@ -203,43 +251,63 @@ class server final {
     }
   };
   template <class BaseClass>
-  class WithAsyncMethod_read_block : public BaseClass {
+  class WithAsyncMethod_read_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithAsyncMethod_read_block() {
+    WithAsyncMethod_read_path() {
       ::grpc::Service::MarkMethodAsync(1);
     }
-    ~WithAsyncMethod_read_block() override {
+    ~WithAsyncMethod_read_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status read_block(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadBlockRequest* /*request*/, ::partition_oram::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status read_path(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadPathRequest* /*request*/, ::partition_oram::ReadPathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void Requestread_block(::grpc::ServerContext* context, ::partition_oram::ReadBlockRequest* request, ::grpc::ServerAsyncResponseWriter< ::partition_oram::ReadBlockResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void Requestread_path(::grpc::ServerContext* context, ::partition_oram::ReadPathRequest* request, ::grpc::ServerAsyncResponseWriter< ::partition_oram::ReadPathResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
-  class WithAsyncMethod_write_block : public BaseClass {
+  class WithAsyncMethod_write_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithAsyncMethod_write_block() {
+    WithAsyncMethod_write_path() {
       ::grpc::Service::MarkMethodAsync(2);
     }
-    ~WithAsyncMethod_write_block() override {
+    ~WithAsyncMethod_write_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status write_block(::grpc::ServerContext* /*context*/, const ::partition_oram::WriteBlockRequest* /*request*/, ::partition_oram::WriteBlockResponse* /*response*/) override {
+    ::grpc::Status write_path(::grpc::ServerContext* /*context*/, const ::partition_oram::WritePathRequest* /*request*/, ::partition_oram::WritePathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void Requestwrite_block(::grpc::ServerContext* context, ::partition_oram::WriteBlockRequest* request, ::grpc::ServerAsyncResponseWriter< ::partition_oram::WriteBlockResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void Requestwrite_path(::grpc::ServerContext* context, ::partition_oram::WritePathRequest* request, ::grpc::ServerAsyncResponseWriter< ::partition_oram::WritePathResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_close_connection : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_close_connection() {
+      ::grpc::Service::MarkMethodAsync(3);
+    }
+    ~WithAsyncMethod_close_connection() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status close_connection(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestclose_connection(::grpc::ServerContext* context, ::google::protobuf::Empty* request, ::grpc::ServerAsyncResponseWriter< ::google::protobuf::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -248,7 +316,7 @@ class server final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_key_exchange() {
-      ::grpc::Service::MarkMethodAsync(3);
+      ::grpc::Service::MarkMethodAsync(4);
     }
     ~WithAsyncMethod_key_exchange() override {
       BaseClassMustBeDerivedFromService(this);
@@ -259,10 +327,30 @@ class server final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestkey_exchange(::grpc::ServerContext* context, ::partition_oram::KeyExchangeRequest* request, ::grpc::ServerAsyncResponseWriter< ::partition_oram::KeyExchangeResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_init_oram<WithAsyncMethod_read_block<WithAsyncMethod_write_block<WithAsyncMethod_key_exchange<Service > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_send_hello : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_send_hello() {
+      ::grpc::Service::MarkMethodAsync(5);
+    }
+    ~WithAsyncMethod_send_hello() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status send_hello(::grpc::ServerContext* /*context*/, const ::partition_oram::HelloMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestsend_hello(::grpc::ServerContext* context, ::partition_oram::HelloMessage* request, ::grpc::ServerAsyncResponseWriter< ::google::protobuf::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_init_oram<WithAsyncMethod_read_path<WithAsyncMethod_write_path<WithAsyncMethod_close_connection<WithAsyncMethod_key_exchange<WithAsyncMethod_send_hello<Service > > > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_init_oram : public BaseClass {
    private:
@@ -291,58 +379,85 @@ class server final {
       ::grpc::CallbackServerContext* /*context*/, const ::partition_oram::InitOramRequest* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class WithCallbackMethod_read_block : public BaseClass {
+  class WithCallbackMethod_read_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithCallbackMethod_read_block() {
+    WithCallbackMethod_read_path() {
       ::grpc::Service::MarkMethodCallback(1,
-          new ::grpc::internal::CallbackUnaryHandler< ::partition_oram::ReadBlockRequest, ::partition_oram::ReadBlockResponse>(
+          new ::grpc::internal::CallbackUnaryHandler< ::partition_oram::ReadPathRequest, ::partition_oram::ReadPathResponse>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::partition_oram::ReadBlockRequest* request, ::partition_oram::ReadBlockResponse* response) { return this->read_block(context, request, response); }));}
-    void SetMessageAllocatorFor_read_block(
-        ::grpc::MessageAllocator< ::partition_oram::ReadBlockRequest, ::partition_oram::ReadBlockResponse>* allocator) {
+                   ::grpc::CallbackServerContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response) { return this->read_path(context, request, response); }));}
+    void SetMessageAllocatorFor_read_path(
+        ::grpc::MessageAllocator< ::partition_oram::ReadPathRequest, ::partition_oram::ReadPathResponse>* allocator) {
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::partition_oram::ReadBlockRequest, ::partition_oram::ReadBlockResponse>*>(handler)
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::partition_oram::ReadPathRequest, ::partition_oram::ReadPathResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
-    ~WithCallbackMethod_read_block() override {
+    ~WithCallbackMethod_read_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status read_block(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadBlockRequest* /*request*/, ::partition_oram::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status read_path(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadPathRequest* /*request*/, ::partition_oram::ReadPathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerUnaryReactor* read_block(
-      ::grpc::CallbackServerContext* /*context*/, const ::partition_oram::ReadBlockRequest* /*request*/, ::partition_oram::ReadBlockResponse* /*response*/)  { return nullptr; }
+    virtual ::grpc::ServerUnaryReactor* read_path(
+      ::grpc::CallbackServerContext* /*context*/, const ::partition_oram::ReadPathRequest* /*request*/, ::partition_oram::ReadPathResponse* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class WithCallbackMethod_write_block : public BaseClass {
+  class WithCallbackMethod_write_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithCallbackMethod_write_block() {
+    WithCallbackMethod_write_path() {
       ::grpc::Service::MarkMethodCallback(2,
-          new ::grpc::internal::CallbackUnaryHandler< ::partition_oram::WriteBlockRequest, ::partition_oram::WriteBlockResponse>(
+          new ::grpc::internal::CallbackUnaryHandler< ::partition_oram::WritePathRequest, ::partition_oram::WritePathResponse>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::partition_oram::WriteBlockRequest* request, ::partition_oram::WriteBlockResponse* response) { return this->write_block(context, request, response); }));}
-    void SetMessageAllocatorFor_write_block(
-        ::grpc::MessageAllocator< ::partition_oram::WriteBlockRequest, ::partition_oram::WriteBlockResponse>* allocator) {
+                   ::grpc::CallbackServerContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response) { return this->write_path(context, request, response); }));}
+    void SetMessageAllocatorFor_write_path(
+        ::grpc::MessageAllocator< ::partition_oram::WritePathRequest, ::partition_oram::WritePathResponse>* allocator) {
       ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::partition_oram::WriteBlockRequest, ::partition_oram::WriteBlockResponse>*>(handler)
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::partition_oram::WritePathRequest, ::partition_oram::WritePathResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
-    ~WithCallbackMethod_write_block() override {
+    ~WithCallbackMethod_write_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status write_block(::grpc::ServerContext* /*context*/, const ::partition_oram::WriteBlockRequest* /*request*/, ::partition_oram::WriteBlockResponse* /*response*/) override {
+    ::grpc::Status write_path(::grpc::ServerContext* /*context*/, const ::partition_oram::WritePathRequest* /*request*/, ::partition_oram::WritePathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerUnaryReactor* write_block(
-      ::grpc::CallbackServerContext* /*context*/, const ::partition_oram::WriteBlockRequest* /*request*/, ::partition_oram::WriteBlockResponse* /*response*/)  { return nullptr; }
+    virtual ::grpc::ServerUnaryReactor* write_path(
+      ::grpc::CallbackServerContext* /*context*/, const ::partition_oram::WritePathRequest* /*request*/, ::partition_oram::WritePathResponse* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_close_connection : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_close_connection() {
+      ::grpc::Service::MarkMethodCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::google::protobuf::Empty, ::google::protobuf::Empty>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response) { return this->close_connection(context, request, response); }));}
+    void SetMessageAllocatorFor_close_connection(
+        ::grpc::MessageAllocator< ::google::protobuf::Empty, ::google::protobuf::Empty>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::google::protobuf::Empty, ::google::protobuf::Empty>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_close_connection() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status close_connection(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* close_connection(
+      ::grpc::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
   class WithCallbackMethod_key_exchange : public BaseClass {
@@ -350,13 +465,13 @@ class server final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithCallbackMethod_key_exchange() {
-      ::grpc::Service::MarkMethodCallback(3,
+      ::grpc::Service::MarkMethodCallback(4,
           new ::grpc::internal::CallbackUnaryHandler< ::partition_oram::KeyExchangeRequest, ::partition_oram::KeyExchangeResponse>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response) { return this->key_exchange(context, request, response); }));}
     void SetMessageAllocatorFor_key_exchange(
         ::grpc::MessageAllocator< ::partition_oram::KeyExchangeRequest, ::partition_oram::KeyExchangeResponse>* allocator) {
-      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(4);
       static_cast<::grpc::internal::CallbackUnaryHandler< ::partition_oram::KeyExchangeRequest, ::partition_oram::KeyExchangeResponse>*>(handler)
               ->SetMessageAllocator(allocator);
     }
@@ -371,7 +486,34 @@ class server final {
     virtual ::grpc::ServerUnaryReactor* key_exchange(
       ::grpc::CallbackServerContext* /*context*/, const ::partition_oram::KeyExchangeRequest* /*request*/, ::partition_oram::KeyExchangeResponse* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_init_oram<WithCallbackMethod_read_block<WithCallbackMethod_write_block<WithCallbackMethod_key_exchange<Service > > > > CallbackService;
+  template <class BaseClass>
+  class WithCallbackMethod_send_hello : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_send_hello() {
+      ::grpc::Service::MarkMethodCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::partition_oram::HelloMessage, ::google::protobuf::Empty>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response) { return this->send_hello(context, request, response); }));}
+    void SetMessageAllocatorFor_send_hello(
+        ::grpc::MessageAllocator< ::partition_oram::HelloMessage, ::google::protobuf::Empty>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(5);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::partition_oram::HelloMessage, ::google::protobuf::Empty>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_send_hello() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status send_hello(::grpc::ServerContext* /*context*/, const ::partition_oram::HelloMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* send_hello(
+      ::grpc::CallbackServerContext* /*context*/, const ::partition_oram::HelloMessage* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_init_oram<WithCallbackMethod_read_path<WithCallbackMethod_write_path<WithCallbackMethod_close_connection<WithCallbackMethod_key_exchange<WithCallbackMethod_send_hello<Service > > > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_init_oram : public BaseClass {
@@ -391,35 +533,52 @@ class server final {
     }
   };
   template <class BaseClass>
-  class WithGenericMethod_read_block : public BaseClass {
+  class WithGenericMethod_read_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithGenericMethod_read_block() {
+    WithGenericMethod_read_path() {
       ::grpc::Service::MarkMethodGeneric(1);
     }
-    ~WithGenericMethod_read_block() override {
+    ~WithGenericMethod_read_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status read_block(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadBlockRequest* /*request*/, ::partition_oram::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status read_path(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadPathRequest* /*request*/, ::partition_oram::ReadPathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
   };
   template <class BaseClass>
-  class WithGenericMethod_write_block : public BaseClass {
+  class WithGenericMethod_write_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithGenericMethod_write_block() {
+    WithGenericMethod_write_path() {
       ::grpc::Service::MarkMethodGeneric(2);
     }
-    ~WithGenericMethod_write_block() override {
+    ~WithGenericMethod_write_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status write_block(::grpc::ServerContext* /*context*/, const ::partition_oram::WriteBlockRequest* /*request*/, ::partition_oram::WriteBlockResponse* /*response*/) override {
+    ::grpc::Status write_path(::grpc::ServerContext* /*context*/, const ::partition_oram::WritePathRequest* /*request*/, ::partition_oram::WritePathResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_close_connection : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_close_connection() {
+      ::grpc::Service::MarkMethodGeneric(3);
+    }
+    ~WithGenericMethod_close_connection() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status close_connection(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -430,13 +589,30 @@ class server final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_key_exchange() {
-      ::grpc::Service::MarkMethodGeneric(3);
+      ::grpc::Service::MarkMethodGeneric(4);
     }
     ~WithGenericMethod_key_exchange() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
     ::grpc::Status key_exchange(::grpc::ServerContext* /*context*/, const ::partition_oram::KeyExchangeRequest* /*request*/, ::partition_oram::KeyExchangeResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_send_hello : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_send_hello() {
+      ::grpc::Service::MarkMethodGeneric(5);
+    }
+    ~WithGenericMethod_send_hello() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status send_hello(::grpc::ServerContext* /*context*/, const ::partition_oram::HelloMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -462,43 +638,63 @@ class server final {
     }
   };
   template <class BaseClass>
-  class WithRawMethod_read_block : public BaseClass {
+  class WithRawMethod_read_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawMethod_read_block() {
+    WithRawMethod_read_path() {
       ::grpc::Service::MarkMethodRaw(1);
     }
-    ~WithRawMethod_read_block() override {
+    ~WithRawMethod_read_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status read_block(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadBlockRequest* /*request*/, ::partition_oram::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status read_path(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadPathRequest* /*request*/, ::partition_oram::ReadPathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void Requestread_block(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void Requestread_path(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
-  class WithRawMethod_write_block : public BaseClass {
+  class WithRawMethod_write_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawMethod_write_block() {
+    WithRawMethod_write_path() {
       ::grpc::Service::MarkMethodRaw(2);
     }
-    ~WithRawMethod_write_block() override {
+    ~WithRawMethod_write_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status write_block(::grpc::ServerContext* /*context*/, const ::partition_oram::WriteBlockRequest* /*request*/, ::partition_oram::WriteBlockResponse* /*response*/) override {
+    ::grpc::Status write_path(::grpc::ServerContext* /*context*/, const ::partition_oram::WritePathRequest* /*request*/, ::partition_oram::WritePathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    void Requestwrite_block(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+    void Requestwrite_path(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_close_connection : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_close_connection() {
+      ::grpc::Service::MarkMethodRaw(3);
+    }
+    ~WithRawMethod_close_connection() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status close_connection(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestclose_connection(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -507,7 +703,7 @@ class server final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_key_exchange() {
-      ::grpc::Service::MarkMethodRaw(3);
+      ::grpc::Service::MarkMethodRaw(4);
     }
     ~WithRawMethod_key_exchange() override {
       BaseClassMustBeDerivedFromService(this);
@@ -518,7 +714,27 @@ class server final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void Requestkey_exchange(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_send_hello : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_send_hello() {
+      ::grpc::Service::MarkMethodRaw(5);
+    }
+    ~WithRawMethod_send_hello() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status send_hello(::grpc::ServerContext* /*context*/, const ::partition_oram::HelloMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void Requestsend_hello(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(5, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -544,47 +760,69 @@ class server final {
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class WithRawCallbackMethod_read_block : public BaseClass {
+  class WithRawCallbackMethod_read_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawCallbackMethod_read_block() {
+    WithRawCallbackMethod_read_path() {
       ::grpc::Service::MarkMethodRawCallback(1,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->read_block(context, request, response); }));
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->read_path(context, request, response); }));
     }
-    ~WithRawCallbackMethod_read_block() override {
+    ~WithRawCallbackMethod_read_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status read_block(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadBlockRequest* /*request*/, ::partition_oram::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status read_path(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadPathRequest* /*request*/, ::partition_oram::ReadPathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerUnaryReactor* read_block(
+    virtual ::grpc::ServerUnaryReactor* read_path(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
-  class WithRawCallbackMethod_write_block : public BaseClass {
+  class WithRawCallbackMethod_write_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithRawCallbackMethod_write_block() {
+    WithRawCallbackMethod_write_path() {
       ::grpc::Service::MarkMethodRawCallback(2,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
-                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->write_block(context, request, response); }));
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->write_path(context, request, response); }));
     }
-    ~WithRawCallbackMethod_write_block() override {
+    ~WithRawCallbackMethod_write_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status write_block(::grpc::ServerContext* /*context*/, const ::partition_oram::WriteBlockRequest* /*request*/, ::partition_oram::WriteBlockResponse* /*response*/) override {
+    ::grpc::Status write_path(::grpc::ServerContext* /*context*/, const ::partition_oram::WritePathRequest* /*request*/, ::partition_oram::WritePathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
-    virtual ::grpc::ServerUnaryReactor* write_block(
+    virtual ::grpc::ServerUnaryReactor* write_path(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_close_connection : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_close_connection() {
+      ::grpc::Service::MarkMethodRawCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->close_connection(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_close_connection() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status close_connection(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* close_connection(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
@@ -593,7 +831,7 @@ class server final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawCallbackMethod_key_exchange() {
-      ::grpc::Service::MarkMethodRawCallback(3,
+      ::grpc::Service::MarkMethodRawCallback(4,
           new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
             [this](
                    ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->key_exchange(context, request, response); }));
@@ -607,6 +845,28 @@ class server final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* key_exchange(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_send_hello : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_send_hello() {
+      ::grpc::Service::MarkMethodRawCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->send_hello(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_send_hello() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status send_hello(::grpc::ServerContext* /*context*/, const ::partition_oram::HelloMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* send_hello(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
@@ -637,58 +897,85 @@ class server final {
     virtual ::grpc::Status Streamedinit_oram(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::partition_oram::InitOramRequest,::google::protobuf::Empty>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
-  class WithStreamedUnaryMethod_read_block : public BaseClass {
+  class WithStreamedUnaryMethod_read_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithStreamedUnaryMethod_read_block() {
+    WithStreamedUnaryMethod_read_path() {
       ::grpc::Service::MarkMethodStreamed(1,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::partition_oram::ReadBlockRequest, ::partition_oram::ReadBlockResponse>(
+          ::partition_oram::ReadPathRequest, ::partition_oram::ReadPathResponse>(
             [this](::grpc::ServerContext* context,
                    ::grpc::ServerUnaryStreamer<
-                     ::partition_oram::ReadBlockRequest, ::partition_oram::ReadBlockResponse>* streamer) {
-                       return this->Streamedread_block(context,
+                     ::partition_oram::ReadPathRequest, ::partition_oram::ReadPathResponse>* streamer) {
+                       return this->Streamedread_path(context,
                          streamer);
                   }));
     }
-    ~WithStreamedUnaryMethod_read_block() override {
+    ~WithStreamedUnaryMethod_read_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status read_block(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadBlockRequest* /*request*/, ::partition_oram::ReadBlockResponse* /*response*/) override {
+    ::grpc::Status read_path(::grpc::ServerContext* /*context*/, const ::partition_oram::ReadPathRequest* /*request*/, ::partition_oram::ReadPathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status Streamedread_block(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::partition_oram::ReadBlockRequest,::partition_oram::ReadBlockResponse>* server_unary_streamer) = 0;
+    virtual ::grpc::Status Streamedread_path(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::partition_oram::ReadPathRequest,::partition_oram::ReadPathResponse>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
-  class WithStreamedUnaryMethod_write_block : public BaseClass {
+  class WithStreamedUnaryMethod_write_path : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
-    WithStreamedUnaryMethod_write_block() {
+    WithStreamedUnaryMethod_write_path() {
       ::grpc::Service::MarkMethodStreamed(2,
         new ::grpc::internal::StreamedUnaryHandler<
-          ::partition_oram::WriteBlockRequest, ::partition_oram::WriteBlockResponse>(
+          ::partition_oram::WritePathRequest, ::partition_oram::WritePathResponse>(
             [this](::grpc::ServerContext* context,
                    ::grpc::ServerUnaryStreamer<
-                     ::partition_oram::WriteBlockRequest, ::partition_oram::WriteBlockResponse>* streamer) {
-                       return this->Streamedwrite_block(context,
+                     ::partition_oram::WritePathRequest, ::partition_oram::WritePathResponse>* streamer) {
+                       return this->Streamedwrite_path(context,
                          streamer);
                   }));
     }
-    ~WithStreamedUnaryMethod_write_block() override {
+    ~WithStreamedUnaryMethod_write_path() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status write_block(::grpc::ServerContext* /*context*/, const ::partition_oram::WriteBlockRequest* /*request*/, ::partition_oram::WriteBlockResponse* /*response*/) override {
+    ::grpc::Status write_path(::grpc::ServerContext* /*context*/, const ::partition_oram::WritePathRequest* /*request*/, ::partition_oram::WritePathResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     // replace default version of method with streamed unary
-    virtual ::grpc::Status Streamedwrite_block(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::partition_oram::WriteBlockRequest,::partition_oram::WriteBlockResponse>* server_unary_streamer) = 0;
+    virtual ::grpc::Status Streamedwrite_path(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::partition_oram::WritePathRequest,::partition_oram::WritePathResponse>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_close_connection : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_close_connection() {
+      ::grpc::Service::MarkMethodStreamed(3,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::google::protobuf::Empty, ::google::protobuf::Empty>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::google::protobuf::Empty, ::google::protobuf::Empty>* streamer) {
+                       return this->Streamedclose_connection(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_close_connection() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status close_connection(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status Streamedclose_connection(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::google::protobuf::Empty,::google::protobuf::Empty>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_key_exchange : public BaseClass {
@@ -696,7 +983,7 @@ class server final {
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_key_exchange() {
-      ::grpc::Service::MarkMethodStreamed(3,
+      ::grpc::Service::MarkMethodStreamed(4,
         new ::grpc::internal::StreamedUnaryHandler<
           ::partition_oram::KeyExchangeRequest, ::partition_oram::KeyExchangeResponse>(
             [this](::grpc::ServerContext* context,
@@ -717,9 +1004,36 @@ class server final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status Streamedkey_exchange(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::partition_oram::KeyExchangeRequest,::partition_oram::KeyExchangeResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_init_oram<WithStreamedUnaryMethod_read_block<WithStreamedUnaryMethod_write_block<WithStreamedUnaryMethod_key_exchange<Service > > > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_send_hello : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_send_hello() {
+      ::grpc::Service::MarkMethodStreamed(5,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::partition_oram::HelloMessage, ::google::protobuf::Empty>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::partition_oram::HelloMessage, ::google::protobuf::Empty>* streamer) {
+                       return this->Streamedsend_hello(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_send_hello() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status send_hello(::grpc::ServerContext* /*context*/, const ::partition_oram::HelloMessage* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status Streamedsend_hello(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::partition_oram::HelloMessage,::google::protobuf::Empty>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_init_oram<WithStreamedUnaryMethod_read_path<WithStreamedUnaryMethod_write_path<WithStreamedUnaryMethod_close_connection<WithStreamedUnaryMethod_key_exchange<WithStreamedUnaryMethod_send_hello<Service > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_init_oram<WithStreamedUnaryMethod_read_block<WithStreamedUnaryMethod_write_block<WithStreamedUnaryMethod_key_exchange<Service > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_init_oram<WithStreamedUnaryMethod_read_path<WithStreamedUnaryMethod_write_path<WithStreamedUnaryMethod_close_connection<WithStreamedUnaryMethod_key_exchange<WithStreamedUnaryMethod_send_hello<Service > > > > > > StreamedService;
 };
 
 }  // namespace partition_oram

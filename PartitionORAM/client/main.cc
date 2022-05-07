@@ -20,7 +20,7 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "client.h"
+#include "oram_client.h"
 
 DEFINE_string(address, "localhost", "The address of the server.");
 DEFINE_string(port, "1234", "The port of the server.");
@@ -42,6 +42,8 @@ int main(int argc, char* argv[]) {
           FLAGS_address, FLAGS_port, FLAGS_crt_path);
   client->run();
   client->start_key_exchange();
+  client->send_hello();
+  client->close_connection();
 
   gflags::ShutDownCommandLineFlags();
   return 0;

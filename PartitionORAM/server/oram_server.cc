@@ -33,16 +33,16 @@ grpc::Status PartitionORAMService::init_oram(grpc::ServerContext* context,
   return grpc::Status::OK;
 }
 
-grpc::Status PartitionORAMService::read_block(grpc::ServerContext* context,
-                                              const ReadBlockRequest* request,
-                                              ReadBlockResponse* response) {
+grpc::Status PartitionORAMService::read_path(grpc::ServerContext* context,
+                                             const ReadPathRequest* request,
+                                             ReadPathResponse* response) {
   // TODO: implement me.
   return grpc::Status::OK;
 }
 
-grpc::Status PartitionORAMService::write_block(grpc::ServerContext* context,
-                                               const WriteBlockRequest* request,
-                                               WriteBlockResponse* response) {
+grpc::Status PartitionORAMService::write_path(grpc::ServerContext* context,
+                                              const WritePathRequest* request,
+                                              WritePathResponse* response) {
   // TODO: implement me.
   return grpc::Status::OK;
 }
@@ -74,6 +74,37 @@ grpc::Status PartitionORAMService::key_exchange(
   logger->info("The session key for sending is {}.",
                spdlog::to_hex(session_key.second));
 
+  return grpc::Status::OK;
+}
+
+grpc::Status PartitionORAMService::close_connection(
+    grpc::ServerContext* context, const google::protobuf::Empty* request,
+    google::protobuf::Empty* response) {
+  logger->info("Closing connection...");
+  server_running = false;
+  return grpc::Status::OK;
+}
+
+grpc::Status PartitionORAMService::send_hello(grpc::ServerContext* context,
+                                              const HelloMessage* request,
+                                              google::protobuf::Empty* empty) {
+  const std::string encrypted_message = request->content();
+  const std::string iv = request->iv();
+  std::string message;
+  Status status;
+
+  logger->info("Received encrypted message: {}.",
+               spdlog::to_hex(encrypted_message));
+
+  if ((status = cryptor_->decrypt((uint8_t*)encrypted_message.data(),
+                                  encrypted_message.size(), (uint8_t*)iv.data(),
+                                  &message)) != Status::OK) {
+    const std::string error_message = oram_utils::string_concat(
+        "Failed to verify Hello message! Error: ", error_list.at(status));
+    return grpc::Status(grpc::StatusCode::INTERNAL, error_message);
+  }
+
+  logger->info("Successfully verified: {}.", message);
   return grpc::Status::OK;
 }
 
@@ -127,7 +158,8 @@ void ServerRunner::run(void) {
   // Start a monitor thread.
   std::thread monitor_thread([&, this]() {
     while (server_running) {
-      // Wake up every 100 miliseconds and check if the server is still running.
+      // Wake up every 100 miliseconds and check if the server is still
+      // running.
       std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     server->Shutdown();

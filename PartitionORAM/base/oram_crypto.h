@@ -23,10 +23,11 @@
 
 #include <sodium.h>
 
-#include "oram_status.h"
+#include "oram_defs.h"
 
 #define ORAM_CRYPTO_KEY_SIZE crypto_aead_aes256gcm_KEYBYTES
 #define ORAM_CRYPTO_RANDOM_SIZE crypto_aead_aes256gcm_NPUBBYTES
+
 #define ull unsigned long long
 
 namespace oram_crypto {
@@ -40,7 +41,8 @@ class Cryptor {
   uint8_t public_key_[crypto_kx_PUBLICKEYBYTES];
   uint8_t secret_key_[crypto_kx_SECRETKEYBYTES];
 
-  bool is_initialized;
+  bool is_initialized = false;
+  bool is_negotiated = false;
 
   Cryptor();
 
@@ -49,14 +51,17 @@ class Cryptor {
  public:
   static std::shared_ptr<Cryptor> get_instance(void);
 
+  static uint32_t uniform_random(uint32_t min, uint32_t max);
+
   partition_oram::Status encrypt(const uint8_t* message, size_t length,
-                                 std::string* const out);
+                                 uint8_t* const iv, std::string* const out);
   partition_oram::Status decrypt(const uint8_t* message, size_t length,
-                                 std::string* const out);
+                                 const uint8_t* iv, std::string* const out);
   partition_oram::Status digest(const uint8_t* message, size_t length,
                                 std::string* const out);
   partition_oram::Status sample_key_pair(void);
-  partition_oram::Status sample_session_key(const std::string& peer_pk, bool type);
+  partition_oram::Status sample_session_key(const std::string& peer_pk,
+                                            bool type);
 
   std::pair<std::string, std::string> get_key_pair(void);
   std::pair<std::string, std::string> get_session_key_pair(void);

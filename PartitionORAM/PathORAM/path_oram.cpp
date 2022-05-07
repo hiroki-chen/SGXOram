@@ -121,7 +121,7 @@ vector<int> btree::getPath(int branch) {
   }
   return path;
 }
-
+// ok
 int btree::randomPath(int node) {
   std::uniform_int_distribution<int> distr(0, 1);
   int rand = distr(e);

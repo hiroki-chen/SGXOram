@@ -56,4 +56,18 @@ void safe_free_all(size_t ptr_num, ...) {
   }
   va_end(ap);
 }
+
+void convert_to_block(const std::string& data,
+                      partition_oram::oram_block_t* const block) {
+  PANIC_IF(data.size() != ORAM_BLOCK_SIZE, "Invalid data size");
+
+  memcpy(block, data.data(), ORAM_BLOCK_SIZE);
+}
+
+void check_status(partition_oram::Status status, const std::string& reason) {
+  if (status != partition_oram::Status::OK) {
+    logger->error("{}", reason);
+    abort();
+  }
+}
 }  // namespace oram_utils

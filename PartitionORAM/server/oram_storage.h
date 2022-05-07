@@ -22,24 +22,14 @@
 #include <cmath>
 #include <vector>
 
-#define DEFAULT_ORAM_DATA_SIZE 4096
-
-// The header containing metadata.
-typedef struct _oram_block_header_t {
-
-} oram_block_header_t;
-
-// The block for ORAM storage.
-typedef struct _oram_block_t {
-  oram_block_header_t header;
-
-  uint8_t data[DEFAULT_ORAM_DATA_SIZE];
-} oram_block_t;
+#include "base/oram_defs.h"
 
 namespace partition_oram {
   class BinaryTree {
     size_t size;
     size_t height;
+
+    // TODO: Construct the main storage.
 
     public:
       BinaryTree(size_t num_of_blocks);

@@ -14,13 +14,15 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef CLIENT_CLIENT_H_
-#define CLIENT_CLIENT_H_
+#ifndef ORAM_CLIENT_H
+#define ORAM_CLIENT_H
 
 #include <string>
 #include <memory>
 
 #include <grpc++/grpc++.h>
+
+#include "oram_controller.h"
 
 #include "protos/messages.grpc.pb.h"
 #include "protos/messages.pb.h"
@@ -32,7 +34,10 @@ class Client {
   std::string server_port_;
   std::string crt_path_;
 
-  std::unique_ptr<server::Stub> stub_;
+  std::shared_ptr<server::Stub> stub_;
+  
+  std::shared_ptr<OramController> controller_;
+
   std::shared_ptr<oram_crypto::Cryptor> cryptor_;
 
  public:
@@ -45,6 +50,8 @@ class Client {
   void run(void);
 
   int start_key_exchange(void);
+  int send_hello(void);
+  int close_connection(void);
 
   virtual ~Client() {}
 };

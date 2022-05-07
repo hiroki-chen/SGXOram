@@ -10,20 +10,29 @@ service server {
   // Initialize the ORAM by sending the client's configurations.
   rpc init_oram(InitOramRequest) returns (google.protobuf.Empty) {}
 
-  rpc read_block(ReadBlockRequest) returns (ReadBlockResponse) {}
+  rpc read_path(ReadPathRequest) returns (ReadPathResponse) {}
 
-  rpc write_block(WriteBlockRequest) returns (WriteBlockResponse) {}
+  rpc write_path(WritePathRequest) returns (WritePathResponse) {}
+
+  rpc close_connection(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 
   // ============ Key Exchange Using Diffie-Hellman ============ //
   // For evaluating the performance when encryption is introduced, 
   // we do not verify the public key sent from the client, i.e., 
   // we assume that there is no man-in-the-middle attacker :)
   rpc key_exchange(KeyExchangeRequest) returns (KeyExchangeResponse) {}
+
+  rpc send_hello(HelloMessage) returns (google.protobuf.Empty) {}
 }
 
 enum Type {
   Sequential = 0;
   Random = 1;
+}
+
+message HelloMessage {
+  bytes content = 1;
+  bytes iv = 2;
 }
 
 message KeyExchangeRequest {
@@ -39,19 +48,22 @@ message InitOramRequest {
   uint32 block_num = 2;
 }
 
-message ReadBlockRequest {
-
+message ReadPathRequest {
+  uint32 path = 1;
+  uint32 level = 2;
 }
 
-message ReadBlockResponse {
-  bytes data = 1;
+message ReadPathResponse {
+  repeated bytes bucket = 1;
 }
 
-message WriteBlockRequest {
+message WritePathRequest {
   // Whether this write operation is triggered by an eviction operation.
   optional Type type = 1;
+  uint32 path = 2;
+  uint32 level = 3;
 }
 
-message WriteBlockResponse {
+message WritePathResponse {
 
 }

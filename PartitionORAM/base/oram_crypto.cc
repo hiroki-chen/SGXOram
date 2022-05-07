@@ -54,42 +54,46 @@ void Cryptor::crypto_prelogue(void) {
 
 // The encryption algorithm also uses AES-GCM mode to encrypt the message.
 partition_oram::Status Cryptor::encrypt(const uint8_t* message, size_t length,
+                                        uint8_t* const iv,
                                         std::string* const out) {
   crypto_prelogue();
+  PANIC_IF(!is_negotiated, "Cryptor is not negotiated.");
 
   // Use the key to encrypte the data.
-  uint8_t* const iv = (uint8_t*)malloc(ORAM_CRYPTO_RANDOM_SIZE);
-  uint8_t* const ciphertext =
-      (uint8_t*)malloc(crypto_aead_aes256gcm_ABYTES + length);
 
   // Fill in the IV.
+  out->resize(crypto_aead_aes256gcm_ABYTES + length);
   unsigned long long ciphertext_len;
-  randombytes_buf(iv, crypto_secretbox_NONCEBYTES);
-  int ret = crypto_aead_aes256gcm_encrypt(ciphertext, &ciphertext_len, message,
-                                          length, nullptr, 0, NULL, iv,
-                                          session_key_rx_);
-  // Copy back to the string.
-  *out = std::string((char*)ciphertext, ciphertext_len);
+  randombytes_buf(iv, ORAM_CRYPTO_RANDOM_SIZE);
+  int ret = crypto_aead_aes256gcm_encrypt(
+      (uint8_t*)out->data(), &ciphertext_len, message, length, nullptr, 0, NULL,
+      iv, session_key_rx_);
 
-  oram_utils::safe_free_all(2, iv, ciphertext);
   return ret == 0 ? partition_oram::Status::OK
                   : partition_oram::Status::INVALID_OPERATION;
 }
 
 partition_oram::Status Cryptor::decrypt(const uint8_t* message, size_t length,
+                                        const uint8_t* iv,
                                         std::string* const out) {
   crypto_prelogue();
+  PANIC_IF(!is_negotiated, "Cryptor is not negotiated.");
+
+  if (length < crypto_aead_aes256gcm_ABYTES) {
+    logger->error("The length of the message is too short.");
+    return partition_oram::Status::INVALID_ARGUMENT;
+  }
 
   // The message consists of the GCM MAC tag, the nonce, ant the
   // ciphertext itself, so it is easily for us to dertemine the length of the
   // plaintext because length of ciphertext = length of plaintext.
-  size_t message_len =
-      length - crypto_aead_aes256gcm_ABYTES - crypto_aead_aes256gcm_NPUBBYTES;
+  size_t message_len = length - crypto_aead_aes256gcm_ABYTES;
   uint8_t* const decrypted = (uint8_t*)malloc(message_len);
+
   unsigned long long decrypted_len;
-  int ret = crypto_aead_aes256gcm_decrypt(
-      decrypted, (ull*)&message_len, nullptr, message, length, nullptr, 0,
-      message + crypto_aead_aes256gcm_NPUBBYTES, session_key_tx_);
+  int ret = crypto_aead_aes256gcm_decrypt(decrypted, (ull*)&message_len,
+                                          nullptr, message, length, nullptr, 0,
+                                          iv, session_key_tx_);
   *out = std::string((char*)decrypted, message_len);
 
   // Free the memory.
@@ -152,8 +156,12 @@ partition_oram::Status Cryptor::sample_session_key(const std::string& peer_pk,
                                         (uint8_t*)peer_pk.c_str());
   }
 
-  return ret == 0 ? partition_oram::Status::OK
-                  : partition_oram::Status::INVALID_OPERATION;
+  if (ret == partition_oram::Status::OK) {
+    is_negotiated = true;
+    return partition_oram::Status::OK;
+  } else {
+    return partition_oram::Status::INVALID_OPERATION;
+  }
 }
 
 std::pair<std::string, std::string> Cryptor::get_key_pair(void) {
@@ -172,5 +180,27 @@ std::pair<std::string, std::string> Cryptor::get_session_key_pair(void) {
   key_pair.second =
       std::string((char*)session_key_tx_, crypto_kx_SESSIONKEYBYTES);
   return key_pair;
+}
+
+uint32_t Cryptor::uniform_random(uint32_t min, uint32_t max) {
+  PANIC_IF((min > max), "The minimum value is greater than the maximum value.");
+
+  // @ref Chromium's base/rand_util.cc for the implementation.
+  uint32_t range = max - min + 1;
+  uint32_t max_acceptable_value =
+      (std::numeric_limits<uint32_t>::max() / range) * range - 1;
+  // We sample a random number and them map it to the range [min, max]
+  // (inclusive) in a uniform way by scaling.
+  uint32_t value;
+
+  do {
+    // Use a strong RNG to generate a random number.
+    // This is important because we want this function to be pseudorandom
+    // and cannot be predicted by any adversary.
+    value = randombytes_random();
+  } while (value > max_acceptable_value);
+
+  value = value % range + min;
+  return value;
 }
 }  // namespace oram_crypto

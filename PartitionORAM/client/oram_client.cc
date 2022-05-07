@@ -14,7 +14,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include "client.h"
+#include "oram_client.h"
 
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/bin_to_hex.h>
@@ -37,10 +37,14 @@ void Client::run(void) {
   ssl_opts.pem_root_certs = crt_file;
   std::shared_ptr<grpc::ChannelCredentials> ssl_creds =
       grpc::SslCredentials(ssl_opts);
-  stub_ = server::NewStub(grpc::CreateChannel(address, ssl_creds));
+  // Make this stub shared among all.
+  stub_ = std::move(server::NewStub(grpc::CreateChannel(address, ssl_creds)));
 
-  // Initialize the cryptor.
+  // Initialize the cryptor and controller.
   cryptor_ = oram_crypto::Cryptor::get_instance();
+  controller_ = OramController::get_instance();
+  // The stub can be shared between multiple objects.
+  controller_->set_stub(stub_);
 
   // Test if crypto is working.
   std::string test_str = "Hello, world!";
@@ -74,6 +78,7 @@ int Client::start_key_exchange(void) {
                                                   0)) != Status::OK) {
     logger->error("Failed to sample session key! Error: {}",
                   error_list.at(oram_status));
+    return -1;
   }
 
   logger->info("The session key sampled.");
@@ -82,5 +87,49 @@ int Client::start_key_exchange(void) {
                spdlog::to_hex(session_key.first));
   logger->info("The session key for sending is {}.",
                spdlog::to_hex(session_key.second));
+
+  return 0;
+}
+
+int Client::send_hello(void) {
+  const std::string initial_message = "Hello";
+  std::string message;
+  uint8_t* const iv = (uint8_t*)malloc(ORAM_CRYPTO_RANDOM_SIZE);
+  cryptor_->encrypt((uint8_t*)initial_message.data(), initial_message.size(),
+                    iv, &message);
+  logger->info("The message is {}.", spdlog::to_hex(message));
+
+  grpc::ClientContext context;
+  HelloMessage request;
+  google::protobuf::Empty empty;
+  request.set_content(message);
+  request.set_iv(iv, ORAM_CRYPTO_RANDOM_SIZE);
+
+  oram_utils::safe_free(iv);
+
+  grpc::Status status = stub_->send_hello(&context, request, &empty);
+
+  if (!status.ok()) {
+    logger->error(status.error_message());
+    return -1;
+  }
+
+  logger->info("The message sent and sucessfully verified by the server.");
+
+  return 0;
+}
+
+int Client::close_connection(void) {
+  grpc::ClientContext context;
+  google::protobuf::Empty empty;
+  grpc::Status status = stub_->close_connection(&context, empty, &empty);
+
+  if (!status.ok()) {
+    logger->error(status.error_message());
+    return -1;
+  }
+
+  logger->info("The connection is closed.");
+  return 0;
 }
 }  // namespace partition_oram

@@ -43,17 +43,25 @@ class PartitionORAMService final : public server::Service {
                          const InitOramRequest* request,
                          google::protobuf::Empty* empty) override;
 
-  grpc::Status read_block(grpc::ServerContext* context,
-                          const ReadBlockRequest* request,
-                          ReadBlockResponse* response) override;
+  grpc::Status read_path(grpc::ServerContext* context,
+                          const ReadPathRequest* request,
+                          ReadPathResponse* response) override;
 
-  grpc::Status write_block(grpc::ServerContext* context,
-                           const WriteBlockRequest* request,
-                           WriteBlockResponse* response) override;
+  grpc::Status write_path(grpc::ServerContext* context,
+                           const WritePathRequest* request,
+                           WritePathResponse* response) override;
+
+  grpc::Status close_connection(grpc::ServerContext* context,
+                                const google::protobuf::Empty* request,
+                                google::protobuf::Empty* response) override;
 
   grpc::Status key_exchange(grpc::ServerContext* context,
                             const KeyExchangeRequest* request,
                             KeyExchangeResponse* response) override;
+
+  grpc::Status send_hello(grpc::ServerContext* context,
+                          const HelloMessage* request,
+                          google::protobuf::Empty* empty) override;
 };
 
 class ServerRunner {
