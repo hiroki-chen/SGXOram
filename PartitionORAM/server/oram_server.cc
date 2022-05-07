@@ -19,6 +19,8 @@
 #include <atomic>
 #include <thread>
 
+#include <spdlog/fmt/bin_to_hex.h>
+
 #include "base/oram_utils.h"
 
 std::atomic_bool server_running;
@@ -45,10 +47,32 @@ grpc::Status PartitionORAMService::write_block(grpc::ServerContext* context,
   return grpc::Status::OK;
 }
 
-grpc::Status key_exchange(grpc::ServerContext* context,
-                          const KeyExchangeRequest* request,
-                          KeyExchangeResponse* response) {
+grpc::Status PartitionORAMService::key_exchange(
+    grpc::ServerContext* context, const KeyExchangeRequest* request,
+    KeyExchangeResponse* response) {
   const std::string public_key_client = request->public_key_client();
+
+  Status status;
+  if ((status = cryptor_->sample_key_pair()) != Status::OK) {
+    const std::string error_message = oram_utils::string_concat(
+        "Failed to sample key pair! Error: ", error_list.at(status));
+    return grpc::Status(grpc::StatusCode::INTERNAL, error_message);
+  }
+
+  if ((status = cryptor_->sample_session_key(public_key_client, 1)) !=
+      Status::OK) {
+    const std::string error_message = oram_utils::string_concat(
+        "Failed to sample session key! Error: ", error_list.at(status));
+    return grpc::Status(grpc::StatusCode::INTERNAL, error_message);
+  }
+  auto key_pair = cryptor_->get_key_pair();
+  response->set_public_key_server(key_pair.first);
+
+  auto session_key = std::move(cryptor_->get_session_key_pair());
+  logger->info("The session key for receiving is {}.",
+               spdlog::to_hex(session_key.first));
+  logger->info("The session key for sending is {}.",
+               spdlog::to_hex(session_key.second));
 
   return grpc::Status::OK;
 }
@@ -96,6 +120,9 @@ void ServerRunner::run(void) {
   std::shared_ptr<grpc::Server> server = builder.BuildAndStart();
   logger->info("Server started to listen on {}:{}.", address_, port_);
   server_running = true;
+
+  // Initialize the cryptor.
+  service_->cryptor_ = oram_crypto::Cryptor::get_instance();
 
   // Start a monitor thread.
   std::thread monitor_thread([&, this]() {

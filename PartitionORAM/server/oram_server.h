@@ -24,6 +24,7 @@
 #include <spdlog/spdlog.h>
 
 #include "oram_storage.h"
+#include "base/oram_crypto.h"
 #include "protos/messages.grpc.pb.h"
 #include "protos/messages.pb.h"
 
@@ -35,6 +36,7 @@ class PartitionORAMService final : public server::Service {
   friend class ServerRunner;
 
   PartitionOramStorage storage_;
+  std::shared_ptr<oram_crypto::Cryptor> cryptor_;
 
  public:
   grpc::Status init_oram(grpc::ServerContext* context,

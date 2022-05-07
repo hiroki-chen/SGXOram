@@ -38,4 +38,22 @@ std::string read_key_crt_file(const std::string& path) {
 
   return oss.str();
 }
+
+void safe_free(void* ptr) {
+  if (ptr != nullptr) {
+    free(ptr);
+  } else {
+    logger->error("Failed to free nullptr");
+  }
+}
+
+void safe_free_all(size_t ptr_num, ...) {
+  va_list ap;
+  va_start(ap, ptr_num);
+  for (size_t i = 0; i < ptr_num; ++i) {
+    void* ptr = va_arg(ap, void*);
+    safe_free(ptr);
+  }
+  va_end(ap);
+}
 }  // namespace oram_utils

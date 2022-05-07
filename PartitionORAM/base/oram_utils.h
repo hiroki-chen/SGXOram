@@ -17,8 +17,11 @@
 #ifndef ORAM_UTILS_H
 #define ORAM_UTILS_H
 
+#include <cassert>
 #include <string>
 #include <sstream>
+
+#define PANIC_IF(cond, message) assert(!(cond) && message)
 
 namespace oram_utils {
 std::string read_key_crt_file(const std::string& path);
@@ -33,6 +36,9 @@ std::string string_concat(const std::string& s, Args&&... args) {
   return oss.str();
 }
 
+void safe_free(void* ptr);
+
+void safe_free_all(size_t ptr_num, ...);
 }  // namespace oram_utils
 
 #endif  // ORAM_UTILS_H

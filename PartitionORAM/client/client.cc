@@ -17,6 +17,7 @@
 #include "client.h"
 
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/bin_to_hex.h>
 
 #include "base/oram_utils.h"
 
@@ -37,5 +38,49 @@ void Client::run(void) {
   std::shared_ptr<grpc::ChannelCredentials> ssl_creds =
       grpc::SslCredentials(ssl_opts);
   stub_ = server::NewStub(grpc::CreateChannel(address, ssl_creds));
+
+  // Initialize the cryptor.
+  cryptor_ = oram_crypto::Cryptor::get_instance();
+
+  // Test if crypto is working.
+  std::string test_str = "Hello, world!";
+  std::string hash;
+  cryptor_->digest((uint8_t*)test_str.data(), test_str.size(), &hash);
+  logger->info("The hash of {} is {}.", test_str, spdlog::to_hex(hash));
+}
+
+int Client::start_key_exchange(void) {
+  cryptor_->sample_key_pair();
+  auto key_pair = std::move(cryptor_->get_key_pair());
+
+  // Send the public key to the server.
+  grpc::ClientContext context;
+  KeyExchangeRequest request;
+  KeyExchangeResponse response;
+  request.set_public_key_client(key_pair.first);
+
+  grpc::Status status = stub_->key_exchange(&context, request, &response);
+
+  if (!status.ok()) {
+    logger->error(status.error_message());
+  }
+  const std::string public_key_server = response.public_key_server();
+  logger->info("The server's public key is {}.",
+               spdlog::to_hex(public_key_server));
+
+  // Sample the session key based on the server's public key.
+  Status oram_status;
+  if ((oram_status = cryptor_->sample_session_key(response.public_key_server(),
+                                                  0)) != Status::OK) {
+    logger->error("Failed to sample session key! Error: {}",
+                  error_list.at(oram_status));
+  }
+
+  logger->info("The session key sampled.");
+  auto session_key = std::move(cryptor_->get_session_key_pair());
+  logger->info("The session key for receiving is {}.",
+               spdlog::to_hex(session_key.first));
+  logger->info("The session key for sending is {}.",
+               spdlog::to_hex(session_key.second));
 }
 }  // namespace partition_oram

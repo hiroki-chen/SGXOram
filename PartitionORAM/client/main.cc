@@ -41,6 +41,7 @@ int main(int argc, char* argv[]) {
       std::make_unique<partition_oram::Client>(
           FLAGS_address, FLAGS_port, FLAGS_crt_path);
   client->run();
+  client->start_key_exchange();
 
   gflags::ShutDownCommandLineFlags();
   return 0;

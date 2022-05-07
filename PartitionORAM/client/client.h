@@ -24,6 +24,7 @@
 
 #include "protos/messages.grpc.pb.h"
 #include "protos/messages.pb.h"
+#include "base/oram_crypto.h"
 
 namespace partition_oram {
 class Client {
@@ -32,6 +33,7 @@ class Client {
   std::string crt_path_;
 
   std::unique_ptr<server::Stub> stub_;
+  std::shared_ptr<oram_crypto::Cryptor> cryptor_;
 
  public:
   Client(const std::string& server_address, const std::string& server_port,
@@ -41,6 +43,8 @@ class Client {
         crt_path_(crt_path) {}
 
   void run(void);
+
+  int start_key_exchange(void);
 
   virtual ~Client() {}
 };
