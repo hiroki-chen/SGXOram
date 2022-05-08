@@ -16,15 +16,19 @@
  */
 #include "oram_utils.h"
 
+#include <cstring>
 #include <fstream>
 #include <sstream>
 
 #include <spdlog/spdlog.h>
+#include <spdlog/fmt/bin_to_hex.h>
+
+#include "oram_crypto.h"
 
 extern std::shared_ptr<spdlog::logger> logger;
 
 namespace oram_utils {
-std::string read_key_crt_file(const std::string& path) {
+std::string ReadKeyCrtFile(const std::string& path) {
   std::ifstream file(path, std::ifstream::in);
   std::ostringstream oss;
 
@@ -39,7 +43,23 @@ std::string read_key_crt_file(const std::string& path) {
   return oss.str();
 }
 
-void safe_free(void* ptr) {
+std::vector<std::string> ReadDataFromFile(const std::string& path) {
+  std::ifstream file(path, std::ifstream::in);
+  std::vector<std::string> data;
+
+  if (file.good()) {
+    std::string line;
+    while (std::getline(file, line)) {
+      data.emplace_back(line);
+    }
+    file.close();
+  } else {
+    logger->error("Failed to read data file: {}", path);
+  }
+  return data;
+}
+
+void SafeFree(void* ptr) {
   if (ptr != nullptr) {
     free(ptr);
   } else {
@@ -47,27 +67,84 @@ void safe_free(void* ptr) {
   }
 }
 
-void safe_free_all(size_t ptr_num, ...) {
+void SafeFreeAll(size_t ptr_num, ...) {
   va_list ap;
   va_start(ap, ptr_num);
   for (size_t i = 0; i < ptr_num; ++i) {
     void* ptr = va_arg(ap, void*);
-    safe_free(ptr);
+    SafeFree(ptr);
   }
   va_end(ap);
 }
 
-void convert_to_block(const std::string& data,
-                      partition_oram::oram_block_t* const block) {
+void ConvertToBlock(const std::string& data,
+                    partition_oram::oram_block_t* const block) {
   PANIC_IF(data.size() != ORAM_BLOCK_SIZE, "Invalid data size");
 
   memcpy(block, data.data(), ORAM_BLOCK_SIZE);
 }
 
-void check_status(partition_oram::Status status, const std::string& reason) {
-  if (status != partition_oram::Status::OK) {
+void ConvertToString(const partition_oram::oram_block_t* const block,
+                     std::string* const data) {
+  data->resize(ORAM_BLOCK_SIZE);
+  memcpy(data->data(), (void*)block, ORAM_BLOCK_SIZE);
+}
+
+void CheckStatus(partition_oram::Status status, const std::string& reason) {
+  if (status != partition_oram::Status::kOK) {
     logger->error("{}", reason);
     abort();
   }
 }
+
+void PadStash(partition_oram::p_oram_stash_t* const stash,
+              const size_t bucket_size) {
+  const size_t stash_size = stash->size();
+  if (stash_size < bucket_size) {
+    for (size_t i = stash_size; i < bucket_size; ++i) {
+      partition_oram::oram_block_t dummy;
+
+      if (oram_crypto::Cryptor::RandomBytes((uint8_t*)(&dummy),
+                                            ORAM_BLOCK_SIZE) !=
+          partition_oram::Status::kOK) {
+        logger->error("Failed to generate random bytes");
+        abort();
+      }
+
+      stash->emplace_back(dummy);
+    }
+  }
+}
+
+std::vector<std::string> SerializeToStringVector(
+    const partition_oram::p_oram_bucket_t& bucket) {
+  std::vector<std::string> ans;
+
+  for (size_t i = 0; i < bucket.size(); ++i) {
+    std::string data;
+    ConvertToString(&bucket[i], &data);
+    ans.emplace_back(data);
+  }
+
+  return ans;
+}
+
+partition_oram::p_oram_bucket_t DeserializeFromStringVector(const std::vector<std::string>& data) {
+  partition_oram::p_oram_bucket_t ans;
+
+  for (size_t i = 0; i < data.size(); ++i) {
+    partition_oram::oram_block_t block;
+    ConvertToBlock(data[i], &block);
+    ans.emplace_back(block);
+  }
+
+  return ans;
+}
+
+void PrintStash(const partition_oram::p_oram_stash_t& stash) {
+  for (size_t i = 0; i < stash.size(); ++i) {
+    std::string data;
+    ConvertToString(&stash[i], &data);
+    logger->info("{}", spdlog::to_hex(data));
+  }
 }  // namespace oram_utils

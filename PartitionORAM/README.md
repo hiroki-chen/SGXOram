@@ -4,8 +4,9 @@ This is the reference implementation of the paper appearing on NDSS symposium: *
 
 The code is constructed upon some important libraries:
 
-* Google's RPC for remote process call (strongly recommended that the library is built from source).
-* Google Flag for command line parsing.
+* Google's `gRPC` library for remote process call (strongly recommended that the library is built from source).
+* Google's `gflags` library for command line parsing.
+* Google's `abseil` library for some advanced tools for C++ (If you build gRPC from source, then libabseil is automatically installed on your computer).
 * spdlog for logging.
 * Libsodium for cryptographic tools.
 

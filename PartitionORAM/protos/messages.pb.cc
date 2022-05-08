@@ -56,7 +56,8 @@ struct KeyExchangeResponseDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT KeyExchangeResponseDefaultTypeInternal _KeyExchangeResponse_default_instance_;
 constexpr InitOramRequest::InitOramRequest(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : parition_num_(0u)
+  : id_(0u)
+  , bucket_size_(0u)
   , block_num_(0u){}
 struct InitOramRequestDefaultTypeInternal {
   constexpr InitOramRequestDefaultTypeInternal()
@@ -69,7 +70,8 @@ struct InitOramRequestDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT InitOramRequestDefaultTypeInternal _InitOramRequest_default_instance_;
 constexpr ReadPathRequest::ReadPathRequest(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : path_(0u)
+  : id_(0u)
+  , path_(0u)
   , level_(0u){}
 struct ReadPathRequestDefaultTypeInternal {
   constexpr ReadPathRequestDefaultTypeInternal()
@@ -94,10 +96,12 @@ struct ReadPathResponseDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT ReadPathResponseDefaultTypeInternal _ReadPathResponse_default_instance_;
 constexpr WritePathRequest::WritePathRequest(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : type_(0)
-
+  : bucket_()
+  , id_(0u)
   , path_(0u)
-  , level_(0u){}
+  , level_(0u)
+  , type_(0)
+{}
 struct WritePathRequestDefaultTypeInternal {
   constexpr WritePathRequestDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -152,7 +156,8 @@ const uint32_t TableStruct_messages_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::partition_oram::InitOramRequest, parition_num_),
+  PROTOBUF_FIELD_OFFSET(::partition_oram::InitOramRequest, id_),
+  PROTOBUF_FIELD_OFFSET(::partition_oram::InitOramRequest, bucket_size_),
   PROTOBUF_FIELD_OFFSET(::partition_oram::InitOramRequest, block_num_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::partition_oram::ReadPathRequest, _internal_metadata_),
@@ -160,6 +165,7 @@ const uint32_t TableStruct_messages_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::partition_oram::ReadPathRequest, id_),
   PROTOBUF_FIELD_OFFSET(::partition_oram::ReadPathRequest, path_),
   PROTOBUF_FIELD_OFFSET(::partition_oram::ReadPathRequest, level_),
   ~0u,  // no _has_bits_
@@ -175,12 +181,16 @@ const uint32_t TableStruct_messages_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
-  PROTOBUF_FIELD_OFFSET(::partition_oram::WritePathRequest, type_),
+  PROTOBUF_FIELD_OFFSET(::partition_oram::WritePathRequest, id_),
   PROTOBUF_FIELD_OFFSET(::partition_oram::WritePathRequest, path_),
   PROTOBUF_FIELD_OFFSET(::partition_oram::WritePathRequest, level_),
+  PROTOBUF_FIELD_OFFSET(::partition_oram::WritePathRequest, bucket_),
+  PROTOBUF_FIELD_OFFSET(::partition_oram::WritePathRequest, type_),
+  ~0u,
+  ~0u,
+  ~0u,
+  ~0u,
   0,
-  ~0u,
-  ~0u,
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::partition_oram::WritePathResponse, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -193,10 +203,10 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 8, -1, -1, sizeof(::partition_oram::KeyExchangeRequest)},
   { 15, -1, -1, sizeof(::partition_oram::KeyExchangeResponse)},
   { 22, -1, -1, sizeof(::partition_oram::InitOramRequest)},
-  { 30, -1, -1, sizeof(::partition_oram::ReadPathRequest)},
-  { 38, -1, -1, sizeof(::partition_oram::ReadPathResponse)},
-  { 45, 54, -1, sizeof(::partition_oram::WritePathRequest)},
-  { 57, -1, -1, sizeof(::partition_oram::WritePathResponse)},
+  { 31, -1, -1, sizeof(::partition_oram::ReadPathRequest)},
+  { 40, -1, -1, sizeof(::partition_oram::ReadPathResponse)},
+  { 47, 58, -1, sizeof(::partition_oram::WritePathRequest)},
+  { 63, -1, -1, sizeof(::partition_oram::WritePathResponse)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -216,33 +226,34 @@ const char descriptor_table_protodef_messages_2eproto[] PROTOBUF_SECTION_VARIABL
   "\007content\030\001 \001(\014\022\n\n\002iv\030\002 \001(\014\"/\n\022KeyExchang"
   "eRequest\022\031\n\021public_key_client\030\001 \001(\014\"0\n\023K"
   "eyExchangeResponse\022\031\n\021public_key_server\030"
-  "\001 \001(\014\":\n\017InitOramRequest\022\024\n\014parition_num"
-  "\030\001 \001(\r\022\021\n\tblock_num\030\002 \001(\r\".\n\017ReadPathReq"
-  "uest\022\014\n\004path\030\001 \001(\r\022\r\n\005level\030\002 \001(\r\"\"\n\020Rea"
-  "dPathResponse\022\016\n\006bucket\030\001 \003(\014\"a\n\020WritePa"
-  "thRequest\022\'\n\004type\030\001 \001(\0162\024.partition_oram"
-  ".TypeH\000\210\001\001\022\014\n\004path\030\002 \001(\r\022\r\n\005level\030\003 \001(\rB"
-  "\007\n\005_type\"\023\n\021WritePathResponse*\"\n\004Type\022\016\n"
-  "\nSequential\020\000\022\n\n\006Random\020\0012\336\003\n\006server\022F\n\t"
-  "init_oram\022\037.partition_oram.InitOramReque"
-  "st\032\026.google.protobuf.Empty\"\000\022P\n\tread_pat"
-  "h\022\037.partition_oram.ReadPathRequest\032 .par"
-  "tition_oram.ReadPathResponse\"\000\022S\n\nwrite_"
-  "path\022 .partition_oram.WritePathRequest\032!"
-  ".partition_oram.WritePathResponse\"\000\022D\n\020c"
-  "lose_connection\022\026.google.protobuf.Empty\032"
-  "\026.google.protobuf.Empty\"\000\022Y\n\014key_exchang"
-  "e\022\".partition_oram.KeyExchangeRequest\032#."
-  "partition_oram.KeyExchangeResponse\"\000\022D\n\n"
-  "send_hello\022\034.partition_oram.HelloMessage"
-  "\032\026.google.protobuf.Empty\"\000b\006proto3"
+  "\001 \001(\014\"E\n\017InitOramRequest\022\n\n\002id\030\001 \001(\r\022\023\n\013"
+  "bucket_size\030\002 \001(\r\022\021\n\tblock_num\030\003 \001(\r\":\n\017"
+  "ReadPathRequest\022\n\n\002id\030\001 \001(\r\022\014\n\004path\030\002 \001("
+  "\r\022\r\n\005level\030\003 \001(\r\"\"\n\020ReadPathResponse\022\016\n\006"
+  "bucket\030\001 \003(\014\"}\n\020WritePathRequest\022\n\n\002id\030\001"
+  " \001(\r\022\014\n\004path\030\002 \001(\r\022\r\n\005level\030\003 \001(\r\022\016\n\006buc"
+  "ket\030\004 \003(\014\022\'\n\004type\030\005 \001(\0162\024.partition_oram"
+  ".TypeH\000\210\001\001B\007\n\005_type\"\023\n\021WritePathResponse"
+  "*\"\n\004Type\022\016\n\nSequential\020\000\022\n\n\006Random\020\0012\330\003\n"
+  "\006server\022E\n\010InitOram\022\037.partition_oram.Ini"
+  "tOramRequest\032\026.google.protobuf.Empty\"\000\022O"
+  "\n\010ReadPath\022\037.partition_oram.ReadPathRequ"
+  "est\032 .partition_oram.ReadPathResponse\"\000\022"
+  "R\n\tWritePath\022 .partition_oram.WritePathR"
+  "equest\032!.partition_oram.WritePathRespons"
+  "e\"\000\022C\n\017CloseConnection\022\026.google.protobuf"
+  ".Empty\032\026.google.protobuf.Empty\"\000\022X\n\013KeyE"
+  "xchange\022\".partition_oram.KeyExchangeRequ"
+  "est\032#.partition_oram.KeyExchangeResponse"
+  "\"\000\022C\n\tSendHello\022\034.partition_oram.HelloMe"
+  "ssage\032\026.google.protobuf.Empty\"\000b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_messages_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2fempty_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_messages_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_messages_2eproto = {
-  false, false, 994, descriptor_table_protodef_messages_2eproto, "messages.proto", 
+  false, false, 1039, descriptor_table_protodef_messages_2eproto, "messages.proto", 
   &descriptor_table_messages_2eproto_once, descriptor_table_messages_2eproto_deps, 1, 8,
   schemas, file_default_instances, TableStruct_messages_2eproto::offsets,
   file_level_metadata_messages_2eproto, file_level_enum_descriptors_messages_2eproto, file_level_service_descriptors_messages_2eproto,
@@ -925,17 +936,17 @@ InitOramRequest::InitOramRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
 InitOramRequest::InitOramRequest(const InitOramRequest& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&parition_num_, &from.parition_num_,
+  ::memcpy(&id_, &from.id_,
     static_cast<size_t>(reinterpret_cast<char*>(&block_num_) -
-    reinterpret_cast<char*>(&parition_num_)) + sizeof(block_num_));
+    reinterpret_cast<char*>(&id_)) + sizeof(block_num_));
   // @@protoc_insertion_point(copy_constructor:partition_oram.InitOramRequest)
 }
 
 inline void InitOramRequest::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
-    reinterpret_cast<char*>(&parition_num_) - reinterpret_cast<char*>(this)),
+    reinterpret_cast<char*>(&id_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&block_num_) -
-    reinterpret_cast<char*>(&parition_num_)) + sizeof(block_num_));
+    reinterpret_cast<char*>(&id_)) + sizeof(block_num_));
 }
 
 InitOramRequest::~InitOramRequest() {
@@ -965,9 +976,9 @@ void InitOramRequest::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  ::memset(&parition_num_, 0, static_cast<size_t>(
+  ::memset(&id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&block_num_) -
-      reinterpret_cast<char*>(&parition_num_)) + sizeof(block_num_));
+      reinterpret_cast<char*>(&id_)) + sizeof(block_num_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -977,17 +988,25 @@ const char* InitOramRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
     uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // uint32 parition_num = 1;
+      // uint32 id = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          parition_num_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // uint32 block_num = 2;
+      // uint32 bucket_size = 2;
       case 2:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          bucket_size_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // uint32 block_num = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           block_num_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
@@ -1022,16 +1041,22 @@ uint8_t* InitOramRequest::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // uint32 parition_num = 1;
-  if (this->_internal_parition_num() != 0) {
+  // uint32 id = 1;
+  if (this->_internal_id() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(1, this->_internal_parition_num(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(1, this->_internal_id(), target);
   }
 
-  // uint32 block_num = 2;
+  // uint32 bucket_size = 2;
+  if (this->_internal_bucket_size() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(2, this->_internal_bucket_size(), target);
+  }
+
+  // uint32 block_num = 3;
   if (this->_internal_block_num() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(2, this->_internal_block_num(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(3, this->_internal_block_num(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1050,12 +1075,17 @@ size_t InitOramRequest::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // uint32 parition_num = 1;
-  if (this->_internal_parition_num() != 0) {
-    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_parition_num());
+  // uint32 id = 1;
+  if (this->_internal_id() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_id());
   }
 
-  // uint32 block_num = 2;
+  // uint32 bucket_size = 2;
+  if (this->_internal_bucket_size() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_bucket_size());
+  }
+
+  // uint32 block_num = 3;
   if (this->_internal_block_num() != 0) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_block_num());
   }
@@ -1082,8 +1112,11 @@ void InitOramRequest::MergeFrom(const InitOramRequest& from) {
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_parition_num() != 0) {
-    _internal_set_parition_num(from._internal_parition_num());
+  if (from._internal_id() != 0) {
+    _internal_set_id(from._internal_id());
+  }
+  if (from._internal_bucket_size() != 0) {
+    _internal_set_bucket_size(from._internal_bucket_size());
   }
   if (from._internal_block_num() != 0) {
     _internal_set_block_num(from._internal_block_num());
@@ -1108,9 +1141,9 @@ void InitOramRequest::InternalSwap(InitOramRequest* other) {
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(InitOramRequest, block_num_)
       + sizeof(InitOramRequest::block_num_)
-      - PROTOBUF_FIELD_OFFSET(InitOramRequest, parition_num_)>(
-          reinterpret_cast<char*>(&parition_num_),
-          reinterpret_cast<char*>(&other->parition_num_));
+      - PROTOBUF_FIELD_OFFSET(InitOramRequest, id_)>(
+          reinterpret_cast<char*>(&id_),
+          reinterpret_cast<char*>(&other->id_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata InitOramRequest::GetMetadata() const {
@@ -1137,17 +1170,17 @@ ReadPathRequest::ReadPathRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
 ReadPathRequest::ReadPathRequest(const ReadPathRequest& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&path_, &from.path_,
+  ::memcpy(&id_, &from.id_,
     static_cast<size_t>(reinterpret_cast<char*>(&level_) -
-    reinterpret_cast<char*>(&path_)) + sizeof(level_));
+    reinterpret_cast<char*>(&id_)) + sizeof(level_));
   // @@protoc_insertion_point(copy_constructor:partition_oram.ReadPathRequest)
 }
 
 inline void ReadPathRequest::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
-    reinterpret_cast<char*>(&path_) - reinterpret_cast<char*>(this)),
+    reinterpret_cast<char*>(&id_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&level_) -
-    reinterpret_cast<char*>(&path_)) + sizeof(level_));
+    reinterpret_cast<char*>(&id_)) + sizeof(level_));
 }
 
 ReadPathRequest::~ReadPathRequest() {
@@ -1177,9 +1210,9 @@ void ReadPathRequest::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  ::memset(&path_, 0, static_cast<size_t>(
+  ::memset(&id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&level_) -
-      reinterpret_cast<char*>(&path_)) + sizeof(level_));
+      reinterpret_cast<char*>(&id_)) + sizeof(level_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -1189,17 +1222,25 @@ const char* ReadPathRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPAC
     uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // uint32 path = 1;
+      // uint32 id = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // uint32 path = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
           path_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
           goto handle_unusual;
         continue;
-      // uint32 level = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+      // uint32 level = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           level_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
         } else
@@ -1234,16 +1275,22 @@ uint8_t* ReadPathRequest::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // uint32 path = 1;
-  if (this->_internal_path() != 0) {
+  // uint32 id = 1;
+  if (this->_internal_id() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(1, this->_internal_path(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(1, this->_internal_id(), target);
   }
 
-  // uint32 level = 2;
+  // uint32 path = 2;
+  if (this->_internal_path() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(2, this->_internal_path(), target);
+  }
+
+  // uint32 level = 3;
   if (this->_internal_level() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(2, this->_internal_level(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(3, this->_internal_level(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1262,12 +1309,17 @@ size_t ReadPathRequest::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // uint32 path = 1;
+  // uint32 id = 1;
+  if (this->_internal_id() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_id());
+  }
+
+  // uint32 path = 2;
   if (this->_internal_path() != 0) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_path());
   }
 
-  // uint32 level = 2;
+  // uint32 level = 3;
   if (this->_internal_level() != 0) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_level());
   }
@@ -1294,6 +1346,9 @@ void ReadPathRequest::MergeFrom(const ReadPathRequest& from) {
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from._internal_id() != 0) {
+    _internal_set_id(from._internal_id());
+  }
   if (from._internal_path() != 0) {
     _internal_set_path(from._internal_path());
   }
@@ -1320,9 +1375,9 @@ void ReadPathRequest::InternalSwap(ReadPathRequest* other) {
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(ReadPathRequest, level_)
       + sizeof(ReadPathRequest::level_)
-      - PROTOBUF_FIELD_OFFSET(ReadPathRequest, path_)>(
-          reinterpret_cast<char*>(&path_),
-          reinterpret_cast<char*>(&other->path_));
+      - PROTOBUF_FIELD_OFFSET(ReadPathRequest, id_)>(
+          reinterpret_cast<char*>(&id_),
+          reinterpret_cast<char*>(&other->id_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata ReadPathRequest::GetMetadata() const {
@@ -1528,7 +1583,8 @@ class WritePathRequest::_Internal {
 
 WritePathRequest::WritePathRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
+  bucket_(arena) {
   SharedCtor();
   if (!is_message_owned) {
     RegisterArenaDtor(arena);
@@ -1537,19 +1593,20 @@ WritePathRequest::WritePathRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
 }
 WritePathRequest::WritePathRequest(const WritePathRequest& from)
   : ::PROTOBUF_NAMESPACE_ID::Message(),
-      _has_bits_(from._has_bits_) {
+      _has_bits_(from._has_bits_),
+      bucket_(from.bucket_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&type_, &from.type_,
-    static_cast<size_t>(reinterpret_cast<char*>(&level_) -
-    reinterpret_cast<char*>(&type_)) + sizeof(level_));
+  ::memcpy(&id_, &from.id_,
+    static_cast<size_t>(reinterpret_cast<char*>(&type_) -
+    reinterpret_cast<char*>(&id_)) + sizeof(type_));
   // @@protoc_insertion_point(copy_constructor:partition_oram.WritePathRequest)
 }
 
 inline void WritePathRequest::SharedCtor() {
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
-    reinterpret_cast<char*>(&type_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&level_) -
-    reinterpret_cast<char*>(&type_)) + sizeof(level_));
+    reinterpret_cast<char*>(&id_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&type_) -
+    reinterpret_cast<char*>(&id_)) + sizeof(type_));
 }
 
 WritePathRequest::~WritePathRequest() {
@@ -1579,10 +1636,11 @@ void WritePathRequest::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  type_ = 0;
-  ::memset(&path_, 0, static_cast<size_t>(
+  bucket_.Clear();
+  ::memset(&id_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&level_) -
-      reinterpret_cast<char*>(&path_)) + sizeof(level_));
+      reinterpret_cast<char*>(&id_)) + sizeof(level_));
+  type_ = 0;
   _has_bits_.Clear();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
@@ -1594,12 +1652,11 @@ const char* WritePathRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPA
     uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // optional .partition_oram.Type type = 1;
+      // uint32 id = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
-          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
-          _internal_set_type(static_cast<::partition_oram::Type>(val));
         } else
           goto handle_unusual;
         continue;
@@ -1616,6 +1673,29 @@ const char* WritePathRequest::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPA
         if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
           level_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
           CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated bytes bucket = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_bucket();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
+        } else
+          goto handle_unusual;
+        continue;
+      // optional .partition_oram.Type type = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_type(static_cast<::partition_oram::Type>(val));
         } else
           goto handle_unusual;
         continue;
@@ -1649,11 +1729,10 @@ uint8_t* WritePathRequest::_InternalSerialize(
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // optional .partition_oram.Type type = 1;
-  if (_internal_has_type()) {
+  // uint32 id = 1;
+  if (this->_internal_id() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
-      1, this->_internal_type(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(1, this->_internal_id(), target);
   }
 
   // uint32 path = 2;
@@ -1666,6 +1745,19 @@ uint8_t* WritePathRequest::_InternalSerialize(
   if (this->_internal_level() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteUInt32ToArray(3, this->_internal_level(), target);
+  }
+
+  // repeated bytes bucket = 4;
+  for (int i = 0, n = this->_internal_bucket_size(); i < n; i++) {
+    const auto& s = this->_internal_bucket(i);
+    target = stream->WriteBytes(4, s, target);
+  }
+
+  // optional .partition_oram.Type type = 5;
+  if (_internal_has_type()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      5, this->_internal_type(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -1684,11 +1776,17 @@ size_t WritePathRequest::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // optional .partition_oram.Type type = 1;
-  cached_has_bits = _has_bits_[0];
-  if (cached_has_bits & 0x00000001u) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
+  // repeated bytes bucket = 4;
+  total_size += 1 *
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(bucket_.size());
+  for (int i = 0, n = bucket_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::BytesSize(
+      bucket_.Get(i));
+  }
+
+  // uint32 id = 1;
+  if (this->_internal_id() != 0) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_id());
   }
 
   // uint32 path = 2;
@@ -1699,6 +1797,13 @@ size_t WritePathRequest::ByteSizeLong() const {
   // uint32 level = 3;
   if (this->_internal_level() != 0) {
     total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::UInt32SizePlusOne(this->_internal_level());
+  }
+
+  // optional .partition_oram.Type type = 5;
+  cached_has_bits = _has_bits_[0];
+  if (cached_has_bits & 0x00000001u) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
@@ -1723,14 +1828,18 @@ void WritePathRequest::MergeFrom(const WritePathRequest& from) {
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from._internal_has_type()) {
-    _internal_set_type(from._internal_type());
+  bucket_.MergeFrom(from.bucket_);
+  if (from._internal_id() != 0) {
+    _internal_set_id(from._internal_id());
   }
   if (from._internal_path() != 0) {
     _internal_set_path(from._internal_path());
   }
   if (from._internal_level() != 0) {
     _internal_set_level(from._internal_level());
+  }
+  if (from._internal_has_type()) {
+    _internal_set_type(from._internal_type());
   }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -1750,12 +1859,13 @@ void WritePathRequest::InternalSwap(WritePathRequest* other) {
   using std::swap;
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
+  bucket_.InternalSwap(&other->bucket_);
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(WritePathRequest, level_)
-      + sizeof(WritePathRequest::level_)
-      - PROTOBUF_FIELD_OFFSET(WritePathRequest, type_)>(
-          reinterpret_cast<char*>(&type_),
-          reinterpret_cast<char*>(&other->type_));
+      PROTOBUF_FIELD_OFFSET(WritePathRequest, type_)
+      + sizeof(WritePathRequest::type_)
+      - PROTOBUF_FIELD_OFFSET(WritePathRequest, id_)>(
+          reinterpret_cast<char*>(&id_),
+          reinterpret_cast<char*>(&other->id_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata WritePathRequest::GetMetadata() const {

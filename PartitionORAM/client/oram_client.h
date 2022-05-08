@@ -14,8 +14,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef ORAM_CLIENT_H
-#define ORAM_CLIENT_H
+#ifndef PARTITION_ORAM_CLIENT_ORAM_CLIENT_H_
+#define PARTITION_ORAM_CLIENT_ORAM_CLIENT_H_
 
 #include <string>
 #include <memory>
@@ -34,27 +34,34 @@ class Client {
   std::string server_port_;
   std::string crt_path_;
 
+  uint32_t bucket_size_;
+  uint32_t block_num_;
+
   std::shared_ptr<server::Stub> stub_;
-  
-  std::shared_ptr<OramController> controller_;
+
+  std::unique_ptr<OramController> controller_;
 
   std::shared_ptr<oram_crypto::Cryptor> cryptor_;
 
  public:
   Client(const std::string& server_address, const std::string& server_port,
-         const std::string& crt_path)
+         const std::string& crt_path, uint32_t bucket_size, uint32_t block_num)
       : server_address_(server_address),
         server_port_(server_port),
-        crt_path_(crt_path) {}
+        crt_path_(crt_path),
+        bucket_size_(bucket_size),
+        block_num_(block_num) {}
 
-  void run(void);
+  void Run(void);
 
-  int start_key_exchange(void);
-  int send_hello(void);
-  int close_connection(void);
+  int StartKeyExchange(void);
+  int SendHello(void);
+  int CloseConnection(void);
+  int InitOram(void);
+  int TestOram(void);
 
   virtual ~Client() {}
 };
 }  // namespace partition_oram
 
-#endif  // CLIENT_CLIENT_H_
+#endif  // PARTITION_ORAM_CLIENT_ORAM_CLIENT_H_

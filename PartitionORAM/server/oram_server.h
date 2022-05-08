@@ -14,11 +14,12 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef ORAM_SERVER_H
-#define ORAM_SERVER_H
+#ifndef PARTITION_ORAM_SERVER_ORAM_SERVER_H_
+#define PARTITION_ORAM_SERVER_ORAM_SERVER_H_
 
 #include <string>
 #include <memory>
+#include <vector>
 
 #include <grpc++/grpc++.h>
 #include <spdlog/spdlog.h>
@@ -35,31 +36,31 @@ class PartitionORAMService final : public server::Service {
  private:
   friend class ServerRunner;
 
-  PartitionOramStorage storage_;
   std::shared_ptr<oram_crypto::Cryptor> cryptor_;
+  std::vector<std::unique_ptr<OramServerStorage>> storages_;
 
  public:
-  grpc::Status init_oram(grpc::ServerContext* context,
+  grpc::Status InitOram(grpc::ServerContext* context,
                          const InitOramRequest* request,
                          google::protobuf::Empty* empty) override;
 
-  grpc::Status read_path(grpc::ServerContext* context,
+  grpc::Status ReadPath(grpc::ServerContext* context,
                           const ReadPathRequest* request,
                           ReadPathResponse* response) override;
 
-  grpc::Status write_path(grpc::ServerContext* context,
+  grpc::Status WritePath(grpc::ServerContext* context,
                            const WritePathRequest* request,
                            WritePathResponse* response) override;
 
-  grpc::Status close_connection(grpc::ServerContext* context,
+  grpc::Status CloseConnection(grpc::ServerContext* context,
                                 const google::protobuf::Empty* request,
                                 google::protobuf::Empty* response) override;
 
-  grpc::Status key_exchange(grpc::ServerContext* context,
+  grpc::Status KeyExchange(grpc::ServerContext* context,
                             const KeyExchangeRequest* request,
                             KeyExchangeResponse* response) override;
 
-  grpc::Status send_hello(grpc::ServerContext* context,
+  grpc::Status SendHello(grpc::ServerContext* context,
                           const HelloMessage* request,
                           google::protobuf::Empty* empty) override;
 };
@@ -79,8 +80,8 @@ class ServerRunner {
   ServerRunner(const std::string& address, const std::string& port,
                const std::string& key_path, const std::string& crt_path);
 
-  void run(void);
+  void Run(void);
 };
 }  // namespace partition_oram
 
-#endif
+#endif // PARTITION_ORAM_SERVER_ORAM_SERVER_H_

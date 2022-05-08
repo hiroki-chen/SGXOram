@@ -38,12 +38,12 @@ Cryptor::~Cryptor() {
   // Do nothing.
 }
 
-std::shared_ptr<Cryptor> Cryptor::get_instance(void) {
+std::shared_ptr<Cryptor> Cryptor::GetInstance(void) {
   std::shared_ptr<Cryptor> instance = std::shared_ptr<Cryptor>(new Cryptor());
   return instance;
 }
 
-void Cryptor::crypto_prelogue(void) {
+void Cryptor::CryptoPrelogue(void) {
   PANIC_IF(!is_initialized, "Cryptor is not initialized.");
 
   if (crypto_aead_aes256gcm_is_available() == 0) {
@@ -53,10 +53,10 @@ void Cryptor::crypto_prelogue(void) {
 }
 
 // The encryption algorithm also uses AES-GCM mode to encrypt the message.
-partition_oram::Status Cryptor::encrypt(const uint8_t* message, size_t length,
+partition_oram::Status Cryptor::Encrypt(const uint8_t* message, size_t length,
                                         uint8_t* const iv,
                                         std::string* const out) {
-  crypto_prelogue();
+  CryptoPrelogue();
   PANIC_IF(!is_negotiated, "Cryptor is not negotiated.");
 
   // Use the key to encrypte the data.
@@ -69,19 +69,19 @@ partition_oram::Status Cryptor::encrypt(const uint8_t* message, size_t length,
       (uint8_t*)out->data(), &ciphertext_len, message, length, nullptr, 0, NULL,
       iv, session_key_rx_);
 
-  return ret == 0 ? partition_oram::Status::OK
-                  : partition_oram::Status::INVALID_OPERATION;
+  return ret == 0 ? partition_oram::Status::kOK
+                  : partition_oram::Status::kInvalidOperation;
 }
 
-partition_oram::Status Cryptor::decrypt(const uint8_t* message, size_t length,
+partition_oram::Status Cryptor::Decrypt(const uint8_t* message, size_t length,
                                         const uint8_t* iv,
                                         std::string* const out) {
-  crypto_prelogue();
+  CryptoPrelogue();
   PANIC_IF(!is_negotiated, "Cryptor is not negotiated.");
 
   if (length < crypto_aead_aes256gcm_ABYTES) {
     logger->error("The length of the message is too short.");
-    return partition_oram::Status::INVALID_ARGUMENT;
+    return partition_oram::Status::kInvalidArgument;
   }
 
   // The message consists of the GCM MAC tag, the nonce, ant the
@@ -97,12 +97,12 @@ partition_oram::Status Cryptor::decrypt(const uint8_t* message, size_t length,
   *out = std::string((char*)decrypted, message_len);
 
   // Free the memory.
-  oram_utils::safe_free(decrypted);
-  return ret == 0 ? partition_oram::Status::OK
-                  : partition_oram::Status::INVALID_OPERATION;
+  oram_utils::SafeFree(decrypted);
+  return ret == 0 ? partition_oram::Status::kOK
+                  : partition_oram::Status::kInvalidOperation;
 }
 
-partition_oram::Status Cryptor::digest(const uint8_t* message, size_t length,
+partition_oram::Status Cryptor::Digest(const uint8_t* message, size_t length,
                                        std::string* const out) {
   uint8_t* const digest = (uint8_t*)malloc(crypto_hash_sha256_BYTES);
   uint8_t* const message_with_nonce =
@@ -116,28 +116,28 @@ partition_oram::Status Cryptor::digest(const uint8_t* message, size_t length,
   *out = std::string((char*)digest, crypto_hash_sha256_BYTES);
 
   // Free the memory.
-  oram_utils::safe_free_all(2, digest, message_with_nonce);
-  return ret == 0 ? partition_oram::Status::OK
-                  : partition_oram::Status::INVALID_OPERATION;
+  oram_utils::SafeFreeAll(2, digest, message_with_nonce);
+  return ret == 0 ? partition_oram::Status::kOK
+                  : partition_oram::Status::kInvalidOperation;
 }
 
-partition_oram::Status Cryptor::sample_key_pair(void) {
-  crypto_prelogue();
+partition_oram::Status Cryptor::SampleKeyPair(void) {
+  CryptoPrelogue();
 
   // Generate a key pair.
   int ret = crypto_kx_keypair(public_key_, secret_key_);
-  return ret == 0 ? partition_oram::Status::OK
-                  : partition_oram::Status::INVALID_OPERATION;
+  return ret == 0 ? partition_oram::Status::kOK
+                  : partition_oram::Status::kInvalidOperation;
 }
 
-partition_oram::Status Cryptor::sample_session_key(const std::string& peer_pk,
+partition_oram::Status Cryptor::SampleSessionKey(const std::string& peer_pk,
                                                    bool type) {
-  crypto_prelogue();
+  CryptoPrelogue();
 
   // Check the length of the peer's public key.
   if (peer_pk.length() != crypto_kx_PUBLICKEYBYTES) {
     logger->error("The length of the peer's public key is not correct.");
-    return partition_oram::Status::INVALID_ARGUMENT;
+    return partition_oram::Status::kInvalidArgument;
   }
 
   // Generate a session key. Prerequisite after this point: the peer's public
@@ -156,15 +156,15 @@ partition_oram::Status Cryptor::sample_session_key(const std::string& peer_pk,
                                         (uint8_t*)peer_pk.c_str());
   }
 
-  if (ret == partition_oram::Status::OK) {
+  if (ret == 0) {
     is_negotiated = true;
-    return partition_oram::Status::OK;
+    return partition_oram::Status::kOK;
   } else {
-    return partition_oram::Status::INVALID_OPERATION;
+    return partition_oram::Status::kInvalidOperation;
   }
 }
 
-std::pair<std::string, std::string> Cryptor::get_key_pair(void) {
+std::pair<std::string, std::string> Cryptor::GetKeyPair(void) {
   PANIC_IF(!is_initialized, "Cryptor is not initialized.");
 
   std::pair<std::string, std::string> key_pair;
@@ -173,7 +173,7 @@ std::pair<std::string, std::string> Cryptor::get_key_pair(void) {
   return key_pair;
 }
 
-std::pair<std::string, std::string> Cryptor::get_session_key_pair(void) {
+std::pair<std::string, std::string> Cryptor::GetSessionKeyPair(void) {
   std::pair<std::string, std::string> key_pair;
   key_pair.first =
       std::string((char*)session_key_rx_, crypto_kx_SESSIONKEYBYTES);
@@ -182,8 +182,11 @@ std::pair<std::string, std::string> Cryptor::get_session_key_pair(void) {
   return key_pair;
 }
 
-uint32_t Cryptor::uniform_random(uint32_t min, uint32_t max) {
-  PANIC_IF((min > max), "The minimum value is greater than the maximum value.");
+partition_oram::Status Cryptor::UniformRandom(uint32_t min, uint32_t max, uint32_t* const out) {
+  if (min > max) {
+    logger->error("The minimum value is greater than the maximum value.");
+    return partition_oram::Status::kInvalidArgument;
+  }
 
   // @ref Chromium's base/rand_util.cc for the implementation.
   uint32_t range = max - min + 1;
@@ -201,6 +204,17 @@ uint32_t Cryptor::uniform_random(uint32_t min, uint32_t max) {
   } while (value > max_acceptable_value);
 
   value = value % range + min;
-  return value;
+  *out = value;
+  return partition_oram::Status::kOK;
+}
+
+partition_oram::Status Cryptor::RandomBytes(uint8_t* const out, size_t length) {
+  if (length == 0) {
+    logger->error("The length of the output buffer is zero.");
+    return partition_oram::Status::kInvalidArgument;
+  }
+
+  randombytes_buf(out, length);
+  return partition_oram::Status::kOK;
 }
 }  // namespace oram_crypto

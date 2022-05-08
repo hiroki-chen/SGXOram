@@ -70,7 +70,7 @@ int main(int argc, char* argv[]) {
   std::unique_ptr<partition_oram::ServerRunner> server_runner =
       std::make_unique<partition_oram::ServerRunner>(
           FLAGS_address, FLAGS_port, FLAGS_key_path, FLAGS_crt_path);
-  server_runner->run();
+  server_runner->Run();
 
   gflags::ShutDownCommandLineFlags();
   return 0;

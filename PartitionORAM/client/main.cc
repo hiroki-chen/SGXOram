@@ -26,6 +26,10 @@ DEFINE_string(address, "localhost", "The address of the server.");
 DEFINE_string(port, "1234", "The port of the server.");
 DEFINE_string(crt_path, "", "The path of the certificate file.");
 
+// ORAM PARAMS.
+DEFINE_uint32(block_num, 1e6, "The number of blocks.");
+DEFINE_uint32(bucket_size, 4, "The size of the bucket.");
+
 std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("oram_client");
 
 int main(int argc, char* argv[]) {
@@ -39,11 +43,15 @@ int main(int argc, char* argv[]) {
 
   std::unique_ptr<partition_oram::Client> client =
       std::make_unique<partition_oram::Client>(
-          FLAGS_address, FLAGS_port, FLAGS_crt_path);
-  client->run();
-  client->start_key_exchange();
-  client->send_hello();
-  client->close_connection();
+          FLAGS_address, FLAGS_port, FLAGS_crt_path, FLAGS_bucket_size,
+          FLAGS_block_num);
+  client->Run();
+  client->StartKeyExchange();
+  client->SendHello();
+  client->InitOram();
+  client->TestOram();
+  
+  client->CloseConnection();
 
   gflags::ShutDownCommandLineFlags();
   return 0;

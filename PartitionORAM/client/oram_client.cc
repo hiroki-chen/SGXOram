@@ -24,15 +24,15 @@
 extern std::shared_ptr<spdlog::logger> logger;
 
 namespace partition_oram {
-void Client::run(void) {
+void Client::Run(void) {
   logger->info("Client started, and the address is given as {}:{}.",
                server_address_, server_port_);
 
-  const std::string address =
-      oram_utils::string_concat(server_address_, ":", server_port_);
+  std::string address;
+  address = oram_utils::StrCat(server_address_, ":", server_port_);
 
   // Configure the SSL connection.
-  const std::string crt_file = oram_utils::read_key_crt_file(crt_path_);
+  const std::string crt_file = oram_utils::ReadKeyCrtFile(crt_path_);
   grpc::SslCredentialsOptions ssl_opts;
   ssl_opts.pem_root_certs = crt_file;
   std::shared_ptr<grpc::ChannelCredentials> ssl_creds =
@@ -41,21 +41,21 @@ void Client::run(void) {
   stub_ = std::move(server::NewStub(grpc::CreateChannel(address, ssl_creds)));
 
   // Initialize the cryptor and controller.
-  cryptor_ = oram_crypto::Cryptor::get_instance();
-  controller_ = OramController::get_instance();
+  cryptor_ = oram_crypto::Cryptor::GetInstance();
+  controller_ = OramController::GetInstance();
   // The stub can be shared between multiple objects.
   controller_->set_stub(stub_);
 
   // Test if crypto is working.
   std::string test_str = "Hello, world!";
   std::string hash;
-  cryptor_->digest((uint8_t*)test_str.data(), test_str.size(), &hash);
+  cryptor_->Digest((uint8_t*)test_str.data(), test_str.size(), &hash);
   logger->info("The hash of {} is {}.", test_str, spdlog::to_hex(hash));
 }
 
-int Client::start_key_exchange(void) {
-  cryptor_->sample_key_pair();
-  auto key_pair = std::move(cryptor_->get_key_pair());
+int Client::StartKeyExchange(void) {
+  cryptor_->SampleKeyPair();
+  auto key_pair = std::move(cryptor_->GetKeyPair());
 
   // Send the public key to the server.
   grpc::ClientContext context;
@@ -63,7 +63,7 @@ int Client::start_key_exchange(void) {
   KeyExchangeResponse response;
   request.set_public_key_client(key_pair.first);
 
-  grpc::Status status = stub_->key_exchange(&context, request, &response);
+  grpc::Status status = stub_->KeyExchange(&context, request, &response);
 
   if (!status.ok()) {
     logger->error(status.error_message());
@@ -74,15 +74,15 @@ int Client::start_key_exchange(void) {
 
   // Sample the session key based on the server's public key.
   Status oram_status;
-  if ((oram_status = cryptor_->sample_session_key(response.public_key_server(),
-                                                  0)) != Status::OK) {
+  if ((oram_status = cryptor_->SampleSessionKey(response.public_key_server(),
+                                                0)) != Status::kOK) {
     logger->error("Failed to sample session key! Error: {}",
-                  error_list.at(oram_status));
+                  kErrorList.at(oram_status));
     return -1;
   }
 
   logger->info("The session key sampled.");
-  auto session_key = std::move(cryptor_->get_session_key_pair());
+  auto session_key = std::move(cryptor_->GetSessionKeyPair());
   logger->info("The session key for receiving is {}.",
                spdlog::to_hex(session_key.first));
   logger->info("The session key for sending is {}.",
@@ -91,11 +91,11 @@ int Client::start_key_exchange(void) {
   return 0;
 }
 
-int Client::send_hello(void) {
+int Client::SendHello(void) {
   const std::string initial_message = "Hello";
   std::string message;
   uint8_t* const iv = (uint8_t*)malloc(ORAM_CRYPTO_RANDOM_SIZE);
-  cryptor_->encrypt((uint8_t*)initial_message.data(), initial_message.size(),
+  cryptor_->Encrypt((uint8_t*)initial_message.data(), initial_message.size(),
                     iv, &message);
   logger->info("The message is {}.", spdlog::to_hex(message));
 
@@ -105,9 +105,9 @@ int Client::send_hello(void) {
   request.set_content(message);
   request.set_iv(iv, ORAM_CRYPTO_RANDOM_SIZE);
 
-  oram_utils::safe_free(iv);
+  oram_utils::SafeFree(iv);
 
-  grpc::Status status = stub_->send_hello(&context, request, &empty);
+  grpc::Status status = stub_->SendHello(&context, request, &empty);
 
   if (!status.ok()) {
     logger->error(status.error_message());
@@ -119,10 +119,10 @@ int Client::send_hello(void) {
   return 0;
 }
 
-int Client::close_connection(void) {
+int Client::CloseConnection(void) {
   grpc::ClientContext context;
   google::protobuf::Empty empty;
-  grpc::Status status = stub_->close_connection(&context, empty, &empty);
+  grpc::Status status = stub_->CloseConnection(&context, empty, &empty);
 
   if (!status.ok()) {
     logger->error(status.error_message());
@@ -130,6 +130,26 @@ int Client::close_connection(void) {
   }
 
   logger->info("The connection is closed.");
+  return 0;
+}
+
+int Client::InitOram(void) {
+  // Initialize the oram via the controller.
+  Status oram_status;
+  if ((oram_status = controller_->Run(block_num_, bucket_size_)) !=
+      Status::kOK) {
+    logger->error("Failed to initialize the oram! Error: {}",
+                  kErrorList.at(oram_status));
+    return -1;
+  } else {
+    logger->info("The oram is initialized.");
+    return 0;
+  }
+}
+
+int Client::TestOram(void) {
+  controller_->TestPathOram(0);
+
   return 0;
 }
 }  // namespace partition_oram

@@ -22,12 +22,12 @@
 namespace partition_oram {
 
 static const char* server_method_names[] = {
-  "/partition_oram.server/init_oram",
-  "/partition_oram.server/read_path",
-  "/partition_oram.server/write_path",
-  "/partition_oram.server/close_connection",
-  "/partition_oram.server/key_exchange",
-  "/partition_oram.server/send_hello",
+  "/partition_oram.server/InitOram",
+  "/partition_oram.server/ReadPath",
+  "/partition_oram.server/WritePath",
+  "/partition_oram.server/CloseConnection",
+  "/partition_oram.server/KeyExchange",
+  "/partition_oram.server/SendHello",
 };
 
 std::unique_ptr< server::Stub> server::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -37,148 +37,148 @@ std::unique_ptr< server::Stub> server::NewStub(const std::shared_ptr< ::grpc::Ch
 }
 
 server::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
-  : channel_(channel), rpcmethod_init_oram_(server_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_read_path_(server_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_write_path_(server_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_close_connection_(server_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_key_exchange_(server_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_send_hello_(server_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  : channel_(channel), rpcmethod_InitOram_(server_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ReadPath_(server_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_WritePath_(server_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_CloseConnection_(server_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_KeyExchange_(server_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_SendHello_(server_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
-::grpc::Status server::Stub::init_oram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::google::protobuf::Empty* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::InitOramRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_init_oram_, context, request, response);
+::grpc::Status server::Stub::InitOram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::google::protobuf::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::InitOramRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_InitOram_, context, request, response);
 }
 
-void server::Stub::async::init_oram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::partition_oram::InitOramRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_init_oram_, context, request, response, std::move(f));
+void server::Stub::async::InitOram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::partition_oram::InitOramRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_InitOram_, context, request, response, std::move(f));
 }
 
-void server::Stub::async::init_oram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_init_oram_, context, request, response, reactor);
+void server::Stub::async::InitOram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_InitOram_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::PrepareAsyncinit_oramRaw(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::partition_oram::InitOramRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_init_oram_, context, request);
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::PrepareAsyncInitOramRaw(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::partition_oram::InitOramRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_InitOram_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::Asyncinit_oramRaw(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::AsyncInitOramRaw(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncinit_oramRaw(context, request, cq);
+    this->PrepareAsyncInitOramRaw(context, request, cq);
   result->StartCall();
   return result;
 }
 
-::grpc::Status server::Stub::read_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::partition_oram::ReadPathResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::ReadPathRequest, ::partition_oram::ReadPathResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_read_path_, context, request, response);
+::grpc::Status server::Stub::ReadPath(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::partition_oram::ReadPathResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::ReadPathRequest, ::partition_oram::ReadPathResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_ReadPath_, context, request, response);
 }
 
-void server::Stub::async::read_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::partition_oram::ReadPathRequest, ::partition_oram::ReadPathResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_read_path_, context, request, response, std::move(f));
+void server::Stub::async::ReadPath(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::partition_oram::ReadPathRequest, ::partition_oram::ReadPathResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReadPath_, context, request, response, std::move(f));
 }
 
-void server::Stub::async::read_path(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_read_path_, context, request, response, reactor);
+void server::Stub::async::ReadPath(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_ReadPath_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::partition_oram::ReadPathResponse>* server::Stub::PrepareAsyncread_pathRaw(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::partition_oram::ReadPathResponse, ::partition_oram::ReadPathRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_read_path_, context, request);
+::grpc::ClientAsyncResponseReader< ::partition_oram::ReadPathResponse>* server::Stub::PrepareAsyncReadPathRaw(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::partition_oram::ReadPathResponse, ::partition_oram::ReadPathRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_ReadPath_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::partition_oram::ReadPathResponse>* server::Stub::Asyncread_pathRaw(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::partition_oram::ReadPathResponse>* server::Stub::AsyncReadPathRaw(::grpc::ClientContext* context, const ::partition_oram::ReadPathRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncread_pathRaw(context, request, cq);
+    this->PrepareAsyncReadPathRaw(context, request, cq);
   result->StartCall();
   return result;
 }
 
-::grpc::Status server::Stub::write_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::partition_oram::WritePathResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::WritePathRequest, ::partition_oram::WritePathResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_write_path_, context, request, response);
+::grpc::Status server::Stub::WritePath(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::partition_oram::WritePathResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::WritePathRequest, ::partition_oram::WritePathResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_WritePath_, context, request, response);
 }
 
-void server::Stub::async::write_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::partition_oram::WritePathRequest, ::partition_oram::WritePathResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_write_path_, context, request, response, std::move(f));
+void server::Stub::async::WritePath(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::partition_oram::WritePathRequest, ::partition_oram::WritePathResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_WritePath_, context, request, response, std::move(f));
 }
 
-void server::Stub::async::write_path(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_write_path_, context, request, response, reactor);
+void server::Stub::async::WritePath(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_WritePath_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::partition_oram::WritePathResponse>* server::Stub::PrepareAsyncwrite_pathRaw(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::partition_oram::WritePathResponse, ::partition_oram::WritePathRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_write_path_, context, request);
+::grpc::ClientAsyncResponseReader< ::partition_oram::WritePathResponse>* server::Stub::PrepareAsyncWritePathRaw(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::partition_oram::WritePathResponse, ::partition_oram::WritePathRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_WritePath_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::partition_oram::WritePathResponse>* server::Stub::Asyncwrite_pathRaw(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::partition_oram::WritePathResponse>* server::Stub::AsyncWritePathRaw(::grpc::ClientContext* context, const ::partition_oram::WritePathRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncwrite_pathRaw(context, request, cq);
+    this->PrepareAsyncWritePathRaw(context, request, cq);
   result->StartCall();
   return result;
 }
 
-::grpc::Status server::Stub::close_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::google::protobuf::Empty* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_close_connection_, context, request, response);
+::grpc::Status server::Stub::CloseConnection(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::google::protobuf::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_CloseConnection_, context, request, response);
 }
 
-void server::Stub::async::close_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_close_connection_, context, request, response, std::move(f));
+void server::Stub::async::CloseConnection(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_CloseConnection_, context, request, response, std::move(f));
 }
 
-void server::Stub::async::close_connection(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_close_connection_, context, request, response, reactor);
+void server::Stub::async::CloseConnection(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_CloseConnection_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::PrepareAsyncclose_connectionRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_close_connection_, context, request);
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::PrepareAsyncCloseConnectionRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_CloseConnection_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::Asyncclose_connectionRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::AsyncCloseConnectionRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncclose_connectionRaw(context, request, cq);
+    this->PrepareAsyncCloseConnectionRaw(context, request, cq);
   result->StartCall();
   return result;
 }
 
-::grpc::Status server::Stub::key_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::partition_oram::KeyExchangeResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::KeyExchangeRequest, ::partition_oram::KeyExchangeResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_key_exchange_, context, request, response);
+::grpc::Status server::Stub::KeyExchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::partition_oram::KeyExchangeResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::KeyExchangeRequest, ::partition_oram::KeyExchangeResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_KeyExchange_, context, request, response);
 }
 
-void server::Stub::async::key_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::partition_oram::KeyExchangeRequest, ::partition_oram::KeyExchangeResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_key_exchange_, context, request, response, std::move(f));
+void server::Stub::async::KeyExchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::partition_oram::KeyExchangeRequest, ::partition_oram::KeyExchangeResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_KeyExchange_, context, request, response, std::move(f));
 }
 
-void server::Stub::async::key_exchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_key_exchange_, context, request, response, reactor);
+void server::Stub::async::KeyExchange(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_KeyExchange_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::partition_oram::KeyExchangeResponse>* server::Stub::PrepareAsynckey_exchangeRaw(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::partition_oram::KeyExchangeResponse, ::partition_oram::KeyExchangeRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_key_exchange_, context, request);
+::grpc::ClientAsyncResponseReader< ::partition_oram::KeyExchangeResponse>* server::Stub::PrepareAsyncKeyExchangeRaw(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::partition_oram::KeyExchangeResponse, ::partition_oram::KeyExchangeRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_KeyExchange_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::partition_oram::KeyExchangeResponse>* server::Stub::Asynckey_exchangeRaw(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::partition_oram::KeyExchangeResponse>* server::Stub::AsyncKeyExchangeRaw(::grpc::ClientContext* context, const ::partition_oram::KeyExchangeRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsynckey_exchangeRaw(context, request, cq);
+    this->PrepareAsyncKeyExchangeRaw(context, request, cq);
   result->StartCall();
   return result;
 }
 
-::grpc::Status server::Stub::send_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::google::protobuf::Empty* response) {
-  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::HelloMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_send_hello_, context, request, response);
+::grpc::Status server::Stub::SendHello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::google::protobuf::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::HelloMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_SendHello_, context, request, response);
 }
 
-void server::Stub::async::send_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall< ::partition_oram::HelloMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_send_hello_, context, request, response, std::move(f));
+void server::Stub::async::SendHello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::partition_oram::HelloMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_SendHello_, context, request, response, std::move(f));
 }
 
-void server::Stub::async::send_hello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_send_hello_, context, request, response, reactor);
+void server::Stub::async::SendHello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_SendHello_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::PrepareAsyncsend_helloRaw(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::partition_oram::HelloMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_send_hello_, context, request);
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::PrepareAsyncSendHelloRaw(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::partition_oram::HelloMessage, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_SendHello_, context, request);
 }
 
-::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::Asyncsend_helloRaw(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::AsyncSendHelloRaw(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) {
   auto* result =
-    this->PrepareAsyncsend_helloRaw(context, request, cq);
+    this->PrepareAsyncSendHelloRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -192,7 +192,7 @@ server::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::partition_oram::InitOramRequest* req,
              ::google::protobuf::Empty* resp) {
-               return service->init_oram(ctx, req, resp);
+               return service->InitOram(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       server_method_names[1],
@@ -202,7 +202,7 @@ server::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::partition_oram::ReadPathRequest* req,
              ::partition_oram::ReadPathResponse* resp) {
-               return service->read_path(ctx, req, resp);
+               return service->ReadPath(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       server_method_names[2],
@@ -212,7 +212,7 @@ server::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::partition_oram::WritePathRequest* req,
              ::partition_oram::WritePathResponse* resp) {
-               return service->write_path(ctx, req, resp);
+               return service->WritePath(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       server_method_names[3],
@@ -222,7 +222,7 @@ server::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::google::protobuf::Empty* req,
              ::google::protobuf::Empty* resp) {
-               return service->close_connection(ctx, req, resp);
+               return service->CloseConnection(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       server_method_names[4],
@@ -232,7 +232,7 @@ server::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::partition_oram::KeyExchangeRequest* req,
              ::partition_oram::KeyExchangeResponse* resp) {
-               return service->key_exchange(ctx, req, resp);
+               return service->KeyExchange(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       server_method_names[5],
@@ -242,49 +242,49 @@ server::Service::Service() {
              ::grpc::ServerContext* ctx,
              const ::partition_oram::HelloMessage* req,
              ::google::protobuf::Empty* resp) {
-               return service->send_hello(ctx, req, resp);
+               return service->SendHello(ctx, req, resp);
              }, this)));
 }
 
 server::Service::~Service() {
 }
 
-::grpc::Status server::Service::init_oram(::grpc::ServerContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response) {
+::grpc::Status server::Service::InitOram(::grpc::ServerContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status server::Service::read_path(::grpc::ServerContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response) {
+::grpc::Status server::Service::ReadPath(::grpc::ServerContext* context, const ::partition_oram::ReadPathRequest* request, ::partition_oram::ReadPathResponse* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status server::Service::write_path(::grpc::ServerContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response) {
+::grpc::Status server::Service::WritePath(::grpc::ServerContext* context, const ::partition_oram::WritePathRequest* request, ::partition_oram::WritePathResponse* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status server::Service::close_connection(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response) {
+::grpc::Status server::Service::CloseConnection(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status server::Service::key_exchange(::grpc::ServerContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response) {
+::grpc::Status server::Service::KeyExchange(::grpc::ServerContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response) {
   (void) context;
   (void) request;
   (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status server::Service::send_hello(::grpc::ServerContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response) {
+::grpc::Status server::Service::SendHello(::grpc::ServerContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response) {
   (void) context;
   (void) request;
   (void) response;

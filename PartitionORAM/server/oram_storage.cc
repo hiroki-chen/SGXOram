@@ -18,10 +18,69 @@
 
 #include <cmath>
 
+#include <spdlog/logger.h>
+
+#include "base/oram_utils.h"
+
+extern std::shared_ptr<spdlog::logger> logger;
+
 namespace partition_oram {
-BinaryTree::BinaryTree(size_t num_of_blocks) {
-  // Calculate the height of the tree that could sufficiently contain all the blocks.
-  height = std::ceil(std::log(num_of_blocks) / std::log(2)) - 1;
-  size = std::pow(2, height + 1) - 1;
+OramServerStorage::OramServerStorage(uint32_t id, size_t capacity,
+                                     size_t bucket_size)
+    : id_(id), capacity_(capacity), bucket_size_(bucket_size) {
+  level_ = std::ceil(LOG_BASE(capacity_, 2)) - 1;
+
+  for (uint32_t i = 0; i <= level_; i++) {
+    // Initialize dummy blocks into the storage.
+    const uint32_t cur_size = POW2(i);
+
+    for (uint32_t j = 0; j < cur_size; j++) {
+      const server_storage_tag_t tag = std::make_pair(i, j);
+      p_oram_bucket_t bucket;
+      oram_utils::PadStash(&bucket, bucket_size_);
+      storage_.insert(std::make_pair(tag, bucket));
+    }
+  }
 }
+
+Status OramServerStorage::ReadPath(uint32_t level, uint32_t path,
+                                   p_oram_bucket_t* const out_bucket) {
+  // The offset should be calculated by the level and path.
+  const uint32_t offset = std::floor(path * 1. / POW2(level_ + 1 - level));
+  const server_storage_tag_t tag = std::make_pair(level, offset);
+
+  logger->info("Read offset {} at level {} for path {}.", offset, level, path);
+
+  auto iter = storage_.find(tag);
+  if (iter == storage_.end()) {
+    logger->error("OramServerStorage::ReadPath: Cannot find the bucket.");
+    // Not found.
+    return Status::kObjectNotFound;
+  } else {
+    std::copy(iter->second.begin(), iter->second.end(),
+              std::back_inserter(*out_bucket));
+    return Status::kOK;
+  }
+}
+
+Status OramServerStorage::WritePath(uint32_t level, uint32_t path,
+                                    const p_oram_bucket_t& in_bucket) {
+  const uint32_t offset = std::floor(path * 1. / POW2(level_ + 1 - level));
+  const server_storage_tag_t tag = std::make_pair(level, offset);
+
+  logger->info("Write offset {} at level {} for path {}. ", offset, level, path);
+
+  auto iter = storage_.find(tag);
+  if (iter == storage_.end()) {
+    logger->error("OramServerStorage::WritePath: Cannot find the bucket.");
+    // Not found.
+    return Status::kObjectNotFound;
+  } else {
+    iter->second.clear();
+    std::copy(in_bucket.begin(), in_bucket.end(),
+              std::back_inserter(iter->second));
+    return Status::kOK;
+  }
+}
+
 }  // namespace partition_oram

@@ -14,8 +14,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef ORAM_CONTROLLER_H
-#define ORAM_CONTROLLER_H
+#ifndef PARTITION_ORAM_CLIENT_ORAM_CONTROLLER_H_
+#define PARTITION_ORAM_CLIENT_ORAM_CONTROLLER_H_
 
 #include <memory>
 #include <unordered_map>
@@ -31,6 +31,7 @@
 namespace partition_oram {
 // This class is the implementation of the ORAM controller for Path ORAM.
 class PathOramController {
+  uint32_t id_;
   // ORAM parameters.
   uint32_t number_of_leafs_;
   uint32_t tree_level_;
@@ -46,26 +47,32 @@ class PathOramController {
   std::shared_ptr<oram_crypto::Cryptor> cryptor_;
 
   // ==================== Begin private methods ==================== //
-  Status read_bucket(uint32_t path, uint32_t level,
+  Status ReadBucket(uint32_t path, uint32_t level,
                      p_oram_bucket_t* const bucket);
-  Status write_bucket(uint32_t path, uint32_t level,
-                      const p_oram_bucket_t* const bucket);
+  Status WriteBucket(uint32_t path, uint32_t level,
+                      const p_oram_bucket_t& bucket);
+
+  p_oram_stash_t FindSubsetOf(uint32_t current_path);
   // ==================== End private methods ==================== //
 
  public:
-  PathOramController();
+  PathOramController(uint32_t id, uint32_t block_num, uint32_t bucket_size);
 
-  void run(const std::string& address,
-           const grpc::SslCredentialsOptions& options);
+  void set_stub(std::shared_ptr<server::Stub> stub) { stub_ = stub; }
+  void set_stash(p_oram_stash_t* const stash) { stash_ = stash; }
+
+  Status InitOram(void);
+  Status FillWithData(const std::vector<oram_block_t>& data);
 
   // The meanings of parameters are explained in Stefanov et al.'s paper.
-  Status access(Operation op_type, uint32_t address, uint8_t* const data);
+  Status Access(Operation op_type, uint32_t address, uint8_t* const data);
 
   virtual ~PathOramController() {}
 };
 
 // This class is the implementation of the ORAM controller for Partition ORAM.
 class OramController {
+  size_t partition_size_;
   // Position map: [key] -> [<slot_id, offset>].
   pp_oram_position_t position_map_;
   // Slots: [slot_id] -> [block1, block2, ..., block_n].
@@ -78,18 +85,22 @@ class OramController {
   // Stub
   std::shared_ptr<server::Stub> stub_;
 
-  OramController();  // TODO: should feed in with some parameters?
-
+  OramController() {}
+ 
  public:
-  static std::shared_ptr<OramController> get_instance();
+  static std::unique_ptr<OramController> GetInstance();
 
   void set_stub(std::shared_ptr<server::Stub> stub) { stub_ = stub; }
 
-  Status access(Operation op_type, uint32_t address, oram_block_t* const data);
-  Status evict(EvictType evict_type);
+  Status Access(Operation op_type, uint32_t address, oram_block_t* const data);
+  Status Evict(EvictType evict_type);
+  Status Run(uint32_t block_num, uint32_t bucket_size);
+
+  // A reserved interface for testing one of the PathORAM controllers.
+  Status TestPathOram(uint32_t controller_id);
 
   virtual ~OramController() {}
 };
 }  // namespace partition_oram
 
-#endif
+#endif // PARTITION_ORAM_CLIENT_ORAM_CONTROLLER_H_

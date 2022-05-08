@@ -8,21 +8,21 @@ import "google/protobuf/empty.proto";
 // any ORAM implementation. It is used to interact with the ORAM.
 service server {
   // Initialize the ORAM by sending the client's configurations.
-  rpc init_oram(InitOramRequest) returns (google.protobuf.Empty) {}
+  rpc InitOram(InitOramRequest) returns (google.protobuf.Empty) {}
 
-  rpc read_path(ReadPathRequest) returns (ReadPathResponse) {}
+  rpc ReadPath(ReadPathRequest) returns (ReadPathResponse) {}
 
-  rpc write_path(WritePathRequest) returns (WritePathResponse) {}
+  rpc WritePath(WritePathRequest) returns (WritePathResponse) {}
 
-  rpc close_connection(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+  rpc CloseConnection(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 
   // ============ Key Exchange Using Diffie-Hellman ============ //
   // For evaluating the performance when encryption is introduced, 
   // we do not verify the public key sent from the client, i.e., 
   // we assume that there is no man-in-the-middle attacker :)
-  rpc key_exchange(KeyExchangeRequest) returns (KeyExchangeResponse) {}
+  rpc KeyExchange(KeyExchangeRequest) returns (KeyExchangeResponse) {}
 
-  rpc send_hello(HelloMessage) returns (google.protobuf.Empty) {}
+  rpc SendHello(HelloMessage) returns (google.protobuf.Empty) {}
 }
 
 enum Type {
@@ -44,13 +44,15 @@ message KeyExchangeResponse {
 };
 
 message InitOramRequest {
-  uint32 parition_num = 1;
-  uint32 block_num = 2;
+  uint32 id = 1;
+  uint32 bucket_size = 2;
+  uint32 block_num = 3;
 }
 
 message ReadPathRequest {
-  uint32 path = 1;
-  uint32 level = 2;
+  uint32 id = 1;
+  uint32 path = 2;
+  uint32 level = 3;
 }
 
 message ReadPathResponse {
@@ -58,10 +60,12 @@ message ReadPathResponse {
 }
 
 message WritePathRequest {
+  uint32 id = 1;
   // Whether this write operation is triggered by an eviction operation.
-  optional Type type = 1;
   uint32 path = 2;
   uint32 level = 3;
+  repeated bytes bucket = 4;
+  optional Type type = 5;
 }
 
 message WritePathResponse {

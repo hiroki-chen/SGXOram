@@ -14,8 +14,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef ORAM_UTILS_H
-#define ORAM_UTILS_H
+#ifndef PARTITION_ORAM_BASE_ORAM_UTILS_H_
+#define PARTITION_ORAM_BASE_ORAM_UTILS_H_
 
 #include <cassert>
 #include <string>
@@ -23,13 +23,14 @@
 
 #include "oram_defs.h"
 
-#define PANIC_IF(cond, message) assert(!(cond) && message)
+#define ASSERT_MSG(x) !(std::cerr << "Assertion failed: " << x << std::endl)
+#define PANIC_IF(cond, message) assert(!(cond) || ASSERT_MSG(message))
 
 namespace oram_utils {
-std::string read_key_crt_file(const std::string& path);
+std::string ReadKeyCrtFile(const std::string& path);
 
 template <typename... Args>
-std::string string_concat(const std::string& s, Args&&... args) {
+std::string StrCat(const std::string& s, Args&&... args) {
   std::ostringstream oss;
   oss << s;
   // Recursively concatenate the rest of the arguments using argument pack
@@ -38,13 +39,25 @@ std::string string_concat(const std::string& s, Args&&... args) {
   return oss.str();
 }
 
-void safe_free(void* ptr);
+std::vector<std::string> ReadDataFromFile(const std::string& path);
 
-void safe_free_all(size_t ptr_num, ...);
+std::vector<std::string> SerializeToStringVector(const partition_oram::p_oram_bucket_t& bucket);
 
-void convert_to_block(const std::string& data, partition_oram::oram_block_t* const block);
+partition_oram::p_oram_bucket_t DeserializeFromStringVector(const std::vector<std::string>& data);
 
-void check_status(partition_oram::Status status, const std::string& reason);
+void SafeFree(void* ptr);
+
+void SafeFreeAll(size_t ptr_num, ...);
+
+void ConvertToBlock(const std::string& data, partition_oram::oram_block_t* const block);
+
+void ConvertToString(const partition_oram::oram_block_t* const block, std::string* const data);
+
+void CheckStatus(partition_oram::Status status, const std::string& reason);
+
+void PadStash(partition_oram::p_oram_stash_t* const stash, const size_t bucket_size);
+
+void PrintStash(const partition_oram::p_oram_stash_t& stash);
 }  // namespace oram_utils
 
-#endif  // ORAM_UTILS_H
+#endif  // PARTITION_ORAM_BASE_ORAM_UTILS_H_

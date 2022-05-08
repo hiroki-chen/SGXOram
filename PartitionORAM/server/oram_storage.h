@@ -14,40 +14,34 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef ORAM_STORAGE_H
-#define ORAM_STORAGE_H
+#ifndef PARTITION_ORAM_SERVER_ORAM_STORAGE_H_
+#define PARTITION_ORAM_SERVER_ORAM_STORAGE_H_
 
 #include <cstdint>
 #include <cstddef>
 #include <cmath>
-#include <vector>
+#include <unordered_map>
 
 #include "base/oram_defs.h"
 
 namespace partition_oram {
-  class BinaryTree {
-    size_t size;
-    size_t height;
+class OramServerStorage {
+  server_storage_t storage_;
+  // The id corresponding to each slot.
+  uint32_t id_;
+  // How many buckets are in the storage.
+  size_t capacity_;
+  // The level of the oram tree.
+  uint32_t level_;
+  // The size of each bucket.
+  size_t bucket_size_;
 
-    // TODO: Construct the main storage.
+ public:
+  OramServerStorage(uint32_t id, size_t capacity, size_t bucket_size);
 
-    public:
-      BinaryTree(size_t num_of_blocks);
+  Status ReadPath(uint32_t level, uint32_t path, p_oram_bucket_t* const out_bucket);
+  Status WritePath(uint32_t level, uint32_t path, const p_oram_bucket_t& in_bucket);
+};
+}  // namespace partition_oram
 
-      size_t get_size(void) const { return size; }
-
-      size_t get_height(void) const { return height; }
-
-      size_t get_leaf_number(void) const { return std::pow(2, height) - 1; }
-
-      std::vector<oram_block_t> read_bucket();
-
-      virtual ~BinaryTree() {};
-  };
-
-  class PartitionOramStorage {
-
-  };
-} // namespace partition_oram
-
-#endif // ORAM_STORAGE_H
+#endif  // PARTITION_ORAM_SERVER_ORAM_STORAGE_H_

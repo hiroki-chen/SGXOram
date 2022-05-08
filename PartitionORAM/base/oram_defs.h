@@ -14,16 +14,26 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#ifndef ORAM_DEFS_H
-#define ORAM_DEFS_H
+#ifndef PARTITION_ORAM_BASE_ORAM_DEFS_H_
+#define PARTITION_ORAM_BASE_ORAM_DEFS_H_
 
-#include <unordered_map>
 #include <utility>
 #include <vector>
+#include <unordered_map>
+
+#include <absl/container/flat_hash_map.h>
 
 #define DEFAULT_ORAM_DATA_SIZE 4096
 
 #define ORAM_BLOCK_SIZE sizeof(partition_oram::oram_block_t)
+
+#if !defined(POW2)
+#define POW2(x) (1 << (x))
+#endif
+
+#if !defined(LOG_BASE)
+#define LOG_BASE(x, base) (log(x) / log(base))
+#endif
 
 namespace partition_oram {
 // The header containing metadata.
@@ -38,40 +48,46 @@ typedef struct _oram_block_t {
   uint8_t data[DEFAULT_ORAM_DATA_SIZE];
 } oram_block_t;
 
-enum Status {
-  OK = 0,
-  INVALID_ARGUMENT = 1,
-  INVALID_OPERATION = 2,
-  OUT_OF_MEMORY = 3,
-  FILE_NOT_FOUND = 4,
-  FILE_IO_ERROR = 5,
-  OUT_OF_RANGE = 6,
-  SERVER_ERROR = 7,
-  UNKNOWN_ERROR = 8,
+enum class Status {
+  kOK = 0,
+  kInvalidArgument = 1,
+  kInvalidOperation = 2,
+  kOutOfMemory = 3,
+  kFileNotFound = 4,
+  kFileIOError = 5,
+  kOutOfRange = 6,
+  kServerError = 7,
+  kObjectNotFound = 8,
+  kUnknownError = 9,
 };
 
-enum Operation {
-  READ = 0,
-  WRITE = 1,
-  INVALID = 2,
+enum class Operation {
+  kRead = 0,
+  kWrite = 1,
+  kInvalid = 2,
 };
 
-enum EvictType {
-  EVICT_SEQ = 0,
-  EVICT_RAND = 1,
+enum class EvictType {
+  kEvictSeq = 0,
+  kEvictRand = 1,
 };
 
-static const std::unordered_map<Status, std::string> error_list = {
-    {OK, "OK"},
-    {INVALID_ARGUMENT, "Invalid argument"},
-    {INVALID_OPERATION, "Invalid operation"},
-    {OUT_OF_MEMORY, "Out of memory"},
-    {FILE_NOT_FOUND, "File not found"},
-    {FILE_IO_ERROR, "File I/O error"},
-    {OUT_OF_RANGE, "Out of range"},
-    {SERVER_ERROR, "Server error"},
-    {UNKNOWN_ERROR, "Unknown error"},
-};
+// Constants.
+static const std::unordered_map<Status, std::string> kErrorList = {
+    {Status::kOK, "OK"},
+    {Status::kInvalidArgument, "Invalid argument"},
+    {Status::kInvalidOperation, "Invalid operation"},
+    {Status::kOutOfMemory, "Out of memory"},
+    {Status::kFileNotFound, "File not found"},
+    {Status::kFileIOError, "File IO error"},
+    {Status::kOutOfRange, "Out of range"},
+    {Status::kServerError, "Server error"},
+    {Status::kObjectNotFound, "The object is not found"},
+    {Status::kUnknownError, "Unknown error"}};
+
+static const float kPartitionAdjustmentFactor = .05;
+
+static const uint32_t kMaximumOramStorageNum = 1e5;
 
 // Alias for Path ORAM.
 using p_oram_bucket_t = std::vector<oram_block_t>;
@@ -82,17 +98,20 @@ using p_oram_position_t = std::unordered_map<uint32_t, uint32_t>;
 using pp_oram_pos_t = std::pair<uint32_t, uint32_t>;
 using pp_oram_position_t = std::unordered_map<uint32_t, pp_oram_pos_t>;
 using pp_oram_slot_t = std::vector<std::vector<oram_block_t>>;
+// Alias for server storage.
+using server_storage_tag_t = std::pair<uint32_t, uint32_t>;
+using server_storage_t = absl::flat_hash_map<server_storage_tag_t, p_oram_bucket_t>;
 
-struct block_eq {
+struct BlockEqual {
  private:
-  uint32_t block_id;
+  uint32_t block_id_;
 
  public:
-  explicit block_eq(uint32_t id) : block_id(id) {}
+  explicit BlockEqual(uint32_t block_id) : block_id_(block_id) {}
   inline bool operator()(const oram_block_t& block) const {
-    return block.header.block_id == block_id;
+    return block.header.block_id == block_id_;
   }
 };
 }  // namespace partition_oram
 
-#endif  // ORAM_DEFS_H
+#endif  // PARTITION_ORAM_BASE_ORAM_DEFS_H_

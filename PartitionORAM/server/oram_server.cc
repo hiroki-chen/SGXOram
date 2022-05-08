@@ -22,53 +22,131 @@
 #include <spdlog/fmt/bin_to_hex.h>
 
 #include "base/oram_utils.h"
+#include "base/oram_defs.h"
 
 std::atomic_bool server_running;
 
 namespace partition_oram {
-grpc::Status PartitionORAMService::init_oram(grpc::ServerContext* context,
-                                             const InitOramRequest* request,
-                                             google::protobuf::Empty* empty) {
-  // TODO: implement me.
+grpc::Status PartitionORAMService::InitOram(grpc::ServerContext* context,
+                                            const InitOramRequest* request,
+                                            google::protobuf::Empty* empty) {
+  logger->info("From peer: {}, InitOram request received.", context->peer());
+
+  // Intialize the Path ORAM storage.
+  const uint32_t id = request->id();
+  const uint32_t bucket_size = request->bucket_size();
+  const uint32_t block_num = request->block_num();
+  const uint32_t capacity = std::ceil(block_num * 1. / bucket_size);
+
+  // Do some sanity check.
+  if (id < storages_.size()) {
+    const std::string error_message =
+        oram_utils::StrCat("PathORAM id: ", id, " already exists.");
+    return grpc::Status(grpc::StatusCode::ALREADY_EXISTS, error_message);
+  } else if (id >= kMaximumOramStorageNum) {
+    const std::string error_message = oram_utils::StrCat(
+        "PathORAM id: ", id, " exceeds the maximum number of ORAM storages: ",
+        kMaximumOramStorageNum);
+    return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT, error_message);
+  }
+
+  // Create a new storage and initialize it.
+  storages_.emplace_back(
+      std::make_unique<OramServerStorage>(id, capacity, bucket_size));
+
+  logger->info("PathORAM id: {} successfully created.", id);
+
   return grpc::Status::OK;
 }
 
-grpc::Status PartitionORAMService::read_path(grpc::ServerContext* context,
-                                             const ReadPathRequest* request,
-                                             ReadPathResponse* response) {
-  // TODO: implement me.
+grpc::Status PartitionORAMService::ReadPath(grpc::ServerContext* context,
+                                            const ReadPathRequest* request,
+                                            ReadPathResponse* response) {
+  logger->info("From peer: {}, ReadPath request received.", context->peer());
+
+  const uint32_t id = request->id();
+  const uint32_t path = request->path();
+  const uint32_t level = request->level();
+
+  if (id >= storages_.size()) {
+    const std::string error_message =
+        oram_utils::StrCat("PathORAM id: ", id, " does not exist.");
+    return grpc::Status(grpc::StatusCode::NOT_FOUND, error_message);
+  }
+
+  // Read the path.
+  p_oram_bucket_t bucket;
+  if (storages_[id]->ReadPath(path, level, &bucket) != Status::kOK) {
+    const std::string error_message =
+        oram_utils::StrCat("Failed to read path: ", path, " in level: ", level,
+                           " in PathORAM id: ", id);
+    return grpc::Status(grpc::StatusCode::INTERNAL, error_message);
+  }
+
+  // Serialze them to the string and send back to the client.
+  const std::vector<std::string> serialized_bucket =
+      std::move(oram_utils::SerializeToStringVector(bucket));
+  // Copy the vector to the response.
+  for (const auto& bucket : serialized_bucket) {
+    response->add_bucket(bucket);
+  }
+
   return grpc::Status::OK;
 }
 
-grpc::Status PartitionORAMService::write_path(grpc::ServerContext* context,
-                                              const WritePathRequest* request,
-                                              WritePathResponse* response) {
-  // TODO: implement me.
+grpc::Status PartitionORAMService::WritePath(grpc::ServerContext* context,
+                                             const WritePathRequest* request,
+                                             WritePathResponse* response) {
+  logger->info("From peer: {}, WritePath request received.", context->peer());
+
+  const uint32_t id = request->id();
+  const uint32_t level = request->level();
+  const uint32_t path = request->path();
+
+  if (id >= storages_.size()) {
+    const std::string error_message =
+        oram_utils::StrCat("PathORAM id: ", id, " does not exist.");
+    return grpc::Status(grpc::StatusCode::NOT_FOUND, error_message);
+  }
+
+  // Deserialize the bucket from the string.
+  p_oram_bucket_t bucket = std::move(
+      oram_utils::DeserializeFromStringVector(std::vector<std::string>(
+          request->bucket().begin(), request->bucket().end())));
+
+  // Write the path.
+  if (storages_[id]->WritePath(path, level, bucket) != Status::kOK) {
+    const std::string error_message =
+        oram_utils::StrCat("Failed to write path: ", path, " in level: ", level,
+                           " in PathORAM id: ", id);
+    return grpc::Status(grpc::StatusCode::INTERNAL, error_message);
+  }
+
   return grpc::Status::OK;
 }
 
-grpc::Status PartitionORAMService::key_exchange(
+grpc::Status PartitionORAMService::KeyExchange(
     grpc::ServerContext* context, const KeyExchangeRequest* request,
     KeyExchangeResponse* response) {
   const std::string public_key_client = request->public_key_client();
 
   Status status;
-  if ((status = cryptor_->sample_key_pair()) != Status::OK) {
-    const std::string error_message = oram_utils::string_concat(
-        "Failed to sample key pair! Error: ", error_list.at(status));
+  if ((status = cryptor_->SampleKeyPair()) != Status::kOK) {
+    const std::string error_message = oram_utils::StrCat(
+        "Failed to sample key pair! Error: ", kErrorList.at(status));
     return grpc::Status(grpc::StatusCode::INTERNAL, error_message);
   }
 
-  if ((status = cryptor_->sample_session_key(public_key_client, 1)) !=
-      Status::OK) {
-    const std::string error_message = oram_utils::string_concat(
-        "Failed to sample session key! Error: ", error_list.at(status));
+  if ((status = cryptor_->SampleSessionKey(public_key_client, 1)) !=
+      Status::kOK) {
+    const std::string error_message = oram_utils::StrCat(
+        "Failed to sample session key! Error: ", kErrorList.at(status));
     return grpc::Status(grpc::StatusCode::INTERNAL, error_message);
   }
-  auto key_pair = cryptor_->get_key_pair();
+  auto key_pair = cryptor_->GetKeyPair();
   response->set_public_key_server(key_pair.first);
 
-  auto session_key = std::move(cryptor_->get_session_key_pair());
+  auto session_key = std::move(cryptor_->GetSessionKeyPair());
   logger->info("The session key for receiving is {}.",
                spdlog::to_hex(session_key.first));
   logger->info("The session key for sending is {}.",
@@ -77,7 +155,7 @@ grpc::Status PartitionORAMService::key_exchange(
   return grpc::Status::OK;
 }
 
-grpc::Status PartitionORAMService::close_connection(
+grpc::Status PartitionORAMService::CloseConnection(
     grpc::ServerContext* context, const google::protobuf::Empty* request,
     google::protobuf::Empty* response) {
   logger->info("Closing connection...");
@@ -85,9 +163,9 @@ grpc::Status PartitionORAMService::close_connection(
   return grpc::Status::OK;
 }
 
-grpc::Status PartitionORAMService::send_hello(grpc::ServerContext* context,
-                                              const HelloMessage* request,
-                                              google::protobuf::Empty* empty) {
+grpc::Status PartitionORAMService::SendHello(grpc::ServerContext* context,
+                                             const HelloMessage* request,
+                                             google::protobuf::Empty* empty) {
   const std::string encrypted_message = request->content();
   const std::string iv = request->iv();
   std::string message;
@@ -96,11 +174,11 @@ grpc::Status PartitionORAMService::send_hello(grpc::ServerContext* context,
   logger->info("Received encrypted message: {}.",
                spdlog::to_hex(encrypted_message));
 
-  if ((status = cryptor_->decrypt((uint8_t*)encrypted_message.data(),
+  if ((status = cryptor_->Decrypt((uint8_t*)encrypted_message.data(),
                                   encrypted_message.size(), (uint8_t*)iv.data(),
-                                  &message)) != Status::OK) {
-    const std::string error_message = oram_utils::string_concat(
-        "Failed to verify Hello message! Error: ", error_list.at(status));
+                                  &message)) != Status::kOK) {
+    const std::string error_message = oram_utils::StrCat(
+        "Failed to verify Hello message! Error: ", kErrorList.at(status));
     return grpc::Status(grpc::StatusCode::INTERNAL, error_message);
   }
 
@@ -112,8 +190,8 @@ ServerRunner::ServerRunner(const std::string& address, const std::string& port,
                            const std::string& key_path,
                            const std::string& crt_path)
     : address_(address), port_(port) {
-  const std::string key_file = oram_utils::read_key_crt_file(key_path);
-  const std::string crt_file = oram_utils::read_key_crt_file(crt_path);
+  const std::string key_file = oram_utils::ReadKeyCrtFile(key_path);
+  const std::string crt_file = oram_utils::ReadKeyCrtFile(crt_path);
 
   if (key_file.empty() || crt_file.empty()) {
     abort();
@@ -134,7 +212,7 @@ ServerRunner::ServerRunner(const std::string& address, const std::string& port,
   is_initialized = true;
 }
 
-void ServerRunner::run(void) {
+void ServerRunner::Run(void) {
   logger->info("Starting server...");
 
   if (!is_initialized) {
@@ -143,8 +221,8 @@ void ServerRunner::run(void) {
   }
 
   grpc::ServerBuilder builder;
-  const std::string address =
-      std::move(oram_utils::string_concat(address_, ":", port_));
+  std::string address;
+  address = "0.0.0.0:1234";
   builder.AddListeningPort(address, creds_);
   builder.RegisterService(service_.get());
 
@@ -153,7 +231,7 @@ void ServerRunner::run(void) {
   server_running = true;
 
   // Initialize the cryptor.
-  service_->cryptor_ = oram_crypto::Cryptor::get_instance();
+  service_->cryptor_ = oram_crypto::Cryptor::GetInstance();
 
   // Start a monitor thread.
   std::thread monitor_thread([&, this]() {

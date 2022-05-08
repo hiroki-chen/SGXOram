@@ -712,19 +712,29 @@ class InitOramRequest final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kParitionNumFieldNumber = 1,
-    kBlockNumFieldNumber = 2,
+    kIdFieldNumber = 1,
+    kBucketSizeFieldNumber = 2,
+    kBlockNumFieldNumber = 3,
   };
-  // uint32 parition_num = 1;
-  void clear_parition_num();
-  uint32_t parition_num() const;
-  void set_parition_num(uint32_t value);
+  // uint32 id = 1;
+  void clear_id();
+  uint32_t id() const;
+  void set_id(uint32_t value);
   private:
-  uint32_t _internal_parition_num() const;
-  void _internal_set_parition_num(uint32_t value);
+  uint32_t _internal_id() const;
+  void _internal_set_id(uint32_t value);
   public:
 
-  // uint32 block_num = 2;
+  // uint32 bucket_size = 2;
+  void clear_bucket_size();
+  uint32_t bucket_size() const;
+  void set_bucket_size(uint32_t value);
+  private:
+  uint32_t _internal_bucket_size() const;
+  void _internal_set_bucket_size(uint32_t value);
+  public:
+
+  // uint32 block_num = 3;
   void clear_block_num();
   uint32_t block_num() const;
   void set_block_num(uint32_t value);
@@ -740,7 +750,8 @@ class InitOramRequest final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  uint32_t parition_num_;
+  uint32_t id_;
+  uint32_t bucket_size_;
   uint32_t block_num_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_messages_2eproto;
@@ -869,10 +880,20 @@ class ReadPathRequest final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kPathFieldNumber = 1,
-    kLevelFieldNumber = 2,
+    kIdFieldNumber = 1,
+    kPathFieldNumber = 2,
+    kLevelFieldNumber = 3,
   };
-  // uint32 path = 1;
+  // uint32 id = 1;
+  void clear_id();
+  uint32_t id() const;
+  void set_id(uint32_t value);
+  private:
+  uint32_t _internal_id() const;
+  void _internal_set_id(uint32_t value);
+  public:
+
+  // uint32 path = 2;
   void clear_path();
   uint32_t path() const;
   void set_path(uint32_t value);
@@ -881,7 +902,7 @@ class ReadPathRequest final :
   void _internal_set_path(uint32_t value);
   public:
 
-  // uint32 level = 2;
+  // uint32 level = 3;
   void clear_level();
   uint32_t level() const;
   void set_level(uint32_t value);
@@ -897,6 +918,7 @@ class ReadPathRequest final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  uint32_t id_;
   uint32_t path_;
   uint32_t level_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -1187,21 +1209,43 @@ class WritePathRequest final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kTypeFieldNumber = 1,
+    kBucketFieldNumber = 4,
+    kIdFieldNumber = 1,
     kPathFieldNumber = 2,
     kLevelFieldNumber = 3,
+    kTypeFieldNumber = 5,
   };
-  // optional .partition_oram.Type type = 1;
-  bool has_type() const;
+  // repeated bytes bucket = 4;
+  int bucket_size() const;
   private:
-  bool _internal_has_type() const;
+  int _internal_bucket_size() const;
   public:
-  void clear_type();
-  ::partition_oram::Type type() const;
-  void set_type(::partition_oram::Type value);
+  void clear_bucket();
+  const std::string& bucket(int index) const;
+  std::string* mutable_bucket(int index);
+  void set_bucket(int index, const std::string& value);
+  void set_bucket(int index, std::string&& value);
+  void set_bucket(int index, const char* value);
+  void set_bucket(int index, const void* value, size_t size);
+  std::string* add_bucket();
+  void add_bucket(const std::string& value);
+  void add_bucket(std::string&& value);
+  void add_bucket(const char* value);
+  void add_bucket(const void* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& bucket() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_bucket();
   private:
-  ::partition_oram::Type _internal_type() const;
-  void _internal_set_type(::partition_oram::Type value);
+  const std::string& _internal_bucket(int index) const;
+  std::string* _internal_add_bucket();
+  public:
+
+  // uint32 id = 1;
+  void clear_id();
+  uint32_t id() const;
+  void set_id(uint32_t value);
+  private:
+  uint32_t _internal_id() const;
+  void _internal_set_id(uint32_t value);
   public:
 
   // uint32 path = 2;
@@ -1222,6 +1266,19 @@ class WritePathRequest final :
   void _internal_set_level(uint32_t value);
   public:
 
+  // optional .partition_oram.Type type = 5;
+  bool has_type() const;
+  private:
+  bool _internal_has_type() const;
+  public:
+  void clear_type();
+  ::partition_oram::Type type() const;
+  void set_type(::partition_oram::Type value);
+  private:
+  ::partition_oram::Type _internal_type() const;
+  void _internal_set_type(::partition_oram::Type value);
+  public:
+
   // @@protoc_insertion_point(class_scope:partition_oram.WritePathRequest)
  private:
   class _Internal;
@@ -1231,9 +1288,11 @@ class WritePathRequest final :
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::HasBits<1> _has_bits_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
-  int type_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> bucket_;
+  uint32_t id_;
   uint32_t path_;
   uint32_t level_;
+  int type_;
   friend struct ::TableStruct_messages_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1581,27 +1640,47 @@ inline void KeyExchangeResponse::set_allocated_public_key_server(std::string* pu
 
 // InitOramRequest
 
-// uint32 parition_num = 1;
-inline void InitOramRequest::clear_parition_num() {
-  parition_num_ = 0u;
+// uint32 id = 1;
+inline void InitOramRequest::clear_id() {
+  id_ = 0u;
 }
-inline uint32_t InitOramRequest::_internal_parition_num() const {
-  return parition_num_;
+inline uint32_t InitOramRequest::_internal_id() const {
+  return id_;
 }
-inline uint32_t InitOramRequest::parition_num() const {
-  // @@protoc_insertion_point(field_get:partition_oram.InitOramRequest.parition_num)
-  return _internal_parition_num();
+inline uint32_t InitOramRequest::id() const {
+  // @@protoc_insertion_point(field_get:partition_oram.InitOramRequest.id)
+  return _internal_id();
 }
-inline void InitOramRequest::_internal_set_parition_num(uint32_t value) {
+inline void InitOramRequest::_internal_set_id(uint32_t value) {
   
-  parition_num_ = value;
+  id_ = value;
 }
-inline void InitOramRequest::set_parition_num(uint32_t value) {
-  _internal_set_parition_num(value);
-  // @@protoc_insertion_point(field_set:partition_oram.InitOramRequest.parition_num)
+inline void InitOramRequest::set_id(uint32_t value) {
+  _internal_set_id(value);
+  // @@protoc_insertion_point(field_set:partition_oram.InitOramRequest.id)
 }
 
-// uint32 block_num = 2;
+// uint32 bucket_size = 2;
+inline void InitOramRequest::clear_bucket_size() {
+  bucket_size_ = 0u;
+}
+inline uint32_t InitOramRequest::_internal_bucket_size() const {
+  return bucket_size_;
+}
+inline uint32_t InitOramRequest::bucket_size() const {
+  // @@protoc_insertion_point(field_get:partition_oram.InitOramRequest.bucket_size)
+  return _internal_bucket_size();
+}
+inline void InitOramRequest::_internal_set_bucket_size(uint32_t value) {
+  
+  bucket_size_ = value;
+}
+inline void InitOramRequest::set_bucket_size(uint32_t value) {
+  _internal_set_bucket_size(value);
+  // @@protoc_insertion_point(field_set:partition_oram.InitOramRequest.bucket_size)
+}
+
+// uint32 block_num = 3;
 inline void InitOramRequest::clear_block_num() {
   block_num_ = 0u;
 }
@@ -1625,7 +1704,27 @@ inline void InitOramRequest::set_block_num(uint32_t value) {
 
 // ReadPathRequest
 
-// uint32 path = 1;
+// uint32 id = 1;
+inline void ReadPathRequest::clear_id() {
+  id_ = 0u;
+}
+inline uint32_t ReadPathRequest::_internal_id() const {
+  return id_;
+}
+inline uint32_t ReadPathRequest::id() const {
+  // @@protoc_insertion_point(field_get:partition_oram.ReadPathRequest.id)
+  return _internal_id();
+}
+inline void ReadPathRequest::_internal_set_id(uint32_t value) {
+  
+  id_ = value;
+}
+inline void ReadPathRequest::set_id(uint32_t value) {
+  _internal_set_id(value);
+  // @@protoc_insertion_point(field_set:partition_oram.ReadPathRequest.id)
+}
+
+// uint32 path = 2;
 inline void ReadPathRequest::clear_path() {
   path_ = 0u;
 }
@@ -1645,7 +1744,7 @@ inline void ReadPathRequest::set_path(uint32_t value) {
   // @@protoc_insertion_point(field_set:partition_oram.ReadPathRequest.path)
 }
 
-// uint32 level = 2;
+// uint32 level = 3;
 inline void ReadPathRequest::clear_level() {
   level_ = 0u;
 }
@@ -1748,32 +1847,24 @@ ReadPathResponse::mutable_bucket() {
 
 // WritePathRequest
 
-// optional .partition_oram.Type type = 1;
-inline bool WritePathRequest::_internal_has_type() const {
-  bool value = (_has_bits_[0] & 0x00000001u) != 0;
-  return value;
+// uint32 id = 1;
+inline void WritePathRequest::clear_id() {
+  id_ = 0u;
 }
-inline bool WritePathRequest::has_type() const {
-  return _internal_has_type();
+inline uint32_t WritePathRequest::_internal_id() const {
+  return id_;
 }
-inline void WritePathRequest::clear_type() {
-  type_ = 0;
-  _has_bits_[0] &= ~0x00000001u;
+inline uint32_t WritePathRequest::id() const {
+  // @@protoc_insertion_point(field_get:partition_oram.WritePathRequest.id)
+  return _internal_id();
 }
-inline ::partition_oram::Type WritePathRequest::_internal_type() const {
-  return static_cast< ::partition_oram::Type >(type_);
+inline void WritePathRequest::_internal_set_id(uint32_t value) {
+  
+  id_ = value;
 }
-inline ::partition_oram::Type WritePathRequest::type() const {
-  // @@protoc_insertion_point(field_get:partition_oram.WritePathRequest.type)
-  return _internal_type();
-}
-inline void WritePathRequest::_internal_set_type(::partition_oram::Type value) {
-  _has_bits_[0] |= 0x00000001u;
-  type_ = value;
-}
-inline void WritePathRequest::set_type(::partition_oram::Type value) {
-  _internal_set_type(value);
-  // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.type)
+inline void WritePathRequest::set_id(uint32_t value) {
+  _internal_set_id(value);
+  // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.id)
 }
 
 // uint32 path = 2;
@@ -1814,6 +1905,109 @@ inline void WritePathRequest::_internal_set_level(uint32_t value) {
 inline void WritePathRequest::set_level(uint32_t value) {
   _internal_set_level(value);
   // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.level)
+}
+
+// repeated bytes bucket = 4;
+inline int WritePathRequest::_internal_bucket_size() const {
+  return bucket_.size();
+}
+inline int WritePathRequest::bucket_size() const {
+  return _internal_bucket_size();
+}
+inline void WritePathRequest::clear_bucket() {
+  bucket_.Clear();
+}
+inline std::string* WritePathRequest::add_bucket() {
+  std::string* _s = _internal_add_bucket();
+  // @@protoc_insertion_point(field_add_mutable:partition_oram.WritePathRequest.bucket)
+  return _s;
+}
+inline const std::string& WritePathRequest::_internal_bucket(int index) const {
+  return bucket_.Get(index);
+}
+inline const std::string& WritePathRequest::bucket(int index) const {
+  // @@protoc_insertion_point(field_get:partition_oram.WritePathRequest.bucket)
+  return _internal_bucket(index);
+}
+inline std::string* WritePathRequest::mutable_bucket(int index) {
+  // @@protoc_insertion_point(field_mutable:partition_oram.WritePathRequest.bucket)
+  return bucket_.Mutable(index);
+}
+inline void WritePathRequest::set_bucket(int index, const std::string& value) {
+  bucket_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.bucket)
+}
+inline void WritePathRequest::set_bucket(int index, std::string&& value) {
+  bucket_.Mutable(index)->assign(std::move(value));
+  // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.bucket)
+}
+inline void WritePathRequest::set_bucket(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  bucket_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:partition_oram.WritePathRequest.bucket)
+}
+inline void WritePathRequest::set_bucket(int index, const void* value, size_t size) {
+  bucket_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:partition_oram.WritePathRequest.bucket)
+}
+inline std::string* WritePathRequest::_internal_add_bucket() {
+  return bucket_.Add();
+}
+inline void WritePathRequest::add_bucket(const std::string& value) {
+  bucket_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:partition_oram.WritePathRequest.bucket)
+}
+inline void WritePathRequest::add_bucket(std::string&& value) {
+  bucket_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:partition_oram.WritePathRequest.bucket)
+}
+inline void WritePathRequest::add_bucket(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  bucket_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:partition_oram.WritePathRequest.bucket)
+}
+inline void WritePathRequest::add_bucket(const void* value, size_t size) {
+  bucket_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:partition_oram.WritePathRequest.bucket)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+WritePathRequest::bucket() const {
+  // @@protoc_insertion_point(field_list:partition_oram.WritePathRequest.bucket)
+  return bucket_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+WritePathRequest::mutable_bucket() {
+  // @@protoc_insertion_point(field_mutable_list:partition_oram.WritePathRequest.bucket)
+  return &bucket_;
+}
+
+// optional .partition_oram.Type type = 5;
+inline bool WritePathRequest::_internal_has_type() const {
+  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+  return value;
+}
+inline bool WritePathRequest::has_type() const {
+  return _internal_has_type();
+}
+inline void WritePathRequest::clear_type() {
+  type_ = 0;
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline ::partition_oram::Type WritePathRequest::_internal_type() const {
+  return static_cast< ::partition_oram::Type >(type_);
+}
+inline ::partition_oram::Type WritePathRequest::type() const {
+  // @@protoc_insertion_point(field_get:partition_oram.WritePathRequest.type)
+  return _internal_type();
+}
+inline void WritePathRequest::_internal_set_type(::partition_oram::Type value) {
+  _has_bits_[0] |= 0x00000001u;
+  type_ = value;
+}
+inline void WritePathRequest::set_type(::partition_oram::Type value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.type)
 }
 
 // -------------------------------------------------------------------
