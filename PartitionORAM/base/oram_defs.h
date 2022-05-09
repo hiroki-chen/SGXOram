@@ -36,18 +36,6 @@
 #endif
 
 namespace partition_oram {
-// The header containing metadata.
-typedef struct _oram_block_header_t {
-  uint32_t block_id;
-} oram_block_header_t;
-
-// The block for ORAM storage.
-typedef struct _oram_block_t {
-  oram_block_header_t header;
-
-  uint8_t data[DEFAULT_ORAM_DATA_SIZE];
-} oram_block_t;
-
 enum class Status {
   kOK = 0,
   kInvalidArgument = 1,
@@ -71,6 +59,25 @@ enum class EvictType {
   kEvictSeq = 0,
   kEvictRand = 1,
 };
+
+enum class BlockType {
+  kDummy = 0,
+  kNormal = 1,
+  kInvalid = 2,
+};
+
+// The header containing metadata.
+typedef struct _oram_block_header_t {
+  uint32_t block_id;
+  BlockType type;
+} oram_block_header_t;
+
+// The block for ORAM storage.
+typedef struct _oram_block_t {
+  oram_block_header_t header;
+
+  uint8_t data[DEFAULT_ORAM_DATA_SIZE];
+} oram_block_t;
 
 // Constants.
 static const std::unordered_map<Status, std::string> kErrorList = {
@@ -100,7 +107,8 @@ using pp_oram_position_t = std::unordered_map<uint32_t, pp_oram_pos_t>;
 using pp_oram_slot_t = std::vector<std::vector<oram_block_t>>;
 // Alias for server storage.
 using server_storage_tag_t = std::pair<uint32_t, uint32_t>;
-using server_storage_t = absl::flat_hash_map<server_storage_tag_t, p_oram_bucket_t>;
+using server_storage_t =
+    absl::flat_hash_map<server_storage_tag_t, p_oram_bucket_t>;
 
 struct BlockEqual {
  private:
@@ -109,7 +117,9 @@ struct BlockEqual {
  public:
   explicit BlockEqual(uint32_t block_id) : block_id_(block_id) {}
   inline bool operator()(const oram_block_t& block) const {
-    return block.header.block_id == block_id_;
+    // Dummy blocks cannot be accidentally read out.
+    return block.header.block_id == block_id_ &&
+           block.header.type == BlockType::kNormal;
   }
 };
 }  // namespace partition_oram

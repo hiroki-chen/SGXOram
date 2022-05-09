@@ -116,6 +116,30 @@ void PadStash(partition_oram::p_oram_stash_t* const stash,
   }
 }
 
+partition_oram::p_oram_bucket_t SampleRandomBucket(size_t size,
+                                                   size_t tree_size) {
+  partition_oram::p_oram_bucket_t bucket;
+
+  for (size_t i = 0; i < tree_size; ++i) {
+    partition_oram::oram_block_t block;
+    block.header.block_id = i;
+    block.header.type = i < size ? partition_oram::BlockType::kNormal
+                                 : partition_oram::BlockType::kDummy;
+    block.data[0] = i;
+
+    if (oram_crypto::Cryptor::RandomBytes(block.data + 1,
+                                          DEFAULT_ORAM_DATA_SIZE - 1) !=
+        partition_oram::Status::kOK) {
+      logger->error("Failed to generate random bytes");
+      abort();
+    }
+
+    bucket.emplace_back(block);
+  }
+
+  return bucket;
+}
+
 std::vector<std::string> SerializeToStringVector(
     const partition_oram::p_oram_bucket_t& bucket) {
   std::vector<std::string> ans;
@@ -129,7 +153,8 @@ std::vector<std::string> SerializeToStringVector(
   return ans;
 }
 
-partition_oram::p_oram_bucket_t DeserializeFromStringVector(const std::vector<std::string>& data) {
+partition_oram::p_oram_bucket_t DeserializeFromStringVector(
+    const std::vector<std::string>& data) {
   partition_oram::p_oram_bucket_t ans;
 
   for (size_t i = 0; i < data.size(); ++i) {
@@ -142,9 +167,24 @@ partition_oram::p_oram_bucket_t DeserializeFromStringVector(const std::vector<st
 }
 
 void PrintStash(const partition_oram::p_oram_stash_t& stash) {
+  logger->debug("Stash:");
+
   for (size_t i = 0; i < stash.size(); ++i) {
-    std::string data;
-    ConvertToString(&stash[i], &data);
-    logger->info("{}", spdlog::to_hex(data));
+    logger->debug("Block {}: type : {}", stash[i].header.block_id,
+                  (int)stash[i].header.type);
   }
+}
+
+void PrintOramTree(const partition_oram::server_storage_t& storage) {
+  logger->debug("The size of the ORAM tree is {}", storage.size());
+  
+  for (auto iter = storage.begin(); iter != storage.end(); ++iter) {
+    logger->debug("Tag {}, {}: ", iter->first.first, iter->first.second);
+
+    for (const auto& block : iter->second) {
+      logger->debug("id: {}, type: {}", block.header.block_id,
+                    (int)block.header.type);
+    }
+  }
+}
 }  // namespace oram_utils

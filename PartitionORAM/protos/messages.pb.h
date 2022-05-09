@@ -49,7 +49,7 @@ struct TableStruct_messages_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[8]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[9]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -69,6 +69,9 @@ extern KeyExchangeRequestDefaultTypeInternal _KeyExchangeRequest_default_instanc
 class KeyExchangeResponse;
 struct KeyExchangeResponseDefaultTypeInternal;
 extern KeyExchangeResponseDefaultTypeInternal _KeyExchangeResponse_default_instance_;
+class PrintOramTreeRequest;
+struct PrintOramTreeRequestDefaultTypeInternal;
+extern PrintOramTreeRequestDefaultTypeInternal _PrintOramTreeRequest_default_instance_;
 class ReadPathRequest;
 struct ReadPathRequestDefaultTypeInternal;
 extern ReadPathRequestDefaultTypeInternal _ReadPathRequest_default_instance_;
@@ -87,6 +90,7 @@ template<> ::partition_oram::HelloMessage* Arena::CreateMaybeMessage<::partition
 template<> ::partition_oram::InitOramRequest* Arena::CreateMaybeMessage<::partition_oram::InitOramRequest>(Arena*);
 template<> ::partition_oram::KeyExchangeRequest* Arena::CreateMaybeMessage<::partition_oram::KeyExchangeRequest>(Arena*);
 template<> ::partition_oram::KeyExchangeResponse* Arena::CreateMaybeMessage<::partition_oram::KeyExchangeResponse>(Arena*);
+template<> ::partition_oram::PrintOramTreeRequest* Arena::CreateMaybeMessage<::partition_oram::PrintOramTreeRequest>(Arena*);
 template<> ::partition_oram::ReadPathRequest* Arena::CreateMaybeMessage<::partition_oram::ReadPathRequest>(Arena*);
 template<> ::partition_oram::ReadPathResponse* Arena::CreateMaybeMessage<::partition_oram::ReadPathResponse>(Arena*);
 template<> ::partition_oram::WritePathRequest* Arena::CreateMaybeMessage<::partition_oram::WritePathRequest>(Arena*);
@@ -95,14 +99,16 @@ PROTOBUF_NAMESPACE_CLOSE
 namespace partition_oram {
 
 enum Type : int {
-  Sequential = 0,
-  Random = 1,
+  kSequential = 0,
+  kRandom = 1,
+  kInit = 2,
+  kNormal = 3,
   Type_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
   Type_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool Type_IsValid(int value);
-constexpr Type Type_MIN = Sequential;
-constexpr Type Type_MAX = Random;
+constexpr Type Type_MIN = kSequential;
+constexpr Type Type_MAX = kNormal;
 constexpr int Type_ARRAYSIZE = Type_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Type_descriptor();
@@ -120,6 +126,152 @@ inline bool Type_Parse(
     Type_descriptor(), name, value);
 }
 // ===================================================================
+
+class PrintOramTreeRequest final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:partition_oram.PrintOramTreeRequest) */ {
+ public:
+  inline PrintOramTreeRequest() : PrintOramTreeRequest(nullptr) {}
+  ~PrintOramTreeRequest() override;
+  explicit constexpr PrintOramTreeRequest(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  PrintOramTreeRequest(const PrintOramTreeRequest& from);
+  PrintOramTreeRequest(PrintOramTreeRequest&& from) noexcept
+    : PrintOramTreeRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline PrintOramTreeRequest& operator=(const PrintOramTreeRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PrintOramTreeRequest& operator=(PrintOramTreeRequest&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PrintOramTreeRequest& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PrintOramTreeRequest* internal_default_instance() {
+    return reinterpret_cast<const PrintOramTreeRequest*>(
+               &_PrintOramTreeRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    0;
+
+  friend void swap(PrintOramTreeRequest& a, PrintOramTreeRequest& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(PrintOramTreeRequest* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PrintOramTreeRequest* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  PrintOramTreeRequest* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<PrintOramTreeRequest>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const PrintOramTreeRequest& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const PrintOramTreeRequest& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to, const ::PROTOBUF_NAMESPACE_ID::Message& from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PrintOramTreeRequest* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "partition_oram.PrintOramTreeRequest";
+  }
+  protected:
+  explicit PrintOramTreeRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kIdFieldNumber = 1,
+  };
+  // uint32 id = 1;
+  void clear_id();
+  uint32_t id() const;
+  void set_id(uint32_t value);
+  private:
+  uint32_t _internal_id() const;
+  void _internal_set_id(uint32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:partition_oram.PrintOramTreeRequest)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  uint32_t id_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_messages_2eproto;
+};
+// -------------------------------------------------------------------
 
 class HelloMessage final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:partition_oram.HelloMessage) */ {
@@ -169,7 +321,7 @@ class HelloMessage final :
                &_HelloMessage_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    0;
+    1;
 
   friend void swap(HelloMessage& a, HelloMessage& b) {
     a.Swap(&b);
@@ -336,7 +488,7 @@ class KeyExchangeRequest final :
                &_KeyExchangeRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   friend void swap(KeyExchangeRequest& a, KeyExchangeRequest& b) {
     a.Swap(&b);
@@ -487,7 +639,7 @@ class KeyExchangeResponse final :
                &_KeyExchangeResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   friend void swap(KeyExchangeResponse& a, KeyExchangeResponse& b) {
     a.Swap(&b);
@@ -638,7 +790,7 @@ class InitOramRequest final :
                &_InitOramRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   friend void swap(InitOramRequest& a, InitOramRequest& b) {
     a.Swap(&b);
@@ -714,7 +866,7 @@ class InitOramRequest final :
   enum : int {
     kIdFieldNumber = 1,
     kBucketSizeFieldNumber = 2,
-    kBlockNumFieldNumber = 3,
+    kBucketNumFieldNumber = 3,
   };
   // uint32 id = 1;
   void clear_id();
@@ -734,13 +886,13 @@ class InitOramRequest final :
   void _internal_set_bucket_size(uint32_t value);
   public:
 
-  // uint32 block_num = 3;
-  void clear_block_num();
-  uint32_t block_num() const;
-  void set_block_num(uint32_t value);
+  // uint32 bucket_num = 3;
+  void clear_bucket_num();
+  uint32_t bucket_num() const;
+  void set_bucket_num(uint32_t value);
   private:
-  uint32_t _internal_block_num() const;
-  void _internal_set_block_num(uint32_t value);
+  uint32_t _internal_bucket_num() const;
+  void _internal_set_bucket_num(uint32_t value);
   public:
 
   // @@protoc_insertion_point(class_scope:partition_oram.InitOramRequest)
@@ -752,7 +904,7 @@ class InitOramRequest final :
   typedef void DestructorSkippable_;
   uint32_t id_;
   uint32_t bucket_size_;
-  uint32_t block_num_;
+  uint32_t bucket_num_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_messages_2eproto;
 };
@@ -806,7 +958,7 @@ class ReadPathRequest final :
                &_ReadPathRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   friend void swap(ReadPathRequest& a, ReadPathRequest& b) {
     a.Swap(&b);
@@ -974,7 +1126,7 @@ class ReadPathResponse final :
                &_ReadPathResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   friend void swap(ReadPathResponse& a, ReadPathResponse& b) {
     a.Swap(&b);
@@ -1135,7 +1287,7 @@ class WritePathRequest final :
                &_WritePathRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   friend void swap(WritePathRequest& a, WritePathRequest& b) {
     a.Swap(&b);
@@ -1214,6 +1366,7 @@ class WritePathRequest final :
     kPathFieldNumber = 2,
     kLevelFieldNumber = 3,
     kTypeFieldNumber = 5,
+    kOffsetFieldNumber = 6,
   };
   // repeated bytes bucket = 4;
   int bucket_size() const;
@@ -1279,6 +1432,19 @@ class WritePathRequest final :
   void _internal_set_type(::partition_oram::Type value);
   public:
 
+  // optional uint32 offset = 6;
+  bool has_offset() const;
+  private:
+  bool _internal_has_offset() const;
+  public:
+  void clear_offset();
+  uint32_t offset() const;
+  void set_offset(uint32_t value);
+  private:
+  uint32_t _internal_offset() const;
+  void _internal_set_offset(uint32_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:partition_oram.WritePathRequest)
  private:
   class _Internal;
@@ -1293,6 +1459,7 @@ class WritePathRequest final :
   uint32_t path_;
   uint32_t level_;
   int type_;
+  uint32_t offset_;
   friend struct ::TableStruct_messages_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1344,7 +1511,7 @@ class WritePathResponse final :
                &_WritePathResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   friend void swap(WritePathResponse& a, WritePathResponse& b) {
     a.Swap(&b);
@@ -1422,6 +1589,30 @@ class WritePathResponse final :
   #pragma GCC diagnostic push
   #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
+// PrintOramTreeRequest
+
+// uint32 id = 1;
+inline void PrintOramTreeRequest::clear_id() {
+  id_ = 0u;
+}
+inline uint32_t PrintOramTreeRequest::_internal_id() const {
+  return id_;
+}
+inline uint32_t PrintOramTreeRequest::id() const {
+  // @@protoc_insertion_point(field_get:partition_oram.PrintOramTreeRequest.id)
+  return _internal_id();
+}
+inline void PrintOramTreeRequest::_internal_set_id(uint32_t value) {
+  
+  id_ = value;
+}
+inline void PrintOramTreeRequest::set_id(uint32_t value) {
+  _internal_set_id(value);
+  // @@protoc_insertion_point(field_set:partition_oram.PrintOramTreeRequest.id)
+}
+
+// -------------------------------------------------------------------
+
 // HelloMessage
 
 // bytes content = 1;
@@ -1680,24 +1871,24 @@ inline void InitOramRequest::set_bucket_size(uint32_t value) {
   // @@protoc_insertion_point(field_set:partition_oram.InitOramRequest.bucket_size)
 }
 
-// uint32 block_num = 3;
-inline void InitOramRequest::clear_block_num() {
-  block_num_ = 0u;
+// uint32 bucket_num = 3;
+inline void InitOramRequest::clear_bucket_num() {
+  bucket_num_ = 0u;
 }
-inline uint32_t InitOramRequest::_internal_block_num() const {
-  return block_num_;
+inline uint32_t InitOramRequest::_internal_bucket_num() const {
+  return bucket_num_;
 }
-inline uint32_t InitOramRequest::block_num() const {
-  // @@protoc_insertion_point(field_get:partition_oram.InitOramRequest.block_num)
-  return _internal_block_num();
+inline uint32_t InitOramRequest::bucket_num() const {
+  // @@protoc_insertion_point(field_get:partition_oram.InitOramRequest.bucket_num)
+  return _internal_bucket_num();
 }
-inline void InitOramRequest::_internal_set_block_num(uint32_t value) {
+inline void InitOramRequest::_internal_set_bucket_num(uint32_t value) {
   
-  block_num_ = value;
+  bucket_num_ = value;
 }
-inline void InitOramRequest::set_block_num(uint32_t value) {
-  _internal_set_block_num(value);
-  // @@protoc_insertion_point(field_set:partition_oram.InitOramRequest.block_num)
+inline void InitOramRequest::set_bucket_num(uint32_t value) {
+  _internal_set_bucket_num(value);
+  // @@protoc_insertion_point(field_set:partition_oram.InitOramRequest.bucket_num)
 }
 
 // -------------------------------------------------------------------
@@ -2010,6 +2201,34 @@ inline void WritePathRequest::set_type(::partition_oram::Type value) {
   // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.type)
 }
 
+// optional uint32 offset = 6;
+inline bool WritePathRequest::_internal_has_offset() const {
+  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+  return value;
+}
+inline bool WritePathRequest::has_offset() const {
+  return _internal_has_offset();
+}
+inline void WritePathRequest::clear_offset() {
+  offset_ = 0u;
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline uint32_t WritePathRequest::_internal_offset() const {
+  return offset_;
+}
+inline uint32_t WritePathRequest::offset() const {
+  // @@protoc_insertion_point(field_get:partition_oram.WritePathRequest.offset)
+  return _internal_offset();
+}
+inline void WritePathRequest::_internal_set_offset(uint32_t value) {
+  _has_bits_[0] |= 0x00000002u;
+  offset_ = value;
+}
+inline void WritePathRequest::set_offset(uint32_t value) {
+  _internal_set_offset(value);
+  // @@protoc_insertion_point(field_set:partition_oram.WritePathRequest.offset)
+}
+
 // -------------------------------------------------------------------
 
 // WritePathResponse
@@ -2017,6 +2236,8 @@ inline void WritePathRequest::set_type(::partition_oram::Type value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

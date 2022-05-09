@@ -45,6 +45,8 @@ std::vector<std::string> SerializeToStringVector(const partition_oram::p_oram_bu
 
 partition_oram::p_oram_bucket_t DeserializeFromStringVector(const std::vector<std::string>& data);
 
+partition_oram::p_oram_bucket_t SampleRandomBucket(size_t size, size_t tree_size);
+
 void SafeFree(void* ptr);
 
 void SafeFreeAll(size_t ptr_num, ...);
@@ -58,6 +60,8 @@ void CheckStatus(partition_oram::Status status, const std::string& reason);
 void PadStash(partition_oram::p_oram_stash_t* const stash, const size_t bucket_size);
 
 void PrintStash(const partition_oram::p_oram_stash_t& stash);
+
+void PrintOramTree(const partition_oram::server_storage_t& storage);
 }  // namespace oram_utils
 
 #endif  // PARTITION_ORAM_BASE_ORAM_UTILS_H_

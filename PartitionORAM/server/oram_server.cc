@@ -27,6 +27,7 @@
 std::atomic_bool server_running;
 
 namespace partition_oram {
+
 grpc::Status PartitionORAMService::InitOram(grpc::ServerContext* context,
                                             const InitOramRequest* request,
                                             google::protobuf::Empty* empty) {
@@ -35,8 +36,7 @@ grpc::Status PartitionORAMService::InitOram(grpc::ServerContext* context,
   // Intialize the Path ORAM storage.
   const uint32_t id = request->id();
   const uint32_t bucket_size = request->bucket_size();
-  const uint32_t block_num = request->block_num();
-  const uint32_t capacity = std::ceil(block_num * 1. / bucket_size);
+  const uint32_t bucket_num = request->bucket_num();
 
   // Do some sanity check.
   if (id < storages_.size()) {
@@ -52,9 +52,28 @@ grpc::Status PartitionORAMService::InitOram(grpc::ServerContext* context,
 
   // Create a new storage and initialize it.
   storages_.emplace_back(
-      std::make_unique<OramServerStorage>(id, capacity, bucket_size));
+      std::make_unique<OramServerStorage>(id, bucket_num, bucket_size));
 
   logger->info("PathORAM id: {} successfully created.", id);
+
+  return grpc::Status::OK;
+}
+
+grpc::Status PartitionORAMService::PrintOramTree(
+    grpc::ServerContext* context, const PrintOramTreeRequest* request,
+    google::protobuf::Empty* response) {
+  logger->info("From peer: {}, PrintOramTree request received.",
+               context->peer());
+
+  const uint32_t id = request->id();
+
+  if (id >= storages_.size()) {
+    const std::string error_message =
+        oram_utils::StrCat("PathORAM id: ", id, " does not exist.");
+    return grpc::Status(grpc::StatusCode::NOT_FOUND, error_message);
+  }
+
+  oram_utils::PrintOramTree(std::move(storages_[id]->get_storage()));
 
   return grpc::Status::OK;
 }
@@ -76,12 +95,14 @@ grpc::Status PartitionORAMService::ReadPath(grpc::ServerContext* context,
 
   // Read the path.
   p_oram_bucket_t bucket;
-  if (storages_[id]->ReadPath(path, level, &bucket) != Status::kOK) {
+  if (storages_[id]->ReadPath(level, path, &bucket) != Status::kOK) {
     const std::string error_message =
         oram_utils::StrCat("Failed to read path: ", path, " in level: ", level,
                            " in PathORAM id: ", id);
     return grpc::Status(grpc::StatusCode::INTERNAL, error_message);
   }
+  logger->debug("After read path:");
+  oram_utils::PrintStash(bucket);
 
   // Serialze them to the string and send back to the client.
   const std::vector<std::string> serialized_bucket =
@@ -98,10 +119,12 @@ grpc::Status PartitionORAMService::WritePath(grpc::ServerContext* context,
                                              const WritePathRequest* request,
                                              WritePathResponse* response) {
   logger->info("From peer: {}, WritePath request received.", context->peer());
+  Type type = request->type();
 
   const uint32_t id = request->id();
   const uint32_t level = request->level();
   const uint32_t path = request->path();
+  const uint32_t offset = request->offset();
 
   if (id >= storages_.size()) {
     const std::string error_message =
@@ -115,7 +138,12 @@ grpc::Status PartitionORAMService::WritePath(grpc::ServerContext* context,
           request->bucket().begin(), request->bucket().end())));
 
   // Write the path.
-  if (storages_[id]->WritePath(path, level, bucket) != Status::kOK) {
+  Status status =
+      type == Type::kInit
+          ? storages_[id]->AccurateWritePath(level, offset, bucket, type)
+          : storages_[id]->WritePath(level, path, bucket);
+
+  if (status != Status::kOK) {
     const std::string error_message =
         oram_utils::StrCat("Failed to write path: ", path, " in level: ", level,
                            " in PathORAM id: ", id);

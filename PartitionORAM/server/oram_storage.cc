@@ -30,6 +30,8 @@ OramServerStorage::OramServerStorage(uint32_t id, size_t capacity,
     : id_(id), capacity_(capacity), bucket_size_(bucket_size) {
   level_ = std::ceil(LOG_BASE(capacity_, 2)) - 1;
 
+  logger->debug("level = {}, capacity = {}", level_, capacity);
+
   for (uint32_t i = 0; i <= level_; i++) {
     // Initialize dummy blocks into the storage.
     const uint32_t cur_size = POW2(i);
@@ -46,10 +48,10 @@ OramServerStorage::OramServerStorage(uint32_t id, size_t capacity,
 Status OramServerStorage::ReadPath(uint32_t level, uint32_t path,
                                    p_oram_bucket_t* const out_bucket) {
   // The offset should be calculated by the level and path.
-  const uint32_t offset = std::floor(path * 1. / POW2(level_ + 1 - level));
+  const uint32_t offset = std::floor(path * 1. / POW2(level_ - level));
   const server_storage_tag_t tag = std::make_pair(level, offset);
-
-  logger->info("Read offset {} at level {} for path {}.", offset, level, path);
+  logger->info("Read offset {} at level {} for path {}.", offset, level,
+                  path);
 
   auto iter = storage_.find(tag);
   if (iter == storage_.end()) {
@@ -65,13 +67,27 @@ Status OramServerStorage::ReadPath(uint32_t level, uint32_t path,
 
 Status OramServerStorage::WritePath(uint32_t level, uint32_t path,
                                     const p_oram_bucket_t& in_bucket) {
-  const uint32_t offset = std::floor(path * 1. / POW2(level_ + 1 - level));
+  const uint32_t offset = std::floor(path * 1. / POW2(level_ - level));
+
+  return AccurateWritePath(level, offset, in_bucket,
+                           partition_oram::Type::kNormal);
+}
+
+Status OramServerStorage::AccurateWritePath(uint32_t level, uint32_t offset,
+                                            const p_oram_bucket_t& in_bucket,
+                                            partition_oram::Type type) {
+  logger->info("Write offset {} at level {}. ", offset, level);
   const server_storage_tag_t tag = std::make_pair(level, offset);
 
-  logger->info("Write offset {} at level {} for path {}. ", offset, level, path);
+  if (type == partition_oram::Type::kInit) {
+    std::copy(in_bucket.begin(), in_bucket.end(),
+              std::back_inserter(storage_[tag]));
+
+    return Status::kOK;
+  }
 
   auto iter = storage_.find(tag);
-  if (iter == storage_.end()) {
+  if (iter == storage_.end() && type == partition_oram::Type::kNormal) {
     logger->error("OramServerStorage::WritePath: Cannot find the bucket.");
     // Not found.
     return Status::kObjectNotFound;

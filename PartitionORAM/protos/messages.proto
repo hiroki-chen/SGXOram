@@ -10,6 +10,8 @@ service server {
   // Initialize the ORAM by sending the client's configurations.
   rpc InitOram(InitOramRequest) returns (google.protobuf.Empty) {}
 
+  rpc PrintOramTree(PrintOramTreeRequest) returns (google.protobuf.Empty) {}
+
   rpc ReadPath(ReadPathRequest) returns (ReadPathResponse) {}
 
   rpc WritePath(WritePathRequest) returns (WritePathResponse) {}
@@ -26,8 +28,14 @@ service server {
 }
 
 enum Type {
-  Sequential = 0;
-  Random = 1;
+  kSequential = 0;
+  kRandom = 1;
+  kInit = 2;
+  kNormal = 3;
+}
+
+message PrintOramTreeRequest {
+  uint32 id = 1;
 }
 
 message HelloMessage {
@@ -46,7 +54,7 @@ message KeyExchangeResponse {
 message InitOramRequest {
   uint32 id = 1;
   uint32 bucket_size = 2;
-  uint32 block_num = 3;
+  uint32 bucket_num = 3;
 }
 
 message ReadPathRequest {
@@ -66,6 +74,7 @@ message WritePathRequest {
   uint32 level = 3;
   repeated bytes bucket = 4;
   optional Type type = 5;
+  optional uint32 offset = 6;
 }
 
 message WritePathResponse {

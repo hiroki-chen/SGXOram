@@ -44,7 +44,8 @@ void Client::Run(void) {
   cryptor_ = oram_crypto::Cryptor::GetInstance();
   controller_ = OramController::GetInstance();
   // The stub can be shared between multiple objects.
-  controller_->set_stub(stub_);
+  controller_->SetStub(stub_);
+  controller_->SetBucketSize(bucket_size_);
 
   // Test if crypto is working.
   std::string test_str = "Hello, world!";

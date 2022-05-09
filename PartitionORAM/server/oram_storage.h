@@ -23,6 +23,7 @@
 #include <unordered_map>
 
 #include "base/oram_defs.h"
+#include "protos/messages.pb.h"
 
 namespace partition_oram {
 class OramServerStorage {
@@ -39,8 +40,15 @@ class OramServerStorage {
  public:
   OramServerStorage(uint32_t id, size_t capacity, size_t bucket_size);
 
-  Status ReadPath(uint32_t level, uint32_t path, p_oram_bucket_t* const out_bucket);
-  Status WritePath(uint32_t level, uint32_t path, const p_oram_bucket_t& in_bucket);
+  Status ReadPath(uint32_t level, uint32_t path,
+                  p_oram_bucket_t* const out_bucket);
+  Status WritePath(uint32_t level, uint32_t path,
+                   const p_oram_bucket_t& in_bucket);
+  Status AccurateWritePath(uint32_t level, uint32_t offset,
+                           const p_oram_bucket_t& in_bucket,
+                           partition_oram::Type type);
+
+  server_storage_t get_storage(void) const { return storage_; }
 };
 }  // namespace partition_oram
 
