@@ -40,8 +40,8 @@ static inline bool check_slot_header(const char* const header_str,
 std::string calculate_slot_fingerprint(uint32_t level, uint32_t offset) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
-  const std::string sid = enclave_utils::enclave_strcat(std::to_string(level).c_str(), "_",
-                                         std::to_string(offset).c_str());
+  const std::string sid = enclave_utils::enclave_strcat(
+      std::to_string(level).c_str(), "_", std::to_string(offset).c_str());
   return crypto_manager->enclave_sha_256(sid);
 }
 
@@ -53,22 +53,12 @@ static void print_permutation(const uint32_t* permutation, uint32_t size) {
 }
 
 // This function assembles position for the current block.
-static std::string assemble_position_and_encrypt(uint32_t level, uint32_t bid,
-                                                 uint32_t address) {
-  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
-      EnclaveCryptoManager::get_instance();
-  // ENCLAVE_LOG("[enclave] Assembling position for bid: %d\n", bid);
-  sgx_oram::oram_position_t* position =
-      (sgx_oram::oram_position_t*)malloc(ORAM_POSITION_SIZE);
+static inline void assemble_position(
+    uint32_t level, uint32_t bid, uint32_t address,
+    sgx_oram::oram_position_t* const position) {
   position->level = level;
   position->bid = bid;
   position->address = address;
-
-  const std::string ans = crypto_manager->enclave_aes_128_gcm_encrypt(
-      std::string((char*)position, ORAM_POSITION_SIZE));
-  enclave_utils::safe_free(position);
-
-  return ans;
 }
 
 static void get_position_and_decrypt(sgx_oram::oram_position_t* const position,
@@ -84,8 +74,9 @@ static void get_position_and_decrypt(sgx_oram::oram_position_t* const position,
   size_t position_size = 0;
   const std::string position_fingerprint =
       crypto_manager->enclave_sha_256(std::to_string(block_address));
-  ocall_read_position(&position_size, position_fingerprint.c_str(), ciphertext,
+  status = ocall_read_position(&position_size, position_fingerprint.c_str(), ciphertext,
                       ENCRYPTED_POSITION_SIZE);
+  enclave_utils::check_sgx_status(status, "ocall_read_position()");
 
   // Check if the position is valid.
   if (position_size == 0) {
@@ -140,14 +131,14 @@ static sgx_status_t populate_leaf_slot(
       EnclaveCryptoManager::get_instance();
 
   const uint32_t slot_begin = header->range_begin;
-  const uint32_t real_number = crypto_manager->get_oram_config()->number / 2;
+  const uint32_t real_number = crypto_manager->get_oram_config()->number >> 1;
   ENCLAVE_LOG("[enclave] Populating leaf slot...");
   ENCLAVE_LOG(
       "[enclave] slot_size: %zu, permutation_size: %zu, offset: %u, "
       "slot_begin: %u\n",
       slot_size, permutation_size, offset, slot_begin);
 
-  size_t i = 0;
+  size_t i = 0, limit = (DEFAULT_BUCKET_SIZE >> 1);
   // The loop should end when i reaches the halve of the slot size or the
   // offset is larger than the needed size.
   // Note that blocks in the same bucket have the same block id. So the offset
@@ -155,7 +146,7 @@ static sgx_status_t populate_leaf_slot(
   // need to multiply slot_begin by the macro DEFAULT_BUCKET_SIZE.
 
   // Or more simply, the offset + i cannot exceed the real_number.
-  for (; (i + offset <= real_number) && (i < DEFAULT_BUCKET_SIZE >> 1); i++) {
+  for (; (i + offset <= real_number) && (i < limit); i++) {
     sgx_oram::oram_block_t* const block_ptr = slot + i;
     // Fill in the block with metadata first.
     block_ptr->header.type = sgx_oram::ORAM_BLOCK_TYPE_NORMAL;
@@ -163,21 +154,16 @@ static sgx_status_t populate_leaf_slot(
     block_ptr->header.address = permutation[offset + i];
 
     // Assemble the <k, v> pair.
-    // ENCLAVE_LOG("[enclave] Address is %d\n", permutation[offset + i]);
-    const std::string position_str = assemble_position_and_encrypt(
-        header->level, slot_begin, permutation[offset + i]);
-    const std::string position_fingerprint = crypto_manager->enclave_sha_256(
-        std::to_string(permutation[offset + i]));
-    // Write the position back to the server.
-    // Note that the key of the position map is the hash value for the address
-    // and the value of that is the encrypted byte array.
-    sgx_status_t status = ocall_write_position(position_fingerprint.c_str(),
-                                               (uint8_t*)position_str.data(),
-                                               position_str.size());
-    enclave_utils::check_sgx_status(status, "ocall_write_position()");
+    sgx_oram::oram_position_t* position =
+        (sgx_oram::oram_position_t*)malloc(ORAM_POSITION_SIZE);
+    assemble_position(header->level, slot_begin, permutation[offset + i],
+                      position);
+    // Encrypt the position and the store it to the ouside.
+    encrypt_position_and_store(position);
     // Then fill in the data.
     memset(block_ptr->data, 0, DEFAULT_ORAM_DATA_SIZE);
     block_ptr->data[0] = block_ptr->header.address;
+    ENCLAVE_LOG("[enclave] Block %d is populated.\n", block_ptr->header.address);
   }
 
   for (; i < slot_size; i++) {
@@ -185,6 +171,7 @@ static sgx_status_t populate_leaf_slot(
     // Mark the block as empty.
     block_ptr->header.type = sgx_oram::ORAM_BLOCK_TYPE_DUMMY;
   }
+
 
   return SGX_SUCCESS;
 }
@@ -306,8 +293,6 @@ std::string get_slot_header_and_decrypt(uint32_t level, uint32_t offset,
     std::shared_ptr<EnclaveCache> cache_manager =
         EnclaveCache::get_instance_for_slot_header();
     std::string ans = cache_manager->read(slot_hash);
-    ENCLAVE_LOG("[enclave] get_slot_header_and_decrypt(): The size is %zu.",
-                ans.size());
     // Then decrypt it.
     ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
     if (!check_slot_header(ans.data(), level)) {
@@ -452,7 +437,26 @@ static sgx_status_t init_so2_slots(uint32_t* const level_size_information,
   return SGX_SUCCESS;
 }
 
-void encrypt_header_and_store(sgx_oram::oram_slot_header_t* const header) {
+void encrypt_position_and_store(
+    const sgx_oram::oram_position_t* const position) {
+  ENCLAVE_LOG("[enclave] Encrypting position...\n");
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
+  // We do not store positions into the cache.
+  const std::string position_hash =
+      crypto_manager->enclave_sha_256(std::to_string(position->address));
+  const std::string encrypted_position =
+      crypto_manager->enclave_aes_128_gcm_encrypt(
+          std::string(reinterpret_cast<const char*>(position),
+                      sizeof(sgx_oram::oram_position_t)));
+  sgx_status_t status = ocall_write_position(
+      position_hash.c_str(), (uint8_t*)encrypted_position.data(),
+      encrypted_position.size());
+  enclave_utils::check_sgx_status(status, "ocall_write_position()");
+}
+
+void encrypt_header_and_store(
+    const sgx_oram::oram_slot_header_t* const header) {
   ENCLAVE_LOG("[enclave] Encrypting the header...\n");
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
@@ -463,8 +467,8 @@ void encrypt_header_and_store(sgx_oram::oram_slot_header_t* const header) {
   const std::string slot_hash = calculate_slot_fingerprint(level, offset);
   // Then encrypt the header.
   const std::string encrypted_header =
-      crypto_manager->enclave_aes_128_gcm_encrypt(
-          std::string(reinterpret_cast<char*>(header), ORAM_SLOT_HEADER_SIZE));
+      crypto_manager->enclave_aes_128_gcm_encrypt(std::string(
+          reinterpret_cast<const char*>(header), ORAM_SLOT_HEADER_SIZE));
 
   if (!cache_enabled) {
     // Store the encrypted header.
@@ -482,7 +486,7 @@ void encrypt_header_and_store(sgx_oram::oram_slot_header_t* const header) {
 
 // This function encrypts the given slot and then stores the result in the
 // external unstrusted memory. All the buffers are allocated by the caller.
-void encrypt_slot_and_store(uint8_t* const slot, size_t slot_size,
+void encrypt_slot_and_store(const uint8_t* const slot, size_t slot_size,
                             uint32_t level, uint32_t offset) {
   ENCLAVE_LOG("[enclave] Encrypting the slot at level %zu, offset %zu...\n",
               level, offset);
@@ -495,7 +499,7 @@ void encrypt_slot_and_store(uint8_t* const slot, size_t slot_size,
   // Encrypt the slot.
   const std::string encrypted_slot =
       crypto_manager->enclave_aes_128_gcm_encrypt(
-          std::string(reinterpret_cast<char*>(slot), slot_size));
+          std::string(reinterpret_cast<const char*>(slot), slot_size));
 
   if (!cache_enabled) {
     // Write the slot to the SGX storage.
@@ -531,7 +535,6 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
   ENCLAVE_LOG("[enclave] block_level: %u, bid_cur: %u", block_level, bid_cur);
 
   // We start from 0.
-  //FIXME: Seems like there are some infinite loops?
   for (uint32_t i = 0; i < level - 1; i++) {
     ENCLAVE_LOG("[enclave] Traversing level %u...\n", i);
     // If the current level is the same as the block level, then we should

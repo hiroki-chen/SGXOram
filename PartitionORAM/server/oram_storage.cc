@@ -28,7 +28,7 @@ namespace partition_oram {
 OramServerStorage::OramServerStorage(uint32_t id, size_t capacity,
                                      size_t bucket_size)
     : id_(id), capacity_(capacity), bucket_size_(bucket_size) {
-  level_ = std::ceil(LOG_BASE(capacity_, 2)) - 1;
+  level_ = std::ceil(LOG_BASE(capacity_ + 1, 2)) - 1;
 
   logger->debug("level = {}, capacity = {}", level_, capacity);
 

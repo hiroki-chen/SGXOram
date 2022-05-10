@@ -40,7 +40,7 @@ PathOramController::PathOramController(uint32_t id, uint32_t block_num,
     : id_(id), bucket_size_(bucket_size) {
   const size_t bucket_num = std::ceil(block_num * 1.0 / bucket_size);
   // Note that the level starts from 0.
-  tree_level_ = std::ceil(LOG_BASE(bucket_num, 2)) - 1;
+  tree_level_ = std::ceil(LOG_BASE(bucket_num + 1, 2)) - 1;
   number_of_leafs_ = POW2(tree_level_);
 
   logger->info(

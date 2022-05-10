@@ -118,7 +118,7 @@ class EnclaveCryptoManager final {
   std::string enclave_aes_128_gcm_decrypt(const std::string& message);
 };
 
-static const std::string candidate =
+static const std::string kCandidate =
     "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 #endif  // ENCLAVE_CRYPTO_MANAGER_HH

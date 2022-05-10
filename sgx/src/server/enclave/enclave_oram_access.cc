@@ -213,17 +213,36 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
     block->header.type =
         static_cast<sgx_oram::oram_block_type_t>(delta_a || delta_b || delta_c);
     // =========== End Third Part: is_dummy processing =========== //
-  }
 
-  enclave_utils::safe_free_all(2, populated_bool_for_data,
-                               populated_bool_for_bid);
+    // =========== Begin Fourth Part: Position Map Update =========== //
+    // TODO.
+    // =========== End Fourth Part: Position Map Update =========== //
+  }
 
   // Finally, we do the one-pass again and read the target data to the client.
   // This time, there is nothing for us to do, i.e., the only thing we need to
   // do is check whether the target block exists.
   for (size_t i = 0; i < slot_size; i++) {
-    // TODO.
+    // Get the block and prepare a buffer for the boolean variable.
+    sgx_oram::oram_block_t* block = slot_storage + i;
+    memset(populated_bool_for_data, 0, DEFAULT_ORAM_DATA_SIZE);
+
+    // Check whether this is the target one.
+    bool condition_existing =
+        (condition) &&
+        (op_type == sgx_oram::oram_operation_t::ORAM_OPERATION_READ) &&
+        (block->header.address == position->address) &&
+        (block->header.type ==
+         sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_NORMAL);
+
+    enclave_utils::populate_from_bool(
+        condition_existing, populated_bool_for_data, DEFAULT_ORAM_DATA_SIZE);
+    enclave_utils::band(populated_bool_for_data, block->data, data_star,
+                        DEFAULT_ORAM_DATA_SIZE, DEFAULT_ORAM_DATA_SIZE);
   }
+
+  enclave_utils::safe_free_all(2, populated_bool_for_data,
+                               populated_bool_for_bid);
 }
 
 // This functions performs some necessary clean-ups and variables assignments
@@ -308,6 +327,7 @@ void sub_access(sgx_oram::oram_operation_t op_type, bool condition_s1,
   encrypt_slot_and_store(s1, s1_size, s1_header->level, s1_header->offset);
 
   // Invoke sub_access_s2.
+  // FIXME: This causes problem.
   sub_access_s2(op_type, condition_s2, s2_header, s2, block_slot1_target,
                 data_star, &counter, pos, position);
   encrypt_slot_and_store(s2, s2_size, s2_header->level, s2_header->offset);
@@ -370,6 +390,8 @@ void sub_evict_s3(sgx_oram::oram_slot_header_t* const header, uint8_t* const s3,
                         ORAM_BLOCK_SIZE, ORAM_BLOCK_SIZE);
     enclave_utils::bor((uint8_t*)block, populated, (uint8_t*)block,
                        ORAM_BLOCK_SIZE, ORAM_BLOCK_SIZE);
+
+    // TODO: Update the position map.
   }
 }
 

@@ -35,7 +35,7 @@ namespace enclave_utils {
 
 using sgx_error_list = std::unordered_map<sgx_status_t, std::string>;
 
-static const std::string digits = "0123456789abcdef";
+static const std::string kDigits = "0123456789abcdef";
 
 #if __cplusplus >= 201703L
 /** @addtogroup String concatenation helpers with arbitrary elements.
@@ -192,6 +192,14 @@ std::string enclave_strcat(const std::string& str, ...);
  * @return uint32_t
  */
 uint32_t uniform_random(uint32_t lower, uint32_t upper);
+
+/**
+ * @brief Get the time source from the CPU using assembly language.
+ * @note  std::chrono is disabled in the enclave and we cannot use it for now.
+ *
+ * @return uint64_t
+ */
+uint64_t get_current_time(void);
 
 }  // namespace enclave_utils
 #endif  // ENCLAVE_UTILS_HH
