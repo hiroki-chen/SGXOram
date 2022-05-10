@@ -70,7 +70,8 @@ class PathOramController {
   Status FillWithData(const std::vector<oram_block_t>& data);
 
   // The meanings of parameters are explained in Stefanov et al.'s paper.
-  Status Access(Operation op_type, uint32_t address, uint8_t* const data);
+  Status Access(Operation op_type, uint32_t address, oram_block_t* const data,
+                bool dummy);
 
   uint32_t GetTreeLevel(void) const { return tree_level_; }
 
@@ -81,8 +82,10 @@ class PathOramController {
 class OramController {
   size_t partition_size_;
   size_t bucket_size_;
-  // Position map: [key] -> [<slot_id, offset>].
-  pp_oram_position_t position_map_;
+  size_t nu_;
+  static size_t counter_;
+  // Position map: [key] -> [slot_id].
+  p_oram_position_t position_map_;
   // Slots: [slot_id] -> [block1, block2, ..., block_n].
   pp_oram_slot_t slots_;
   // Controllers for each slot: [slot_id] -> [controller_1, controller_2, ...,
@@ -95,14 +98,20 @@ class OramController {
 
   OramController() {}
 
+  // ==================== Begin private methods ==================== //
+  Status Evict(uint32_t id);
+  Status SequentialEvict(void);
+  Status RandomEvict(void);
+  // ==================== End private methods ==================== //
+
  public:
   static std::unique_ptr<OramController> GetInstance();
 
   void SetStub(std::shared_ptr<server::Stub> stub) { stub_ = stub; }
   void SetBucketSize(size_t bucket_size) { bucket_size_ = bucket_size; }
+  void SetNu(size_t nu) { nu_ = nu; }
 
   Status Access(Operation op_type, uint32_t address, oram_block_t* const data);
-  Status Evict(EvictType evict_type);
   Status Run(uint32_t block_num, uint32_t bucket_size);
 
   // A reserved interface for testing one of the PathORAM controllers.

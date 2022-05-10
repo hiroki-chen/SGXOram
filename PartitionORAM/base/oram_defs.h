@@ -102,8 +102,6 @@ using p_oram_stash_t = std::vector<oram_block_t>;
 using p_oram_path_t = std::vector<p_oram_bucket_t>;
 using p_oram_position_t = std::unordered_map<uint32_t, uint32_t>;
 // Alias for Partition ORAM.
-using pp_oram_pos_t = std::pair<uint32_t, uint32_t>;
-using pp_oram_position_t = std::unordered_map<uint32_t, pp_oram_pos_t>;
 using pp_oram_slot_t = std::vector<std::vector<oram_block_t>>;
 // Alias for server storage.
 using server_storage_tag_t = std::pair<uint32_t, uint32_t>;
