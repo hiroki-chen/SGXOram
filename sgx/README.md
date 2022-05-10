@@ -62,7 +62,7 @@ sudo make install
 popd
 ```
 
-For more information, interested readers are referred to [this](https://grpc.io).
+For more information, interested readers are referred to [this](https://grpc.io). **Note: IF GRPC is as shared library, you CANNOT run SGX in hardware mode** because `libsgx_quote_ex.so` depends on `libprotobuf.so.10` which conflicts with `libprotobuf.so.3` required by `libgrpc++_reflection.so`. In this case, please remove `-DBUILD_SHARED_LIBS=ON` and link to the static libraries.
 
 Also, you may also need to set the environment for the SGX SDK so that you can properly build the enclave:
 
