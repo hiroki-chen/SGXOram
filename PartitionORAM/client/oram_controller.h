@@ -31,6 +31,8 @@
 namespace partition_oram {
 // This class is the implementation of the ORAM controller for Path ORAM.
 class PathOramController {
+  friend class OramController;
+
   uint32_t id_;
   // ORAM parameters.
   uint32_t number_of_leafs_;
@@ -48,9 +50,12 @@ class PathOramController {
 
   // ==================== Begin private methods ==================== //
   Status ReadBucket(uint32_t path, uint32_t level,
-                     p_oram_bucket_t* const bucket);
+                    p_oram_bucket_t* const bucket);
   Status WriteBucket(uint32_t path, uint32_t level,
-                      const p_oram_bucket_t& bucket);
+                     const p_oram_bucket_t& bucket);
+  Status AccurateWriteBucket(uint32_t level, uint32_t offset,
+                             const p_oram_bucket_t& bucket);
+  Status PrintOramTree(void);
 
   p_oram_stash_t FindSubsetOf(uint32_t current_path);
   // ==================== End private methods ==================== //
@@ -58,8 +63,8 @@ class PathOramController {
  public:
   PathOramController(uint32_t id, uint32_t block_num, uint32_t bucket_size);
 
-  void set_stub(std::shared_ptr<server::Stub> stub) { stub_ = stub; }
-  void set_stash(p_oram_stash_t* const stash) { stash_ = stash; }
+  void SetStub(std::shared_ptr<server::Stub> stub) { stub_ = stub; }
+  void SetStash(p_oram_stash_t* const stash) { stash_ = stash; }
 
   Status InitOram(void);
   Status FillWithData(const std::vector<oram_block_t>& data);
@@ -67,12 +72,15 @@ class PathOramController {
   // The meanings of parameters are explained in Stefanov et al.'s paper.
   Status Access(Operation op_type, uint32_t address, uint8_t* const data);
 
+  uint32_t GetTreeLevel(void) const { return tree_level_; }
+
   virtual ~PathOramController() {}
 };
 
 // This class is the implementation of the ORAM controller for Partition ORAM.
 class OramController {
   size_t partition_size_;
+  size_t bucket_size_;
   // Position map: [key] -> [<slot_id, offset>].
   pp_oram_position_t position_map_;
   // Slots: [slot_id] -> [block1, block2, ..., block_n].
@@ -86,11 +94,12 @@ class OramController {
   std::shared_ptr<server::Stub> stub_;
 
   OramController() {}
- 
+
  public:
   static std::unique_ptr<OramController> GetInstance();
 
-  void set_stub(std::shared_ptr<server::Stub> stub) { stub_ = stub; }
+  void SetStub(std::shared_ptr<server::Stub> stub) { stub_ = stub; }
+  void SetBucketSize(size_t bucket_size) { bucket_size_ = bucket_size; }
 
   Status Access(Operation op_type, uint32_t address, oram_block_t* const data);
   Status Evict(EvictType evict_type);
@@ -103,4 +112,4 @@ class OramController {
 };
 }  // namespace partition_oram
 
-#endif // PARTITION_ORAM_CLIENT_ORAM_CONTROLLER_H_
+#endif  // PARTITION_ORAM_CLIENT_ORAM_CONTROLLER_H_

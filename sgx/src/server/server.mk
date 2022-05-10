@@ -102,6 +102,9 @@ endif
 ifeq ($(SGX_MODE), SIM)
 	Trts_Library_Name := sgx_trts_sim
 	Service_Library_Name := sgx_tservice_sim
+else
+	Trts_Library_Name = sgx_trts
+	Service_Library_Name := sgx_tservice
 endif
 Crypto_Library_Name := sgx_tcrypto
 

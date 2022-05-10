@@ -37,15 +37,59 @@ std::unique_ptr<OramController> OramController::GetInstance() {
 
 PathOramController::PathOramController(uint32_t id, uint32_t block_num,
                                        uint32_t bucket_size)
-    : id_(id), number_of_leafs_(block_num), bucket_size_(bucket_size) {
+    : id_(id), bucket_size_(bucket_size) {
+  const size_t bucket_num = std::ceil(block_num * 1.0 / bucket_size);
   // Note that the level starts from 0.
-  tree_level_ =
-      std::ceil(std::log(block_num * 1.0 / bucket_size) / std::log(2)) - 1;
+  tree_level_ = std::ceil(LOG_BASE(bucket_num + 1, 2)) - 1;
+  number_of_leafs_ = POW2(tree_level_);
 
   logger->info(
       "PathORAM Config:\n"
-      "id: {}, block_num: {}, bucket_size: {}, tree_height: {}\n",
+      "id: {}, number_of_leafs: {}, bucket_size: {}, tree_height: {}\n",
       id_, number_of_leafs_, bucket_size_, tree_level_);
+}
+
+Status PathOramController::PrintOramTree(void) {
+  grpc::ClientContext context;
+  PrintOramTreeRequest request;
+  google::protobuf::Empty empty;
+
+  request.set_id(id_);
+  grpc::Status status = stub_->PrintOramTree(&context, request, &empty);
+
+  if (!status.ok()) {
+    logger->error("PrintOramTree failed: {}", status.error_message());
+    return Status::kServerError;
+  }
+
+  return Status::kOK;
+}
+
+Status PathOramController::AccurateWriteBucket(uint32_t level, uint32_t offset,
+                                               const p_oram_bucket_t& bucket) {
+  grpc::ClientContext context;
+  WritePathRequest request;
+  WritePathResponse response;
+
+  request.set_id(id_);
+  request.set_level(level);
+  request.set_offset(offset);
+  request.set_type(Type::kInit);
+
+  // Copy the buckets into the buffer of WriteBucketRequest.
+  for (const auto& block : bucket) {
+    std::string block_str;
+    oram_utils::ConvertToString(&block, &block_str);
+    request.add_bucket(block_str);
+  }
+
+  grpc::Status status = stub_->WritePath(&context, request, &response);
+
+  if (!status.ok()) {
+    return Status::kServerError;
+  }
+
+  return Status::kOK;
 }
 
 Status PathOramController::InitOram(void) {
@@ -55,7 +99,7 @@ Status PathOramController::InitOram(void) {
 
   request.set_id(id_);
   request.set_bucket_size(bucket_size_);
-  request.set_block_num(number_of_leafs_);
+  request.set_bucket_num(number_of_leafs_);
 
   grpc::Status status = stub_->InitOram(&context, request, &empty);
   if (!status.ok()) {
@@ -63,19 +107,76 @@ Status PathOramController::InitOram(void) {
     return Status::kServerError;
   }
 
-  // Initialize the position map.
-  for (size_t i = 0; i < number_of_leafs_; i++) {
-    position_map_.emplace(i, i);
-  }
-
   return Status::kOK;
 }
 
+// The input vector of blocks should be sorted by their path id.
 Status PathOramController::FillWithData(const std::vector<oram_block_t>& data) {
   // We organize all the data into buckets and then directly write them to the
   // server by invoking the WritePath method provided by the gRPC framework.
+  // The data are organized level by level, and for best performance, we
+  // initialize the ORAM tree from the leaf to the root. In other words, we
+  // **GREEDILY** fill the buckets from the leaf to the root.
 
   // TODO: Implement me.
+  // TODO: Initialize the tree while filling the position map.
+  size_t p_data = 0;
+  for (int i = tree_level_; i >= 0; i--) {
+    // We pick bucket_size blocks from the data and organize them into a bucket.
+    // The bucket is then sent to the server.
+    const uint32_t level_size = POW2(i);
+    const uint32_t span = POW2(tree_level_ - i);
+
+    for (uint32_t j = 0; j < level_size; j++) {
+      p_oram_bucket_t bucket_this_level;
+
+      // This determined the range of the current bucket in terms of path.
+      const uint32_t begin = j * span;
+      const uint32_t end = begin + span - 1;
+
+      // Organize into a bucket.
+      for (size_t k = 0; k < bucket_size_; k++) {
+        if (p_data >= data.size()) {
+          break;
+        }
+
+        // Sample a random path for the block.
+        uint32_t path;
+        oram_utils::CheckStatus(
+            oram_crypto::Cryptor::UniformRandom(begin, end, &path),
+            "UniformRandom error");
+        logger->debug("Path = {} for range [{}, {}]", path, begin, end);
+        bucket_this_level.emplace_back(data[p_data]);
+        // Update the position map.
+        position_map_[data[p_data].header.block_id] = path;
+        logger->debug("Block {} is stored at path {}",
+                      data[p_data].header.block_id, path);
+        p_data++;
+      }
+
+      oram_utils::PadStash(&bucket_this_level, bucket_size_);
+
+      // Write the bucket to the server.
+      oram_utils::CheckStatus(
+          AccurateWriteBucket(i, j, bucket_this_level),
+          "Failed to write bucket accurately when intializing the ORAM!");
+    }
+  }
+
+  // Print the oram tree on the server side.
+  grpc::ClientContext context;
+  PrintOramTreeRequest request;
+  google::protobuf::Empty empty;
+
+  request.set_id(id_);
+
+  // grpc::Status status = stub_->PrintOramTree(&context, request, &empty);
+  // if (!status.ok()) {
+  //   logger->error("PrintOramTree failed: {}", status.error_message());
+  //   return Status::kServerError;
+  // }
+
+  return Status::kOK;
 }
 
 Status PathOramController::ReadBucket(uint32_t path, uint32_t level,
@@ -118,6 +219,7 @@ Status PathOramController::WriteBucket(uint32_t path, uint32_t level,
 
   request.set_path(path);
   request.set_level(level);
+  request.set_type(Type::kNormal);
 
   // Copy the buckets into the buffer of WriteBucketRequest.
   for (const auto& block : bucket) {
@@ -175,6 +277,7 @@ Status PathOramController::Access(Operation op_type, uint32_t address,
   // Randomly remap the position of block a to a new random position.
   // Let x denote the block’s old position.
   const uint32_t x = position_map_[address];
+  logger->info("The address {} has the path {}.", address, x);
   // Update the position map.
   position_map_[address] = new_path;
 
@@ -200,7 +303,7 @@ Status PathOramController::Access(Operation op_type, uint32_t address,
       // <=> S = S ∪ ReadBucket(P(x, l))
       auto iter = std::find_if(stash_->begin(), stash_->end(),
                                BlockEqual(block.header.block_id));
-      if (iter == stash_->end()) {
+      if (iter == stash_->end() && block.header.type == BlockType::kNormal) {
         stash_->emplace_back(block);
       }
     }
@@ -208,6 +311,7 @@ Status PathOramController::Access(Operation op_type, uint32_t address,
 
   // Step 6-9: Update block, if any.
   // If the access is a write, update the data stored for block a.
+  oram_utils::PrintStash(*stash_);
   auto iter = std::find_if(stash_->begin(), stash_->end(), BlockEqual(address));
   PANIC_IF(iter == stash_->end(), "Failed to find the block in the stash.");
 
@@ -271,8 +375,8 @@ Status OramController::Run(uint32_t block_num, uint32_t bucket_size) {
     // We create the PathORAM controller for each slot.
     path_oram_controllers_.emplace_back(
         std::make_unique<PathOramController>(i, partition_size_, bucket_size));
-    path_oram_controllers_.back()->set_stub(stub_);
-    path_oram_controllers_.back()->set_stash(&slots_[i]);
+    path_oram_controllers_.back()->SetStub(stub_);
+    path_oram_controllers_.back()->SetStash(&slots_[i]);
 
     // Then invoke the intialization procedure.
     Status status = path_oram_controllers_.back()->InitOram();
@@ -293,13 +397,25 @@ Status OramController::TestPathOram(uint32_t controller_id) {
   PathOramController* const controller =
       path_oram_controllers_[controller_id].get();
 
-  for (uint32_t i = 0; i < partition_size_; i++) {
-    oram_block_t block;
-    block.header.block_id = i;
-    memset(block.data, 0, DEFAULT_ORAM_DATA_SIZE);
-    block.data[0] = i;
-    controller->Access(Operation::kWrite, i, (uint8_t*)(&block));
+  const size_t level = controller->GetTreeLevel();
+  const size_t tree_size = (POW2(level + 1) - 1) * bucket_size_;
+  controller->FillWithData(
+      std::move(oram_utils::SampleRandomBucket(partition_size_, tree_size)));
+  controller->PrintOramTree();
+
+  uint8_t* const data = (uint8_t*)malloc(DEFAULT_ORAM_DATA_SIZE);
+  memset(data, 0, DEFAULT_ORAM_DATA_SIZE);
+
+  for (size_t r = 0; r < 100; r++) {
+    for (size_t i = 0; i < partition_size_; i++) {
+      Status status = controller->Access(Operation::kRead, i, data);
+      oram_utils::CheckStatus(status, "Failed to read block.");
+
+      PANIC_IF((data[0] != i), "Failed to read the correct block.");
+    }
   }
+
+  oram_utils::SafeFree(data);
 }
 
 }  // namespace partition_oram

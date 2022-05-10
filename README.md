@@ -56,10 +56,10 @@ For more information, interested readers are referred to [this](https://grpc.io)
 
 ## Build our project
 
-To build our project, you may need to first install Intel SGX SDK for Linux system, and you also need to install gRPC framework for the connection between the client and the server, and we strongly recommend that one should install gRPC via source rather than package manager. Finally, we will use the gFlag library for command line argument parsing, and you can install it by
+To build our project, you may need to first install Intel SGX SDK for Linux system, and you also need to install gRPC framework for the connection between the client and the server, and we strongly recommend that one should install gRPC via source rather than package manager. Finally, we will use the gFlag and spdlog library for command line argument parsing, and you can install it by
 
 ```shell
-sudo apt install -y libgflags-dev
+sudo apt install -y libgflags-dev libspdlog-dev
 ```
 
 Also, you may also need to set the environment for the SGX SDK so that you can properly build the enclave:
@@ -93,7 +93,7 @@ make -j all
 Extra care must be paid when one tries to properly run the server and the client. Before running, please make sure that the path of loaded libraries is correctly set, and the ssl key is generated:
 
 ```shell
-export LD_LIBRARY_PATH="$(pwd)/lib:$LD_LIBRARY_PATH"
+source ./env.sh
 sh -c ./keygen.sh
 ```
 

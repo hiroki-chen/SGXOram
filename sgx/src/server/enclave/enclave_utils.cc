@@ -74,8 +74,8 @@ std::string hex_to_string(const uint8_t* array, const size_t& len) {
   std::string ans = "\n0000: ";
   for (size_t i = 0; i < len; i++) {
     // Convert every byte into a hex string.
-    ans += digits[array[i] >> 4];
-    ans += digits[array[i] & 0xf];
+    ans += kDigits[array[i] >> 4];
+    ans += kDigits[array[i] & 0xf];
 
     if (i % 32 == 31) {
       ans += '\n';
@@ -93,8 +93,8 @@ void string_to_hex(const std::string& in, uint8_t* out) {
   for (size_t i = 0; i < in.size(); i += 2) {
     // To binary.
     uint8_t num = 0;
-    num += digits.find(in[i]);
-    num += digits.find(in[i + 1]) << 4;
+    num += kDigits.find(in[i]);
+    num += kDigits.find(in[i + 1]) << 4;
     out[i / 2] = num;
   }
 }
@@ -104,8 +104,8 @@ std::string to_hex(const uint8_t* array, const size_t& len) {
   std::string ans;
   for (size_t i = 0; i < len; i++) {
     // Convert every byte into a hex string.
-    ans += digits[array[i] >> 4];
-    ans += digits[array[i] & 0xf];
+    ans += kDigits[array[i] >> 4];
+    ans += kDigits[array[i] & 0xf];
   }
   return ans;
 }
@@ -121,7 +121,8 @@ void printf(const char* fmt, ...) {
 
 void sprintf(const std::string& str, bool hex) {
   if (hex) {
-    ENCLAVE_LOG("%s", hex_to_string((const uint8_t*)str.data(), str.size()).data());
+    ENCLAVE_LOG("%s",
+                hex_to_string((const uint8_t*)str.data(), str.size()).data());
   } else {
     ENCLAVE_LOG("%s", str.data());
   }
@@ -267,6 +268,14 @@ bool is_equal(uint8_t* const lhs, uint8_t* const rhs, const size_t& len) {
     }
   }
   return true;
+}
+
+uint64_t get_current_time(void) {
+  uint32_t hi, lo;
+
+  __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
+
+  return ((uint64_t)hi << 32) | (uint64_t)lo;
 }
 
 }  // namespace enclave_utils

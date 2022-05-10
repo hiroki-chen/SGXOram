@@ -23,6 +23,7 @@ namespace partition_oram {
 
 static const char* server_method_names[] = {
   "/partition_oram.server/InitOram",
+  "/partition_oram.server/PrintOramTree",
   "/partition_oram.server/ReadPath",
   "/partition_oram.server/WritePath",
   "/partition_oram.server/CloseConnection",
@@ -38,11 +39,12 @@ std::unique_ptr< server::Stub> server::NewStub(const std::shared_ptr< ::grpc::Ch
 
 server::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
   : channel_(channel), rpcmethod_InitOram_(server_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ReadPath_(server_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_WritePath_(server_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_CloseConnection_(server_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_KeyExchange_(server_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_SendHello_(server_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_PrintOramTree_(server_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ReadPath_(server_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_WritePath_(server_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_CloseConnection_(server_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_KeyExchange_(server_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_SendHello_(server_method_names[6], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status server::Stub::InitOram(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::google::protobuf::Empty* response) {
@@ -64,6 +66,29 @@ void server::Stub::async::InitOram(::grpc::ClientContext* context, const ::parti
 ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::AsyncInitOramRaw(::grpc::ClientContext* context, const ::partition_oram::InitOramRequest& request, ::grpc::CompletionQueue* cq) {
   auto* result =
     this->PrepareAsyncInitOramRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
+::grpc::Status server::Stub::PrintOramTree(::grpc::ClientContext* context, const ::partition_oram::PrintOramTreeRequest& request, ::google::protobuf::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::partition_oram::PrintOramTreeRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_PrintOramTree_, context, request, response);
+}
+
+void server::Stub::async::PrintOramTree(::grpc::ClientContext* context, const ::partition_oram::PrintOramTreeRequest* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::partition_oram::PrintOramTreeRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_PrintOramTree_, context, request, response, std::move(f));
+}
+
+void server::Stub::async::PrintOramTree(::grpc::ClientContext* context, const ::partition_oram::PrintOramTreeRequest* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_PrintOramTree_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::PrepareAsyncPrintOramTreeRaw(::grpc::ClientContext* context, const ::partition_oram::PrintOramTreeRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::partition_oram::PrintOramTreeRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_PrintOramTree_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* server::Stub::AsyncPrintOramTreeRaw(::grpc::ClientContext* context, const ::partition_oram::PrintOramTreeRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncPrintOramTreeRaw(context, request, cq);
   result->StartCall();
   return result;
 }
@@ -197,6 +222,16 @@ server::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       server_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< server::Service, ::partition_oram::PrintOramTreeRequest, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](server::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::partition_oram::PrintOramTreeRequest* req,
+             ::google::protobuf::Empty* resp) {
+               return service->PrintOramTree(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      server_method_names[2],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< server::Service, ::partition_oram::ReadPathRequest, ::partition_oram::ReadPathResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](server::Service* service,
              ::grpc::ServerContext* ctx,
@@ -205,7 +240,7 @@ server::Service::Service() {
                return service->ReadPath(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      server_method_names[2],
+      server_method_names[3],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< server::Service, ::partition_oram::WritePathRequest, ::partition_oram::WritePathResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](server::Service* service,
@@ -215,7 +250,7 @@ server::Service::Service() {
                return service->WritePath(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      server_method_names[3],
+      server_method_names[4],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< server::Service, ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](server::Service* service,
@@ -225,7 +260,7 @@ server::Service::Service() {
                return service->CloseConnection(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      server_method_names[4],
+      server_method_names[5],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< server::Service, ::partition_oram::KeyExchangeRequest, ::partition_oram::KeyExchangeResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](server::Service* service,
@@ -235,7 +270,7 @@ server::Service::Service() {
                return service->KeyExchange(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      server_method_names[5],
+      server_method_names[6],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< server::Service, ::partition_oram::HelloMessage, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
           [](server::Service* service,
@@ -250,6 +285,13 @@ server::Service::~Service() {
 }
 
 ::grpc::Status server::Service::InitOram(::grpc::ServerContext* context, const ::partition_oram::InitOramRequest* request, ::google::protobuf::Empty* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status server::Service::PrintOramTree(::grpc::ServerContext* context, const ::partition_oram::PrintOramTreeRequest* request, ::google::protobuf::Empty* response) {
   (void) context;
   (void) request;
   (void) response;

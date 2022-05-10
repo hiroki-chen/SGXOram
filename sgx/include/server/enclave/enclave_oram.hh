@@ -25,10 +25,12 @@
 
 sgx_status_t init_oram(uint32_t* permutation, size_t permutation_size);
 
-void encrypt_slot_and_store(uint8_t* const slot, size_t slot_size,
+void encrypt_slot_and_store(const uint8_t* const slot, size_t slot_size,
                             uint32_t level, uint32_t offset);
 
-void encrypt_header_and_store(sgx_oram::oram_slot_header_t* const header);
+void encrypt_position_and_store(const sgx_oram::oram_position_t* const position);
+
+void encrypt_header_and_store(const sgx_oram::oram_slot_header_t* const header);
 
 uint32_t calculate_offset(uint32_t block_id, uint32_t level_cur);
 

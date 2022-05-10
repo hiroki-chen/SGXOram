@@ -294,7 +294,7 @@ int Client::test_oram_cache(void) {
       stub_->test_oram_cache(&context, request, &empty_response);
 
   if (!status.ok()) {
-    logger->error("Cannot test the cache!");
+    logger->error(status.error_message());
     return -1;
   } else {
     logger->info("The cache functions well!");

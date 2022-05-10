@@ -41,28 +41,32 @@ class PartitionORAMService final : public server::Service {
 
  public:
   grpc::Status InitOram(grpc::ServerContext* context,
-                         const InitOramRequest* request,
-                         google::protobuf::Empty* empty) override;
+                        const InitOramRequest* request,
+                        google::protobuf::Empty* empty) override;
+
+  grpc::Status PrintOramTree(grpc::ServerContext* context,
+                             const PrintOramTreeRequest* request,
+                             google::protobuf::Empty* response) override;
 
   grpc::Status ReadPath(grpc::ServerContext* context,
-                          const ReadPathRequest* request,
-                          ReadPathResponse* response) override;
+                        const ReadPathRequest* request,
+                        ReadPathResponse* response) override;
 
   grpc::Status WritePath(grpc::ServerContext* context,
-                           const WritePathRequest* request,
-                           WritePathResponse* response) override;
+                         const WritePathRequest* request,
+                         WritePathResponse* response) override;
 
   grpc::Status CloseConnection(grpc::ServerContext* context,
-                                const google::protobuf::Empty* request,
-                                google::protobuf::Empty* response) override;
+                               const google::protobuf::Empty* request,
+                               google::protobuf::Empty* response) override;
 
   grpc::Status KeyExchange(grpc::ServerContext* context,
-                            const KeyExchangeRequest* request,
-                            KeyExchangeResponse* response) override;
+                           const KeyExchangeRequest* request,
+                           KeyExchangeResponse* response) override;
 
   grpc::Status SendHello(grpc::ServerContext* context,
-                          const HelloMessage* request,
-                          google::protobuf::Empty* empty) override;
+                         const HelloMessage* request,
+                         google::protobuf::Empty* empty) override;
 };
 
 class ServerRunner {
@@ -84,4 +88,4 @@ class ServerRunner {
 };
 }  // namespace partition_oram
 
-#endif // PARTITION_ORAM_SERVER_ORAM_SERVER_H_
+#endif  // PARTITION_ORAM_SERVER_ORAM_SERVER_H_
