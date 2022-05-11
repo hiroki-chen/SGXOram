@@ -28,7 +28,7 @@ COMMON_INCLUDE_PATH := ../../include
 SRC_PATH := $(CURDIR)
 BUILD_PATH := ../../build/server
 KEY_PATH := ../../key
-GRPC_PATH := /usr/local
+GRPC_PATH := /usr/local/grpc
 
 # Must recompile the project if these parameters are changed.
 BUCKET_SIZE ?= 32
@@ -81,7 +81,8 @@ App_Cpp_Files := $(wildcard $(SRC_PATH)/app/*.cc)
 App_Cpp_Flags := $(App_C_Flags)
 App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread -lsgx_pthread\
 								  -lsgx_ukey_exchange -lservice_provider\
-									-L$(GRPC_PATH)/lib `pkg-config --libs protobuf grpc++`\
+								  `pkg-config $(GRPC_PATH)/lib/pkgconfig/grpc++.pc --libs`\
+									`pkg-config /usr/local/grpc/lib/pkgconfig/protobuf.pc --libs`\
            				-lpthread\
            				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
            				-ldl -lgflags -llz4
