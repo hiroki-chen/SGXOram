@@ -99,6 +99,36 @@ void string_to_hex(const std::string& in, uint8_t* out) {
   }
 }
 
+void print_block(sgx_oram::oram_block_t* const block) {
+  ENCLAVE_LOG("------------------------------");
+  ENCLAVE_LOG("[enclave] Block: ");
+  ENCLAVE_LOG("[enclave]  - address: %d", block->header.address);
+  ENCLAVE_LOG("[enclave]  - type: %d", (int)block->header.type);
+  ENCLAVE_LOG("[enclave]  - bid: %d", block->header.bid);
+  ENCLAVE_LOG("[enclave]  - data[0]: %d", block->data[0]);
+  ENCLAVE_LOG("------------------------------");
+}
+
+void print_slot_metadata(const sgx_oram::oram_slot_header_t* const header) {
+  ENCLAVE_LOG("------------------------------");
+  ENCLAVE_LOG("[enclave] Slot metadata: ");
+  ENCLAVE_LOG("[enclave]  - type: %d", (int)header->type);
+  ENCLAVE_LOG("[enclave]  - level: %u", header->level);
+  ENCLAVE_LOG("[enclave]  - offset: %u", header->offset);
+  ENCLAVE_LOG("[enclave]  - range: [%u, %u]", header->range_begin, header->range_end);
+  ENCLAVE_LOG("[enclave]  - dummy_number: %u", header->dummy_number);
+  ENCLAVE_LOG("[enclave]  - slot_size: %u", header->slot_size);
+  ENCLAVE_LOG("------------------------------");
+}
+
+void print_permutation(const uint32_t* permutation, uint32_t size) {
+  ENCLAVE_LOG("------------------------------");
+  for (uint32_t i = 0; i < size; ++i) {
+    ENCLAVE_LOG("%u ", permutation[i]);
+  }
+  ENCLAVE_LOG("------------------------------");
+}
+
 std::string to_hex(const uint8_t* array, const size_t& len) {
   // Convert the array of bytes into a hex string.
   std::string ans;
@@ -146,7 +176,7 @@ uint8_t populate_from_bool(bool condition) {
 }
 
 void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
-          uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size) {
+          uint8_t* out, size_t lhs_size, size_t rhs_size) {
   // A sanity check.
   if (lhs_size != rhs_size) {
     ENCLAVE_LOG("[enclave] lhs_size != rhs_size.\n");
@@ -169,7 +199,7 @@ void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
 }
 
 void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
-         uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size) {
+         uint8_t* out, size_t lhs_size, size_t rhs_size) {
   // A sanity check.
   if (lhs_size != rhs_size) {
     ENCLAVE_LOG("[enclave] lhs_size != rhs_size.\n");

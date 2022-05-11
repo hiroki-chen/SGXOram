@@ -50,7 +50,7 @@ SGX_COMMON_FLAGS += -Wall -Wextra -Winit-self -Wpointer-arith -Wreturn-type \
                     -Waddress -Wsequence-point -Wformat-security \
                     -Wmissing-include-dirs -Wfloat-equal -Wundef \
                     -Wcast-align -Wno-cast-qual -Wno-unused-variable \
-										-Wno-unused-parameter \
+										-Wno-unused-parameter -Werror \
 										-I$(INCLUDE_PATH) -I$(COMMON_INCLUDE_PATH)\
 									  -DSUPPLIED_KEY_DERIVATION \
 										-DDEFAULT_BUCKET_SIZE=$(BUCKET_SIZE) -DDEFAULT_SLOT_SIZE=$(SLOT_SIZE)
@@ -84,7 +84,7 @@ App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpth
 									-L$(GRPC_PATH)/lib `pkg-config --libs protobuf grpc++`\
            				-lpthread\
            				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           				-ldl -lgflags -llz4 -lglog
+           				-ldl -lgflags -llz4
 
 App_Cpp_Objects := $(patsubst $(SRC_PATH)/app/%.cc, $(BUILD_PATH)/app/%.o, $(App_Cpp_Files))
 App_Dependencies := $(patsubst %.o,%.d,$(App_Cpp_Objects))

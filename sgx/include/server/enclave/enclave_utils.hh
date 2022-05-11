@@ -116,6 +116,28 @@ void printf(const char* fmt, ...);
 void sprintf(const std::string& str, bool hex = false);
 
 /**
+ * @brief Print the block.
+ * 
+ * @param block 
+ */
+void print_block(sgx_oram::oram_block_t* const block);
+
+/**
+ * @brief Print the slot header.
+ * 
+ * @param header 
+ */
+void print_slot_metadata(const sgx_oram::oram_slot_header_t* const header);
+
+/**
+ * @brief Print the permutation.
+ * 
+ * @param permutation 
+ * @param size 
+ */
+void print_permutation(const uint32_t* permutation, uint32_t size);
+
+/**
  * @brief Safe free the memory.
  *
  * @param ptr
@@ -138,10 +160,10 @@ bool is_equal(uint8_t* const lhs, uint8_t* const rhs, const size_t& len);
 // enclave
 //        because the enclave is not compiled with -fno-strict-aliasing.
 void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
-          uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size);
+          uint8_t* out, size_t lhs_size, size_t rhs_size);
 
 void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
-         uint8_t* __restrict__ out, size_t lhs_size, size_t rhs_size);
+         uint8_t* out, size_t lhs_size, size_t rhs_size);
 
 void bneg(const uint8_t* __restrict__ lhs, uint8_t* __restrict__ out,
           size_t lhs_size);

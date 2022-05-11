@@ -73,6 +73,8 @@ class Client final : public oram::sgx_oram::Service {
   int read_block(uint32_t address);
 
   int test_oram_cache(void);
+
+  int test_oram(void);
 };
 
 #endif

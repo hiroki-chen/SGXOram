@@ -280,7 +280,7 @@ int Client::read_block(uint32_t address) {
   // Decrypt the data.
   std::string ciphertext = reply.data();
   std::string plaintext = decrypt(ciphertext);
-  logger->info("The content of the block is {}", spdlog::to_hex(plaintext));
+  logger->info("The content of the block is {}", (int)plaintext.data()[0]);
   return 0;
 }
 
@@ -300,4 +300,15 @@ int Client::test_oram_cache(void) {
     logger->info("The cache functions well!");
     return 0;
   }
+}
+
+int Client::test_oram(void) {
+  logger->info("Begin testing the ORAM!");
+  for (size_t i = 0; i < FLAGS_number; i++) {
+    if (read_block(i) != 0) {
+      return -1;
+    }
+  }
+
+  return 0;
 }

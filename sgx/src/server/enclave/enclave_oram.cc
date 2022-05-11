@@ -45,13 +45,6 @@ std::string calculate_slot_fingerprint(uint32_t level, uint32_t offset) {
   return crypto_manager->enclave_sha_256(sid);
 }
 
-static void print_permutation(const uint32_t* permutation, uint32_t size) {
-  for (uint32_t i = 0; i < size; ++i) {
-    ENCLAVE_LOG("%u ", permutation[i]);
-  }
-  ENCLAVE_LOG("\n");
-}
-
 // This function assembles position for the current block.
 static inline void assemble_position(
     uint32_t level, uint32_t bid, uint32_t address,
@@ -74,8 +67,8 @@ static void get_position_and_decrypt(sgx_oram::oram_position_t* const position,
   size_t position_size = 0;
   const std::string position_fingerprint =
       crypto_manager->enclave_sha_256(std::to_string(block_address));
-  status = ocall_read_position(&position_size, position_fingerprint.c_str(), ciphertext,
-                      ENCRYPTED_POSITION_SIZE);
+  status = ocall_read_position(&position_size, position_fingerprint.c_str(),
+                               ciphertext, ENCRYPTED_POSITION_SIZE);
   enclave_utils::check_sgx_status(status, "ocall_read_position()");
 
   // Check if the position is valid.
@@ -163,7 +156,9 @@ static sgx_status_t populate_leaf_slot(
     // Then fill in the data.
     memset(block_ptr->data, 0, DEFAULT_ORAM_DATA_SIZE);
     block_ptr->data[0] = block_ptr->header.address;
-    ENCLAVE_LOG("[enclave] Block %d is populated.\n", block_ptr->header.address);
+
+    // Do not forget to  decrement the numebr of dummy blocks of the slot.
+    header->dummy_number--;
   }
 
   for (; i < slot_size; i++) {
@@ -171,7 +166,6 @@ static sgx_status_t populate_leaf_slot(
     // Mark the block as empty.
     block_ptr->header.type = sgx_oram::ORAM_BLOCK_TYPE_DUMMY;
   }
-
 
   return SGX_SUCCESS;
 }
@@ -332,13 +326,6 @@ static inline void assemble_slot_header(
   header->slot_size = header->dummy_number;
   header->range_begin = begin;
   header->range_end = end;
-
-  ENCLAVE_LOG(
-      "[enclave] Assembled slot header: level %zu, offset %zu, "
-      "dummy_number %zu, slot_size %zu, range_begin %zu, "
-      "range_end %zu.",
-      header->level, header->offset, header->dummy_number, header->slot_size,
-      header->range_begin, header->range_end);
 }
 
 static sgx_status_t init_so2_oram(uint32_t* const level_size_information) {
@@ -439,7 +426,6 @@ static sgx_status_t init_so2_slots(uint32_t* const level_size_information,
 
 void encrypt_position_and_store(
     const sgx_oram::oram_position_t* const position) {
-  ENCLAVE_LOG("[enclave] Encrypting position...\n");
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
   // We do not store positions into the cache.
@@ -457,7 +443,6 @@ void encrypt_position_and_store(
 
 void encrypt_header_and_store(
     const sgx_oram::oram_slot_header_t* const header) {
-  ENCLAVE_LOG("[enclave] Encrypting the header...\n");
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
   bool cache_enabled = crypto_manager->cache_enabled();
@@ -488,8 +473,8 @@ void encrypt_header_and_store(
 // external unstrusted memory. All the buffers are allocated by the caller.
 void encrypt_slot_and_store(const uint8_t* const slot, size_t slot_size,
                             uint32_t level, uint32_t offset) {
-  ENCLAVE_LOG("[enclave] Encrypting the slot at level %zu, offset %zu...\n",
-              level, offset);
+  // ENCLAVE_LOG("[enclave] Encrypting the slot at level %zu, offset %zu...\n",
+  //             level, offset);
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
   bool cache_enabled = crypto_manager->cache_enabled();
@@ -535,13 +520,13 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
   ENCLAVE_LOG("[enclave] block_level: %u, bid_cur: %u", block_level, bid_cur);
 
   // We start from 0.
-  for (uint32_t i = 0; i < level - 1; i++) {
-    ENCLAVE_LOG("[enclave] Traversing level %u...\n", i);
+  for (uint32_t i = level - 1; i >= 1; i--) {
+    ENCLAVE_LOG("[enclave] Traversing level %d...\n", i);
     // If the current level is the same as the block level, then we should
     // directly access the data; otherwise, we should perform fake access.
-    bool condition_s1 = (i + 1 == block_level);
-    bool condition_s2 = (i == block_level);
-    data_access(static_cast<sgx_oram::oram_operation_t>(op_type), i, data,
+    bool condition_s1 = (i == block_level);
+    bool condition_s2 = (i - 1 == block_level);
+    data_access(static_cast<sgx_oram::oram_operation_t>(op_type), i - 1, data,
                 data_len, condition_s1, condition_s2, position);
   }
 

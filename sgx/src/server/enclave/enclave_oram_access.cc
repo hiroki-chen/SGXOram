@@ -35,12 +35,14 @@ void sub_access_s1(bool condition, sgx_oram::oram_slot_header_t* const header,
                    uint8_t* const s1, uint8_t* const block_slot1_target,
                    uint8_t* const block_slot1_evict, uint32_t* const counter,
                    sgx_oram::oram_position_t* const position) {
+  ENCLAVE_LOG("[enclave] Invoking sub_access_s1...");
   sgx_oram::oram_block_t* slot_storage = (sgx_oram::oram_block_t*)s1;
   const size_t slot_size = header->slot_size;
 
   for (size_t i = 0; i < slot_size; i++) {
     // Locate the blocks.
     sgx_oram::oram_block_t* block = slot_storage + i;
+    enclave_utils::print_block(block);
     // Initialize some bool variables.
     // Variable condition_existing stands for whether the target block is
     // existing:
@@ -87,8 +89,11 @@ void sub_access_s1(bool condition, sgx_oram::oram_slot_header_t* const header,
     //  - The slot is not dummy and this is a real access and the slot is the
     //    target one.
     //  - The slot is not dummy and this slot can be evicted.
+    // FIXME: LOC 2
+    ENCLAVE_LOG("[enclave] before dummy_number: %d.", header->dummy_number);
     header->dummy_number +=
         condition_existing || (condition_epsilon && condition_counter);
+    ENCLAVE_LOG("[enclave] after dummy_number: %d.", header->dummy_number);
   }
 }
 
@@ -114,6 +119,8 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
   for (size_t i = 0; i < slot_size; i++) {
     // Get the block.
     sgx_oram::oram_block_t* block = slot_storage + i;
+    enclave_utils::print_block(block);
+
     // =========== Begin First Part: data processing =========== //
     // Step 1: bl.data = bl.data & ~(pos = 0)
     //  -> Clear the current block for holding the incoming data.
@@ -225,7 +232,7 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
   for (size_t i = 0; i < slot_size; i++) {
     // Get the block and prepare a buffer for the boolean variable.
     sgx_oram::oram_block_t* block = slot_storage + i;
-    memset(populated_bool_for_data, 0, DEFAULT_ORAM_DATA_SIZE);
+    enclave_utils::print_block(block);
 
     // Check whether this is the target one.
     bool condition_existing =
@@ -235,10 +242,9 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
         (block->header.type ==
          sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_NORMAL);
 
-    enclave_utils::populate_from_bool(
-        condition_existing, populated_bool_for_data, DEFAULT_ORAM_DATA_SIZE);
-    enclave_utils::band(populated_bool_for_data, block->data, data_star,
-                        DEFAULT_ORAM_DATA_SIZE, DEFAULT_ORAM_DATA_SIZE);
+    enclave_utils::oblivious_assign(condition_existing, data_star,
+                                    block->data, DEFAULT_ORAM_DATA_SIZE,
+                                    DEFAULT_ORAM_DATA_SIZE);
   }
 
   enclave_utils::safe_free_all(2, populated_bool_for_data,
@@ -306,21 +312,25 @@ void sub_access(sgx_oram::oram_operation_t op_type, bool condition_s1,
   enclave_utils::oblivious_assign(
       counter == 0, (bool*)&block_slot1_evict->header.type, &constant);
   // - Copy the data to the data_star if current operation is read.
+  // - Note that we do nothing if the current operation is dummy.
   enclave_utils::oblivious_assign(
-      op_type == sgx_oram::oram_operation_t::ORAM_OPERATION_READ, data_star,
-      (uint8_t*)block_slot1_target->data, DEFAULT_ORAM_DATA_SIZE,
+      (op_type == sgx_oram::oram_operation_t::ORAM_OPERATION_READ) &&
+          (condition_s1),
+      data_star, (uint8_t*)block_slot1_target->data, DEFAULT_ORAM_DATA_SIZE,
       DEFAULT_ORAM_DATA_SIZE);
   // - Copy the data_star to the data if current operation is write.
   enclave_utils::oblivious_assign(
-      op_type == sgx_oram::oram_operation_t::ORAM_OPERATION_WRITE,
+      (op_type == sgx_oram::oram_operation_t::ORAM_OPERATION_WRITE) &&
+          (condition_s1),
       (uint8_t*)block_slot1_target->data, data_star, DEFAULT_ORAM_DATA_SIZE,
       DEFAULT_ORAM_DATA_SIZE);
 
   // Sample new bid and a random position for the blocks and reset the counter.
   uint32_t pos = 0;
+  ENCLAVE_LOG("[enclave] S1 HEADER...");
+  enclave_utils::print_slot_metadata(s1_header);
   sub_access_s1_epilogue(condition_s1, s1_header->dummy_number,
                          block_slot1_target, block_slot1_evict, &counter, &pos);
-
   // After accessing, we need to update the slot.
   ENCLAVE_LOG(
       "[enclave] Slot 1 accessed! Now storing it to the cache / memory...");
@@ -331,6 +341,7 @@ void sub_access(sgx_oram::oram_operation_t op_type, bool condition_s1,
   sub_access_s2(op_type, condition_s2, s2_header, s2, block_slot1_target,
                 data_star, &counter, pos, position);
   encrypt_slot_and_store(s2, s2_size, s2_header->level, s2_header->offset);
+  ENCLAVE_LOG("[enclave] sss2: %d", data_star[0]);
 
   // Eventually, destroy all the allocated memory.
   enclave_utils::safe_free_all(2, block_slot1_target, block_slot1_evict);
@@ -359,6 +370,7 @@ void sub_evict_s2(sgx_oram::oram_slot_header_t* const header, uint8_t* const s2,
     block->header.type = static_cast<sgx_oram::oram_block_type_t>(
         (condition_counter && condition_epsilon && condition_normal));
     // Increment the dummy number of the current slot.
+    // FIXME: LOC 1
     header->dummy_number +=
         (condition_counter && condition_epsilon && condition_normal);
   }
@@ -464,8 +476,9 @@ void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
 
   // Invoke sub_access.
   sub_access(op_type, condition_s1, condition_s2, s1_header, s2_header,
-             s1_storage, s1_size, s2_storage, s2_size, data, data_size,
+             s1_storage, s1_size, s2_storage, s2_size, data, current_level,
              position);
+
   // Invoke sub_evict.
   ENCLAVE_LOG("[enclave] Invoking sub_evict for level %d...", current_level);
   sub_evict(s2_header, s2_storage, s2_size, current_level, position);
