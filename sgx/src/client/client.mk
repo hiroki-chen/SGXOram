@@ -33,10 +33,10 @@ APP_NAME := $(BUILD_PATH)/../bin/client.bin
 CXX ?= g++
 CXX_FLAGS ?= -std=c++17 -Wall -Wextra -Werror -fPIC -I$(COMMON_INCLUDE_PATH) -I$(CLIENT_INCLUDE_PATH) -DSUPPLIED_KEY_DERIVATION
 CXX_LINK_FLAGS ?= -L$(LIB_PATH) -lsample_libcrypto -lservice_provider\
-								  -L$(GRPC_PATH)/lib `pkg-config --libs protobuf grpc++`\
-									-pthread\
-									-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-									-ldl -lgflags -lsodium
+		  -L$(GRPC_PATH)/lib `pkg-config --libs protobuf grpc++`\
+		  -pthread\
+		  -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
+	 	  -ldl -lgflags -lsodium
 									
 ifeq ($(MODE), DEBUG)
 	CXX_FLAGS += -O0 -g

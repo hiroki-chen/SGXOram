@@ -50,10 +50,9 @@ SGX_COMMON_FLAGS += -Wall -Wextra -Winit-self -Wpointer-arith -Wreturn-type \
                     -Waddress -Wsequence-point -Wformat-security \
                     -Wmissing-include-dirs -Wfloat-equal -Wundef \
                     -Wcast-align -Wno-cast-qual -Wno-unused-variable \
-										-Wno-unused-parameter -Werror \
-										-I$(INCLUDE_PATH) -I$(COMMON_INCLUDE_PATH)\
-									  -DSUPPLIED_KEY_DERIVATION \
-										-DDEFAULT_BUCKET_SIZE=$(BUCKET_SIZE) -DDEFAULT_SLOT_SIZE=$(SLOT_SIZE)
+		    -Wno-unused-parameter -Werror \
+	            -I$(INCLUDE_PATH) -I$(COMMON_INCLUDE_PATH)\
+		    -DSUPPLIED_KEY_DERIVATION
 
 SGX_COMMON_CFLAGS := $(SGX_COMMON_FLAGS) -Wjump-misses-init -Wstrict-prototypes -Wunsuffixed-float-constants
 SGX_COMMON_CXXFLAGS := $(SGX_COMMON_FLAGS) -Wnon-virtual-dtor -std=c++1z
@@ -79,13 +78,12 @@ PROTO_OBJ := $(wildcard ../../build/proto/*.o)
 
 App_Cpp_Files := $(wildcard $(SRC_PATH)/app/*.cc)
 App_Cpp_Flags := $(App_C_Flags)
-App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread -lsgx_pthread\
-								  -lsgx_ukey_exchange -lservice_provider\
-								  `pkg-config $(GRPC_PATH)/lib/pkgconfig/grpc++.pc --libs`\
-									`pkg-config /usr/local/grpc/lib/pkgconfig/protobuf.pc --libs`\
-           				-lpthread\
-           				-Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
-           				-ldl -lgflags -llz4
+App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name)\
+		  -lpthread -lsgx_pthread -lsgx_ukey_exchange -lservice_provider\
+		  `pkg-config $(GRPC_PATH)/lib/pkgconfig/grpc++.pc --libs`\
+		  `pkg-config /usr/local/grpc/lib/pkgconfig/protobuf.pc --libs`\
+           	  -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
+           	  -ldl -lgflags -llz4
 
 App_Cpp_Objects := $(patsubst $(SRC_PATH)/app/%.cc, $(BUILD_PATH)/app/%.o, $(App_Cpp_Files))
 App_Dependencies := $(patsubst %.o,%.d,$(App_Cpp_Objects))
@@ -229,7 +227,7 @@ $(BUILD_PATH)/enclave/enclave_u.o: $(SRC_PATH)/enclave/enclave_u.c
 
 # Compile the enclave.
 $(BUILD_PATH)/enclave/%.o: $(SRC_PATH)/enclave/%.cc
-	$(CXX) $(Enclave_Cpp_Flags) -MMD -MP $(SGX_COMMON_CXXFLAGS) -c $< -o $@
+	@$(CXX) $(Enclave_Cpp_Flags) -MMD -MP $(SGX_COMMON_CXXFLAGS) -c $< -o $@
 	@printf "\033[1;93;49mCXX =>  $@\033[0m\n"
 
 # Link the object files and generate a shared object.
@@ -264,9 +262,9 @@ $(KEY_PATH)/key.pem:
 
 $(Signed_Enclave_Name): $(Enclave_Name) $(KEY_PATH)/key.pem
 	@$(SGX_SIGN) sign -key $(KEY_PATH)/key.pem \
-					  -enclave $(Enclave_Name) -out $@ \
-					  -config $(Enclave_Config_File) \
-						> $(BUILD_PATH)/enclave/sign.log 2>&1
+	             -enclave $(Enclave_Name) -out $@ \
+	             -config $(Enclave_Config_File) \
+		     > $(BUILD_PATH)/enclave/sign.log 2>&1
 
 enclave: mk create_proxy $(Signed_Enclave_Name)
 	@printf "\033[1;93;49mEnclave created!\033[0m\n"
