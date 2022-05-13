@@ -302,8 +302,6 @@ grpc::Status SGXORAMService::read_block(grpc::ServerContext* server_context,
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   }
 
-  logger->debug("The data is {}.",
-                spdlog::to_hex(std::string((char*)data, encrypted_data_size)));
   read_reply->set_data(data, encrypted_data_size);
   read_reply->set_success(true);
   return grpc::Status::OK;

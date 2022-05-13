@@ -46,9 +46,8 @@ std::string calculate_slot_fingerprint(uint32_t level, uint32_t offset) {
 }
 
 // This function assembles position for the current block.
-static inline void assemble_position(
-    uint32_t level, uint32_t bid, uint32_t address,
-    sgx_oram::oram_position_t* const position) {
+void assemble_position(uint32_t level, uint32_t bid, uint32_t address,
+                       sgx_oram::oram_position_t* const position) {
   position->level = level;
   position->bid = bid;
   position->address = address;
@@ -156,6 +155,8 @@ static sgx_status_t populate_leaf_slot(
     // Then fill in the data.
     memset(block_ptr->data, 0, DEFAULT_ORAM_DATA_SIZE);
     block_ptr->data[0] = block_ptr->header.address;
+
+    enclave_utils::safe_free(position);
 
     // Do not forget to  decrement the numebr of dummy blocks of the slot.
     header->dummy_number--;
@@ -415,8 +416,7 @@ static sgx_status_t init_so2_slots(uint32_t* const level_size_information,
       // Epilogue.
       encrypt_header_and_store(header);
       encrypt_slot_and_store((uint8_t*)slot, slot_size, i, j);
-      enclave_utils::safe_free(header);
-      enclave_utils::safe_free(slot);
+      enclave_utils::safe_free_all(2, header, slot);
     }
   }
 
@@ -502,6 +502,9 @@ void encrypt_slot_and_store(const uint8_t* const slot, size_t slot_size,
 
 sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
                                uint8_t* data, size_t data_len) {
+  // Record the start time.
+  const uint64_t time_begin = enclave_utils::get_current_time();
+
   ENCLAVE_LOG("[enclave] Accessing data at address %d.\n", block_address);
   // Get the instance of the cryptomanager.
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
@@ -535,6 +538,11 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
       crypto_manager->enclave_aes_128_gcm_encrypt(
           std::string((char*)data, DEFAULT_ORAM_DATA_SIZE));
   memcpy(data, encrypted_data.data(), encrypted_data.size());
+  enclave_utils::safe_free(position);
+
+  // Record the end time.
+  const uint64_t time_end = enclave_utils::get_current_time();
+  ENCLAVE_LOG("[enclave] Time used: %lu", (time_end - time_begin)); 
 
   return SGX_SUCCESS;
 }
