@@ -117,23 +117,23 @@ void sprintf(const std::string& str, bool hex = false);
 
 /**
  * @brief Print the block.
- * 
- * @param block 
+ *
+ * @param block
  */
 void print_block(sgx_oram::oram_block_t* const block);
 
 /**
  * @brief Print the slot header.
- * 
- * @param header 
+ *
+ * @param header
  */
 void print_slot_metadata(const sgx_oram::oram_slot_header_t* const header);
 
 /**
  * @brief Print the permutation.
- * 
- * @param permutation 
- * @param size 
+ *
+ * @param permutation
+ * @param size
  */
 void print_permutation(const uint32_t* permutation, uint32_t size);
 
@@ -174,10 +174,16 @@ uint8_t populate_from_bool(bool condition);
 
 void check_sgx_status(const sgx_status_t& status, const std::string& location);
 
+void slot_segment_write(const char* slot_fingerprint, const uint8_t* const slot,
+                        size_t slot_size, size_t seg_size = 65535);
+
+void slot_segment_read(const char* slot_fingerprint, uint8_t* slot,
+                       size_t slot_size, size_t seg_size = 65535);
+
 /**
- * @brief Assigns rhs to lhs when condition is true. We implicitly assume that
- *        the size of the lhs variable is always the same as the size of the rhs
- *        variable.
+ * @brief Assigns rhs to lhs when condition is true. We implicitly assume
+ * that the size of the lhs variable is always the same as the size of the
+ * rhs variable.
  *
  * @param condition
  * @param lhs

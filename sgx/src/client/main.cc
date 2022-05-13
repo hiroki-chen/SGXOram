@@ -34,6 +34,7 @@ DEFINE_uint32(type, 0, "The type of the ORAM tree");
 DEFINE_double(constant, 1.0, "A special constant for the ORAM tree");
 DEFINE_uint32(round, 1, "The number of rounds of the ORAM access");
 DEFINE_uint32(oram_type, 1, "The type of the ORAM used by the client.");
+DEFINE_uint32(access_num, 100, "The number of accesses to the ORAM.");
 
 std::shared_ptr<spdlog::logger> logger = spdlog::rotating_logger_mt(
     client_name, client_log_dir + "/" + client_name + "_" + get_log_file_name(),

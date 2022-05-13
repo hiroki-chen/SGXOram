@@ -32,14 +32,16 @@ void sub_access(sgx_oram::oram_operation_t op_type, bool condition_s1,
 void sub_access_s1(bool condition, sgx_oram::oram_slot_header_t* const header,
                    uint8_t* const s1, uint8_t* const block_slot1_target,
                    uint8_t* const block_slot1_evict, uint32_t* const counter,
-                   sgx_oram::oram_position_t* const position);
+                   sgx_oram::oram_position_t* const position_target);
 
 void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
                    sgx_oram::oram_slot_header_t* const header,
                    uint8_t* const s2,
                    sgx_oram::oram_block_t* const block_slot1_target,
                    uint8_t* const data_star, uint32_t* const counter,
-                   uint32_t pos, sgx_oram::oram_position_t* const position);
+                   uint32_t pos,
+                   sgx_oram::oram_position_t* const position_target,
+                   sgx_oram::oram_position_t* const position_client);
 
 void sub_access_s1_epilogue(bool condition, uint32_t dummy_number,
                             sgx_oram::oram_block_t* block_slot1_target,
@@ -51,7 +53,9 @@ void sub_evict_s2(sgx_oram::oram_slot_header_t* const header, uint8_t* const s2,
                   uint32_t current_level, uint32_t* const counter);
 
 void sub_evict_s3(sgx_oram::oram_slot_header_t* const header, uint8_t* const s3,
-                  sgx_oram::oram_block_t* const block_evict, uint32_t position);
+                  sgx_oram::oram_block_t* const block_evict,
+                  sgx_oram::oram_position_t* const position_target,
+                  uint32_t position);
 
 void sub_evict_s2_epilogue(uint32_t dummy_number, uint32_t begin, uint32_t end,
                            sgx_oram::oram_block_t* block_evict,
@@ -65,5 +69,8 @@ void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
 void sub_evict(sgx_oram::oram_slot_header_t* const s2_header, uint8_t* const s2,
                size_t s2_size, uint32_t current_level,
                sgx_oram::oram_position_t* const position);
+
+void position_prefetch(sgx_oram::oram_position_t* const position,
+                       const sgx_oram::oram_block_t* const block);
 
 #endif

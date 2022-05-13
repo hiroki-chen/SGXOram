@@ -158,6 +158,25 @@ void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
   server_runner->store_compressed_slot(slot_finger_print, compressed_data);
 }
 
+void ocall_write_slot_seg(const char* slot_fingerprint, size_t offset,
+                          const uint8_t* data, size_t data_len, int finished) {
+  uint8_t* slot = server_runner->get_slot_buf();
+
+  if (offset == 0) {
+    memset(slot, 0, slot_buf_size);
+    server_runner->reset_cur_size();
+  }
+
+  server_runner->add_cur_size(data_len);
+  memcpy(slot + offset, data, data_len);
+
+  if (finished) {
+    // Write the whole thing back.
+    ocall_write_slot(slot_fingerprint, slot, server_runner->get_cur_size());
+    return;
+  }
+}
+
 void ocall_write_slot_header(const char* slot_finger_print, const uint8_t* data,
                              size_t data_len) {
   logger->debug("[OCall] Writing slot header for {}",
@@ -189,6 +208,18 @@ size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
     // The enclave will simply crash or handle the error.
     return 0;
   }
+}
+
+size_t ocall_read_slot_seg(const char* slot_finger_print, size_t offset,
+                           uint8_t* data, size_t data_len) {
+  uint8_t* slot = server_runner->get_slot_buf();
+  if (offset == 0) {
+    memset(slot, 0, slot_buf_size);
+    size_t total_size = ocall_read_slot(slot_finger_print, slot, data_len);
+  }
+
+  memcpy(data, slot + offset, data_len);
+  return data_len;
 }
 
 size_t ocall_read_slot_header(const char* slot_finger_print, uint8_t* data,

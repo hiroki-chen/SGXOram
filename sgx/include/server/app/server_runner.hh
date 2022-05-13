@@ -29,6 +29,7 @@
 
 #include <messages.grpc.pb.h>
 #include <messages.pb.h>
+#include <configs.hh>
 
 #define DH_HALF_KEY_LEN 32
 #define DH_SHARED_KEY_LEN 32
@@ -46,6 +47,7 @@ struct OramConfiguration {
   uint32_t round;
   uint32_t level;
   uint32_t oram_type;
+  uint32_t seg_size;
 };
 
 class SGXORAMService final : public oram::sgx_oram::Service {
@@ -62,7 +64,6 @@ class SGXORAMService final : public oram::sgx_oram::Service {
   std::unordered_map<std::string, std::string> storage_slot_body;
   std::unordered_map<std::string, std::string> storage_slot_header;
 
-  // FIXME: A non-access-pattern-hiding position map.
   std::unordered_map<std::string, std::string> position_map;
 
   sgx_status_t init_enclave(sgx_enclave_id_t* const global_eid);
@@ -160,8 +161,14 @@ class Server final {
 
   std::unique_ptr<SGXORAMService> service;
 
+  uint8_t* slot_buf;
+
+  size_t current_size;
+
  public:
-  Server() = default;
+  Server() : current_size(0ul) { slot_buf = (uint8_t*)malloc(slot_buf_size); }
+
+  virtual ~Server() { free(slot_buf); }
 
   void run(const std::string& address, sgx_enclave_id_t* const global_eid);
 
@@ -200,6 +207,14 @@ class Server final {
   void store_position(const std::string& address, const std::string& position) {
     service->position_map[address] = position;
   }
+
+  void add_cur_size(size_t size) { current_size += size; }
+
+  void reset_cur_size(void) { current_size = 0ul; }
+
+  size_t get_cur_size(void) { return current_size; }
+
+  uint8_t* get_slot_buf(void) { return slot_buf; }
 
   sgx_enclave_id_t* get_enclave_id(void) { return service->global_eid; }
 };

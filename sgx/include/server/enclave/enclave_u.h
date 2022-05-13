@@ -35,6 +35,10 @@ void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_printf, (const char* str));
 #define OCALL_READ_SLOT_DEFINED__
 size_t SGX_UBRIDGE(SGX_NOCONVENTION, ocall_read_slot, (const char* slot_finderprint, uint8_t* slot, size_t slot_size));
 #endif
+#ifndef OCALL_READ_SLOT_SEG_DEFINED__
+#define OCALL_READ_SLOT_SEG_DEFINED__
+size_t SGX_UBRIDGE(SGX_NOCONVENTION, ocall_read_slot_seg, (const char* slot_fingerprint, size_t offset, uint8_t* slot, size_t slot_size));
+#endif
 #ifndef OCALL_READ_SLOT_HEADER_DEFINED__
 #define OCALL_READ_SLOT_HEADER_DEFINED__
 size_t SGX_UBRIDGE(SGX_NOCONVENTION, ocall_read_slot_header, (const char* slot_finger_print, uint8_t* header, size_t size));
@@ -42,6 +46,10 @@ size_t SGX_UBRIDGE(SGX_NOCONVENTION, ocall_read_slot_header, (const char* slot_f
 #ifndef OCALL_WRITE_SLOT_DEFINED__
 #define OCALL_WRITE_SLOT_DEFINED__
 void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_write_slot, (const char* slot_finderprint, const uint8_t* slot, size_t size));
+#endif
+#ifndef OCALL_WRITE_SLOT_SEG_DEFINED__
+#define OCALL_WRITE_SLOT_SEG_DEFINED__
+void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_write_slot_seg, (const char* slot_fingerprint, size_t offset, const uint8_t* slot, size_t size, int finished));
 #endif
 #ifndef OCALL_WRITE_SLOT_HEADER_DEFINED__
 #define OCALL_WRITE_SLOT_HEADER_DEFINED__

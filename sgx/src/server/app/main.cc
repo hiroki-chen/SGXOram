@@ -55,6 +55,7 @@ DEFINE_string(address, "localhost", "The server's IP address");
 DEFINE_string(port, "1234", "The server's port");
 DEFINE_bool(verbose, true, "Whether to print verbose information");
 DEFINE_bool(cache_enabled, true, "Whether to enable the enclave cache");
+DEFINE_uint32(seg_size, 65535, "The size of the slot segment");
 
 // Configurations for the enclave.
 static sgx_enclave_id_t global_eid = 0;

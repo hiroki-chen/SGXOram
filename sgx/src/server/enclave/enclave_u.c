@@ -147,6 +147,14 @@ typedef struct ms_ocall_read_slot_t {
 	size_t ms_slot_size;
 } ms_ocall_read_slot_t;
 
+typedef struct ms_ocall_read_slot_seg_t {
+	size_t ms_retval;
+	const char* ms_slot_fingerprint;
+	size_t ms_offset;
+	uint8_t* ms_slot;
+	size_t ms_slot_size;
+} ms_ocall_read_slot_seg_t;
+
 typedef struct ms_ocall_read_slot_header_t {
 	size_t ms_retval;
 	const char* ms_slot_finger_print;
@@ -159,6 +167,14 @@ typedef struct ms_ocall_write_slot_t {
 	const uint8_t* ms_slot;
 	size_t ms_size;
 } ms_ocall_write_slot_t;
+
+typedef struct ms_ocall_write_slot_seg_t {
+	const char* ms_slot_fingerprint;
+	size_t ms_offset;
+	const uint8_t* ms_slot;
+	size_t ms_size;
+	int ms_finished;
+} ms_ocall_write_slot_seg_t;
 
 typedef struct ms_ocall_write_slot_header_t {
 	const char* ms_slot_finderprint;
@@ -263,6 +279,14 @@ static sgx_status_t SGX_CDECL enclave_ocall_read_slot(void* pms)
 	return SGX_SUCCESS;
 }
 
+static sgx_status_t SGX_CDECL enclave_ocall_read_slot_seg(void* pms)
+{
+	ms_ocall_read_slot_seg_t* ms = SGX_CAST(ms_ocall_read_slot_seg_t*, pms);
+	ms->ms_retval = ocall_read_slot_seg(ms->ms_slot_fingerprint, ms->ms_offset, ms->ms_slot, ms->ms_slot_size);
+
+	return SGX_SUCCESS;
+}
+
 static sgx_status_t SGX_CDECL enclave_ocall_read_slot_header(void* pms)
 {
 	ms_ocall_read_slot_header_t* ms = SGX_CAST(ms_ocall_read_slot_header_t*, pms);
@@ -275,6 +299,14 @@ static sgx_status_t SGX_CDECL enclave_ocall_write_slot(void* pms)
 {
 	ms_ocall_write_slot_t* ms = SGX_CAST(ms_ocall_write_slot_t*, pms);
 	ocall_write_slot(ms->ms_slot_finderprint, ms->ms_slot, ms->ms_size);
+
+	return SGX_SUCCESS;
+}
+
+static sgx_status_t SGX_CDECL enclave_ocall_write_slot_seg(void* pms)
+{
+	ms_ocall_write_slot_seg_t* ms = SGX_CAST(ms_ocall_write_slot_seg_t*, pms);
+	ocall_write_slot_seg(ms->ms_slot_fingerprint, ms->ms_offset, ms->ms_slot, ms->ms_size, ms->ms_finished);
 
 	return SGX_SUCCESS;
 }
@@ -392,16 +424,18 @@ static sgx_status_t SGX_CDECL enclave_sgx_thread_set_multiple_untrusted_events_o
 
 static const struct {
 	size_t nr_ocall;
-	void * table[20];
+	void * table[22];
 } ocall_table_enclave = {
-	20,
+	22,
 	{
 		(void*)enclave_ocall_is_header_in_storage,
 		(void*)enclave_ocall_is_body_in_storage,
 		(void*)enclave_ocall_printf,
 		(void*)enclave_ocall_read_slot,
+		(void*)enclave_ocall_read_slot_seg,
 		(void*)enclave_ocall_read_slot_header,
 		(void*)enclave_ocall_write_slot,
+		(void*)enclave_ocall_write_slot_seg,
 		(void*)enclave_ocall_write_slot_header,
 		(void*)enclave_ocall_exception_handler,
 		(void*)enclave_ocall_read_position,

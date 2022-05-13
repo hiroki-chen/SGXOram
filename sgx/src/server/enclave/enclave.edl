@@ -126,6 +126,11 @@ enclave {
     size_t ocall_read_slot([ in, string ] const char *slot_finderprint,
                            [ out, size = slot_size ] uint8_t *slot,
                            size_t slot_size);
+    size_t ocall_read_slot_seg([ in, string ] const char *slot_fingerprint,
+                               size_t offset,
+                               [ out, size = slot_size ] uint8_t *slot,
+                               size_t slot_size);
+
     size_t ocall_read_slot_header([ in, string ]const char* slot_finger_print,
                                   [ out, size = size ] uint8_t* header,
                                   size_t size);
@@ -134,6 +139,11 @@ enclave {
     void ocall_write_slot([ in, string ] const char *slot_finderprint,
                           [ in, size = size ] const uint8_t* slot,
                           size_t size);
+    void ocall_write_slot_seg([ in, string ] const char *slot_fingerprint,
+                              size_t offset,
+                              [ in, size = size] const uint8_t* slot,
+                              size_t size, int finished);
+
     void ocall_write_slot_header([ in, string ] const char *slot_finderprint,
                                  [ in, size = size ] const uint8_t* header,
                                   size_t size);

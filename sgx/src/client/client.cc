@@ -40,6 +40,7 @@ DECLARE_double(constant);
 DECLARE_uint32(round);
 DECLARE_uint32(oram_type);
 DECLARE_uint32(cache_type);
+DECLARE_uint32(access_num);
 
 static std::string read_keycert(const std::string& path) {
   std::ifstream file(path, std::ifstream::in);
@@ -304,7 +305,7 @@ int Client::test_oram_cache(void) {
 
 int Client::test_oram(void) {
   logger->info("Begin testing the ORAM!");
-  for (size_t i = 0; i < FLAGS_number; i++) {
+  for (size_t i = 0; i < FLAGS_access_num; i++) {
     if (read_block(i) != 0) {
       return -1;
     }

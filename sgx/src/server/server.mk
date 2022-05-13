@@ -173,9 +173,21 @@ endif
 
 App_Cpp_Flags := $(App_C_Flags)
 
-ifeq ($(SGX_MODE), SIM)
+ifeq ($(SGX_MODE), HW)
+ifeq ($(SGX_DEBUG), 1)
+	Build_Mode = HW_DEBUG
+else ifeq ($(SGX_PRERELEASE), 1)
+	Build_Mode = HW_PRERELEASE
+else
+	Build_Mode = HW_RELEASE
+endif
+else
 ifeq ($(SGX_DEBUG), 1)
 	Build_Mode = SIM_DEBUG
+else ifeq ($(SGX_PRERELEASE), 1)
+	Build_Mode = SIM_PRERELEASE
+else
+	Build_Mode = SIM_RELEASE
 endif
 endif
 
@@ -217,7 +229,7 @@ $(BUILD_PATH)/enclave/enclave_u.o: $(SRC_PATH)/enclave/enclave_u.c
 
 # Compile the enclave.
 $(BUILD_PATH)/enclave/%.o: $(SRC_PATH)/enclave/%.cc
-	@$(CXX) $(Enclave_Cpp_Flags) -MMD -MP $(SGX_COMMON_CXXFLAGS) -c $< -o $@
+	$(CXX) $(Enclave_Cpp_Flags) -MMD -MP $(SGX_COMMON_CXXFLAGS) -c $< -o $@
 	@printf "\033[1;93;49mCXX =>  $@\033[0m\n"
 
 # Link the object files and generate a shared object.

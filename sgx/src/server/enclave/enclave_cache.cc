@@ -92,8 +92,12 @@ void EnclaveCache::replace_item(const std::string& key,
           old_key.c_str(), old_value.size());
 
       if (is_body) {
-        ocall_write_slot(old_key.c_str(), (uint8_t*)old_value.data(),
-                         old_value.size());
+        // status = ocall_write_slot(old_key.c_str(),
+        // (uint8_t*)old_value.data(),
+        //                           old_value.size());
+        // enclave_utils::check_sgx_status(status, "ocall_write_slot()");
+        enclave_utils::slot_segment_write(old_key.c_str(), (uint8_t*)old_value.data(),
+                                          old_value.size(), seg_size_);
       } else {
         ocall_write_slot_header(old_key.c_str(), (uint8_t*)old_value.data(),
                                 old_value.size());
@@ -144,9 +148,11 @@ std::string EnclaveCache::internal_read(const std::string& key, size_t size,
     sgx_status_t status = SGX_ERROR_UNEXPECTED;
 
     if (is_body) {
-      status = ocall_read_slot(&buf_size, key.c_str(), (uint8_t*)buf.data(),
-                               buf_size);
-      enclave_utils::check_sgx_status(status, "ocall_read_slot()");
+      // status = ocall_read_slot(&buf_size, key.c_str(), (uint8_t*)buf.data(),
+      //                          buf_size);
+      enclave_utils::slot_segment_read(key.c_str(), (uint8_t*)buf.data(),
+                                       buf_size, seg_size_);
+      // enclave_utils::check_sgx_status(status, "slot_segment_read()");
     } else {
       status = ocall_read_slot_header(&buf_size, key.c_str(),
                                       (uint8_t*)buf.data(), buf_size);

@@ -208,6 +208,8 @@ void get_slot_and_decrypt(const std::string& slot_hash, uint8_t* slot_buffer,
     sgx_status_t status = SGX_ERROR_UNEXPECTED;
     status = ocall_read_slot(&slot_size, slot_hash.c_str(), ciphertext,
                              ciphertext_size);
+    // enclave_utils::slot_segment_read(slot_hash.c_str(), ciphertext,
+    //                                  ciphertext_size);
     enclave_utils::check_sgx_status(status, "get_slot_and_decrypt()");
 
     // Check if the slot is valid.
@@ -559,6 +561,10 @@ sgx_status_t SGXAPI ecall_init_oram_controller(uint8_t* oram_config,
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
   crypto_manager->set_oram_config(oram_config, oram_config_size);
+  // Set the seg size for the cache.
+  std::shared_ptr<EnclaveCache> cache_manager =
+      EnclaveCache::get_instance_for_slot_body();
+  cache_manager->set_seg_size(crypto_manager->get_oram_config()->seg_size);
   // Begin initialize the slot...
   ENCLAVE_LOG("[enclave] Initializing the slot...");
   ENCLAVE_LOG("[enclave] oram_type is %d.",
