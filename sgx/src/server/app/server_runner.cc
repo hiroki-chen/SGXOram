@@ -34,6 +34,7 @@
 #include <enclave/enclave_u.h>
 
 DECLARE_bool(cache_enabled);
+DECLARE_uint32(seg_size);
 
 std::atomic_bool server_running;
 
@@ -59,6 +60,7 @@ static void print_oram_config(const OramConfiguration& oram_config) {
   logger->info("  round: {}", oram_config.round);
   logger->info("  level: {}", oram_config.level);
   logger->info("  oram_type: {}", oram_config.oram_type);
+  logger->info("  seg_size: {}", oram_config.seg_size);
 }
 
 // This function is dedicated to the assembly of message 2!!!
@@ -293,8 +295,15 @@ grpc::Status SGXORAMService::read_block(grpc::ServerContext* server_context,
       DEFAULT_ORAM_DATA_SIZE + SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE;
   uint8_t* data = (uint8_t*)malloc(encrypted_data_size);
   memset(data, 0, encrypted_data_size);
+
+  auto start = std::chrono::high_resolution_clock::now();
   status = ecall_access_data(*global_eid, &status, 0, address, data,
                              encrypted_data_size);
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration =
+      std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+  logger->info("The server has read the block at address {} in {} ms.", address,
+               duration.count());
 
   if (status != SGX_SUCCESS) {
     const std::string error_message = "Enclave cannot access the data!";
@@ -508,6 +517,7 @@ grpc::Status SGXORAMService::init_oram(
   oram_config.type = oram_init_request->type();
   oram_config.bucket_size = oram_init_request->bucket_size();
   oram_config.oram_type = oram_init_request->oram_type();
+  oram_config.seg_size = FLAGS_seg_size;
 
   const std::string verification_message = oram_init_request->verification();
   uint32_t* permutation = new uint32_t[real_number];

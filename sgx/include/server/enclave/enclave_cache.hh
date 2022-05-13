@@ -54,6 +54,7 @@ class EnclaveCache {
   cache_list_t cache_list_;
   key_map_t key_map_;
   cache_type_t cache_type_;
+  size_t seg_size_;
   // The constructor is private to ensure that the cache is created
   // through the static get_instance_for_slot_body() method to prevent multiple
   // instances of the cache, which does not make sense.
@@ -67,6 +68,8 @@ class EnclaveCache {
  public:
   static std::shared_ptr<EnclaveCache> get_instance_for_slot_body(void);
   static std::shared_ptr<EnclaveCache> get_instance_for_slot_header(void);
+
+  void set_seg_size(size_t seg_size) { seg_size_ = seg_size; }
 
   /**
    * @brief Update the cache with the new slot. If the entry already exists, it

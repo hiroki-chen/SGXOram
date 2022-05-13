@@ -41,8 +41,10 @@ sgx_status_t SGX_CDECL ocall_is_header_in_storage(int* retval, const char* slot_
 sgx_status_t SGX_CDECL ocall_is_body_in_storage(int* retval, const char* slot_fingerprint);
 sgx_status_t SGX_CDECL ocall_printf(const char* str);
 sgx_status_t SGX_CDECL ocall_read_slot(size_t* retval, const char* slot_finderprint, uint8_t* slot, size_t slot_size);
+sgx_status_t SGX_CDECL ocall_read_slot_seg(size_t* retval, const char* slot_fingerprint, size_t offset, uint8_t* slot, size_t slot_size);
 sgx_status_t SGX_CDECL ocall_read_slot_header(size_t* retval, const char* slot_finger_print, uint8_t* header, size_t size);
 sgx_status_t SGX_CDECL ocall_write_slot(const char* slot_finderprint, const uint8_t* slot, size_t size);
+sgx_status_t SGX_CDECL ocall_write_slot_seg(const char* slot_fingerprint, size_t offset, const uint8_t* slot, size_t size, int finished);
 sgx_status_t SGX_CDECL ocall_write_slot_header(const char* slot_finderprint, const uint8_t* header, size_t size);
 sgx_status_t SGX_CDECL ocall_exception_handler(const char* err_msg);
 sgx_status_t SGX_CDECL ocall_read_position(size_t* retval, const char* position_finderprint, uint8_t* position, size_t position_size);

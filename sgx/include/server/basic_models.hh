@@ -145,6 +145,7 @@ typedef struct _oram_configuration_t {
   uint32_t round;
   uint32_t level;
   uint32_t oram_type;
+  uint32_t seg_size;
 } oram_configuration_t;
 
 typedef enum _oram_operation_t {

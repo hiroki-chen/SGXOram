@@ -17,10 +17,11 @@
 #include <enclave/enclave_utils.hh>
 
 #include <cassert>
+#include <cmath>
 
 #include <sgx_urts.h>
 
-#include <enclave/enclave_u.h>
+#include <enclave/enclave_t.h>
 namespace enclave_utils {
 // Error code for SGX API calls
 static sgx_error_list sgx_errlist = {
@@ -115,7 +116,8 @@ void print_slot_metadata(const sgx_oram::oram_slot_header_t* const header) {
   ENCLAVE_LOG("[enclave]  - type: %d", (int)header->type);
   ENCLAVE_LOG("[enclave]  - level: %u", header->level);
   ENCLAVE_LOG("[enclave]  - offset: %u", header->offset);
-  ENCLAVE_LOG("[enclave]  - range: [%u, %u]", header->range_begin, header->range_end);
+  ENCLAVE_LOG("[enclave]  - range: [%u, %u]", header->range_begin,
+              header->range_end);
   ENCLAVE_LOG("[enclave]  - dummy_number: %u", header->dummy_number);
   ENCLAVE_LOG("[enclave]  - slot_size: %u", header->slot_size);
   ENCLAVE_LOG("------------------------------");
@@ -306,6 +308,46 @@ uint64_t get_current_time(void) {
   __asm__ __volatile__("rdtsc" : "=a"(lo), "=d"(hi));
 
   return ((uint64_t)hi << 32) | (uint64_t)lo;
+}
+
+void slot_segment_write(const char* slot_fingerprint, const uint8_t* const slot,
+                        size_t slot_size, size_t seg_size) {
+  // Write the slot in segments.
+  size_t seg_num = std::floor(slot_size * 1. / seg_size);
+
+  for (size_t i = 0; i < seg_num; i++) {
+    sgx_status_t status = ocall_write_slot_seg(
+        slot_fingerprint, i * seg_size, slot + i * seg_size, seg_size, 0);
+    check_sgx_status(status, "ocall_write_slot_seg()");
+  }
+
+  // Write the last segment.
+  size_t last_seg_size = slot_size % seg_size;
+  if (last_seg_size != 0) {
+    ocall_write_slot_seg(slot_fingerprint, seg_num * seg_size,
+                         slot + seg_num * seg_size, last_seg_size, 1);
+  }
+}
+
+void slot_segment_read(const char* slot_fingerprint, uint8_t* slot,
+                       size_t slot_size, size_t seg_size) {
+  // Read the slot in segments.
+  size_t seg_num = std::floor(slot_size * 1. / seg_size);
+  size_t dummy;
+  for (size_t i = 0; i < seg_num; i++) {
+    sgx_status_t status = ocall_read_slot_seg(
+        &dummy, slot_fingerprint, i * seg_size, slot + i * seg_size, seg_size);
+    check_sgx_status(status, "ocall_read_slot_seg()");
+  }
+
+  // Read the last segment.
+  size_t last_seg_size = slot_size % seg_size;
+  if (last_seg_size != 0) {
+    sgx_status_t status =
+        ocall_read_slot_seg(&dummy, slot_fingerprint, seg_num * seg_size,
+                            slot + seg_num * seg_size, last_seg_size);
+    check_sgx_status(status, "ocall_read_slot_seg()");
+  }
 }
 
 }  // namespace enclave_utils

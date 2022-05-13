@@ -37,4 +37,6 @@ static const std::string client_name = "client.bin";
 static constexpr uint32_t client_log_size = 1024 * 1024 * 10;
 static constexpr uint32_t client_log_num = 10;
 
+static constexpr uint32_t slot_buf_size = 102400000;
+
 #endif  // CONFIG_HH
