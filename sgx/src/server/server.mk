@@ -28,7 +28,7 @@ COMMON_INCLUDE_PATH := ../../include
 SRC_PATH := $(CURDIR)
 BUILD_PATH := ../../build/server
 KEY_PATH := ../../key
-GRPC_PATH := /usr/local/grpc
+GRPC_PATH := /usr/local
 
 # Must recompile the project if these parameters are changed.
 BUCKET_SIZE ?= 32
@@ -42,7 +42,7 @@ include $(SGX_SDK)/buildenv.mk
 ifeq ($(SGX_DEBUG), 1)
 	SGX_COMMON_FLAGS += -O0 -g
 else
-	SGX_COMMON_FLAGS += -O2
+	SGX_COMMON_FLAGS += -O3
 endif 
 
 # Compilation flags for building the enclave application.
@@ -79,9 +79,9 @@ PROTO_OBJ := $(wildcard ../../build/proto/*.o)
 App_Cpp_Files := $(wildcard $(SRC_PATH)/app/*.cc)
 App_Cpp_Flags := $(App_C_Flags)
 App_Link_Flags := -L../../lib -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name)\
-		  -lpthread -lsgx_pthread -lsgx_ukey_exchange -lservice_provider\
+		  -lpthread -lsgx_pthread -lsgx_omp -lsgx_ukey_exchange -lservice_provider\
 		  `pkg-config $(GRPC_PATH)/lib/pkgconfig/grpc++.pc --libs`\
-		  `pkg-config /usr/local/grpc/lib/pkgconfig/protobuf.pc --libs`\
+		  `pkg-config $(GRPC_PATH)/lib/pkgconfig/protobuf.pc --libs`\
            	  -Wl,--no-as-needed -lgrpc++_reflection -Wl,--as-needed\
            	  -ldl -lgflags -llz4
 

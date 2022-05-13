@@ -81,10 +81,6 @@ int SGX_CDECL main(int argc, char** argv) {
   spdlog::set_default_logger(logger);
   spdlog::set_level(spdlog::level::debug);
   spdlog::set_pattern(log_pattern);
-  spdlog::flush_every(3s);
-
-  spdlog::info("Hello");
-  logger->flush();
 
   // Nullify the input arguments.
   (void)(argc);

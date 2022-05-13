@@ -189,6 +189,8 @@ void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
     ENCLAVE_LOG("[enclave] lhs or rhs is not aligned to 32.\n");
     return;
   }
+
+#pragma omp parallel for if (lhs_size >= 65535)
   // Performs bitwise AND operation on two arrays in 32-bit chunks.
   // We assume that the arrays are of the same size multiple of 32.
   // Please pad the arrays with zeros **in advance** if necessary.
@@ -210,6 +212,8 @@ void bor(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
     ENCLAVE_LOG("[enclave] lhs or rhs is not aligned to 32.\n");
     return;
   }
+
+#pragma omp parallel for if (lhs_size >= 65535)
   // Performs bitwise OR operation on two arrays in 32-bit chunks.
   // We assume that the arrays are of the same size multiple of 32.
   // Please pad the arrays with zeros **in advance** if necessary.

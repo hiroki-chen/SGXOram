@@ -131,7 +131,6 @@ size_t ocall_read_position(const char* position_fingerprint, uint8_t* position,
   const std::string decompressed_position = decompress_data(position_str);
   // Copy the decompressed position to the position buffer.
   memcpy(position, decompressed_position.data(), decompressed_position.size());
-  logger->debug("Read position: {}", spdlog::to_hex(decompressed_position));
   return decompressed_position.size();
 }
 
@@ -150,8 +149,6 @@ void ocall_write_position(const char* position_fingerprint,
 
 void ocall_write_slot(const char* slot_finger_print, const uint8_t* data,
                       size_t data_len) {
-  logger->debug("[OCall] Writing slot for {}", std::string(slot_finger_print));
-
   // Compress the data and then store it to the server.
   std::string compressed_data =
       compress_data(std::string((char*)data, data_len));
@@ -179,9 +176,6 @@ void ocall_write_slot_seg(const char* slot_fingerprint, size_t offset,
 
 void ocall_write_slot_header(const char* slot_finger_print, const uint8_t* data,
                              size_t data_len) {
-  logger->debug("[OCall] Writing slot header for {}",
-                std::string(slot_finger_print));
-
   // Compress the data and then store it to the server.
   std::string compressed_data =
       compress_data(std::string((char*)data, data_len));
@@ -191,7 +185,6 @@ void ocall_write_slot_header(const char* slot_finger_print, const uint8_t* data,
 
 size_t ocall_read_slot(const char* slot_finger_print, uint8_t* data,
                        size_t data_len) {
-  logger->debug("[OCall] Reading slot: {}", std::string(slot_finger_print));
   // Check if the slot is in the memory.
   bool is_in_memory = server_runner->is_body_in_storage(slot_finger_print);
 

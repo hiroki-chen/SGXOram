@@ -29,7 +29,7 @@
 
 constexpr size_t maximum_cache_size_in_bytes = 96 * 1024 * 1024;
 constexpr size_t maximum_cache_size = 16;
-constexpr size_t maximum_cache_size_for_header = 256;
+constexpr size_t maximum_cache_size_for_header = 1024;
 
 using sgx_oram::cache_type_t;
 

@@ -86,10 +86,6 @@ void EnclaveCache::replace_item(const std::string& key,
       // The key is the hashed fingerprint of the slot.
       std::string old_key = last_item.first;
       std::string old_value = last_item.second.second;
-      ENCLAVE_LOG(
-          "[enclave] Write back the last item %s to the external memory. The "
-          "size of the old value is %zu",
-          old_key.c_str(), old_value.size());
 
       if (is_body) {
         // status = ocall_write_slot(old_key.c_str(),
@@ -117,12 +113,12 @@ void EnclaveCache::write(const std::string& key, const std::string& value,
                          bool is_body) {
   auto it = key_map_.find(key);
   if (it != key_map_.end()) {
-    ENCLAVE_LOG("[enclave] W Cache hit on key %s.", key.c_str());
+    // ENCLAVE_LOG("[enclave] W Cache hit on key %s.", key.c_str());
     // Update the item.
     it->second->second.second = value;
     cache_list_.splice(cache_list_.begin(), cache_list_, it->second);
   } else {
-    ENCLAVE_LOG("[enclave] W Cache miss on key %s.", key.c_str());
+    // ENCLAVE_LOG("[enclave] W Cache miss on key %s.", key.c_str());
     replace_item(key, value, true, is_body);
   }
 
@@ -137,8 +133,8 @@ std::string EnclaveCache::internal_read(const std::string& key, size_t size,
   auto it = key_map_.find(key);
 
   if (it == key_map_.end()) {
-    ENCLAVE_LOG("[enclave] R Cache miss on key %s", key.c_str());
-    ENCLAVE_LOG("[enclave] R Fetching from external memory...");
+    // ENCLAVE_LOG("[enclave] R Cache miss on key %s", key.c_str());
+    // ENCLAVE_LOG("[enclave] R Fetching from external memory...");
 
     // If the target key value is not in the cache, fetch it from the external
     // memory. We assume the external memory is always available.
@@ -163,7 +159,7 @@ std::string EnclaveCache::internal_read(const std::string& key, size_t size,
     replace_item(key, buf, false, is_body);
     return buf;
   } else {
-    ENCLAVE_LOG("[enclave] R Cache hit on key %s", key.c_str());
+    // ENCLAVE_LOG("[enclave] R Cache hit on key %s", key.c_str());
     const std::string ans = it->second->second.second;
     cache_list_.splice(cache_list_.begin(), cache_list_, it->second);
     return ans;

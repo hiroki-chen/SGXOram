@@ -45,7 +45,7 @@ void sub_access_s1(bool condition, sgx_oram::oram_slot_header_t* const header,
   for (size_t i = 0; i < slot_size; i++) {
     // Locate the blocks.
     sgx_oram::oram_block_t* block = slot_storage + i;
-    enclave_utils::print_block(block);
+    // enclave_utils::print_block(block);
     // Initialize some bool variables.
     // Variable condition_existing stands for whether the target block is
     // existing:
@@ -231,7 +231,7 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
         static_cast<sgx_oram::oram_block_type_t>(delta_a || delta_b || delta_c);
     // =========== End Third Part: is_dummy processing =========== //
 
-    enclave_utils::print_block(block);
+    // enclave_utils::print_block(block);
   }
 
   // Obliviously update the position map.
@@ -252,7 +252,7 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
   for (size_t i = 0; i < slot_size; i++) {
     // Get the block and prepare a buffer for the boolean variable.
     sgx_oram::oram_block_t* block = slot_storage + i;
-    enclave_utils::print_block(block);
+    // enclave_utils::print_block(block);
 
     // Check whether this is the target one.
     bool condition_existing =
@@ -357,7 +357,7 @@ void sub_access(sgx_oram::oram_operation_t op_type, bool condition_s1,
   // Sample new bid and a random position for the blocks and reset the counter.
   uint32_t pos = 0;
   ENCLAVE_LOG("[enclave] S1 HEADER...");
-  enclave_utils::print_slot_metadata(s1_header);
+
   sub_access_s1_epilogue(condition_s1, s1_header->dummy_number,
                          block_slot1_target, block_slot1_evict, &counter, &pos);
   // After accessing, we need to update the slot.
@@ -373,11 +373,9 @@ void sub_access(sgx_oram::oram_operation_t op_type, bool condition_s1,
   // block_slot1_target->header.address);
 
   // Invoke sub_access_s2.
-  // FIXME: This causes problem.
   sub_access_s2(op_type, condition_s2, s2_header, s2, block_slot1_target,
                 data_star, &counter, pos, position_target, position);
   encrypt_slot_and_store(s2, s2_size, s2_header->level, s2_header->offset);
-  ENCLAVE_LOG("[enclave] sss2: %d", data_star[0]);
 
   // Eventually, destroy all the allocated memory.
   enclave_utils::safe_free_all(3, block_slot1_target, block_slot1_evict,
