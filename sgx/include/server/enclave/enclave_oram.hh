@@ -33,6 +33,12 @@ void encrypt_position_and_store(
 
 void encrypt_header_and_store(const sgx_oram::oram_slot_header_t* const header);
 
+void assemble_position(uint32_t level, uint32_t bid, uint32_t address,
+                       sgx_oram::oram_position_t* const position);
+
+void get_position_and_decrypt(sgx_oram::oram_position_t* const position,
+                              uint32_t block_address);
+
 uint32_t calculate_offset(uint32_t block_id, uint32_t level_cur);
 
 void get_slot_and_decrypt(const std::string& slot_hash, uint8_t* slot_buffer,
@@ -42,8 +48,5 @@ std::string get_slot_header_and_decrypt(uint32_t level, uint32_t offset,
                                         sgx_oram::oram_slot_header_t* header);
 
 std::string calculate_slot_fingerprint(uint32_t level, uint32_t offset);
-
-void assemble_position(uint32_t level, uint32_t bid, uint32_t address,
-                       sgx_oram::oram_position_t* const position);
 
 #endif  // ENCLAVE_ORAM_HH
