@@ -120,8 +120,6 @@ Status PathOramController::FillWithData(const std::vector<oram_block_t>& data) {
   // initialize the ORAM tree from the leaf to the root. In other words, we
   // **GREEDILY** fill the buckets from the leaf to the root.
 
-  // TODO: Implement me.
-  // TODO: Initialize the tree while filling the position map.
   size_t p_data = 0;
   for (int i = tree_level_; i >= 0; i--) {
     // We pick bucket_size blocks from the data and organize them into a bucket.
@@ -171,12 +169,6 @@ Status PathOramController::FillWithData(const std::vector<oram_block_t>& data) {
   google::protobuf::Empty empty;
 
   request.set_id(id_);
-
-  // grpc::Status status = stub_->PrintOramTree(&context, request, &empty);
-  // if (!status.ok()) {
-  //   logger->error("PrintOramTree failed: {}", status.error_message());
-  //   return Status::kServerError;
-  // }
 
   return Status::kOK;
 }
@@ -281,7 +273,9 @@ Status PathOramController::Access(Operation op_type, uint32_t address,
   const uint32_t x = position_map_[address];
   logger->info("The address {} has the path {}.", address, x);
   // Update the position map.
-  position_map_[address] = new_path;
+  if (!dummy) {
+    position_map_[address] = new_path;
+  }
 
   // Step 3-5: Read the whole path from the server into the stash.
   p_oram_path_t bucket_this_path;
@@ -391,6 +385,7 @@ Status OramController::Access(Operation op_type, uint32_t address,
     // Invoke a dummy read.
     Status status =
         controller->Access(Operation::kRead, address, nullptr, true);
+    oram_utils::CheckStatus(status, "Cannot perform fake read!");
     // Read the block directly from the slot.
     block = *iter;
     // Expire the iterator.
@@ -411,7 +406,18 @@ Status OramController::Access(Operation op_type, uint32_t address,
   return Status::kOK;
 }
 
-Status OramController::Evict(uint32_t id) {}
+Status OramController::Evict(uint32_t id) {
+  PathOramController* const controller = path_oram_controllers_[id].get();
+  if (slots_[id].empty()) {
+    // Perform a fake write.
+    return controller->Access(Operation::kRead, 0, nullptr, true);
+  } else {
+    oram_block_t block = slots_[id].back();
+    slots_[id].pop_back();
+    return controller->Access(Operation::kWrite, block.header.block_id, &block,
+                              false);
+  }
+}
 
 // RandomEvict samples \nu \in \mathbb{N} random slots (with replacement) to
 // evict from.
@@ -422,8 +428,12 @@ Status OramController::RandomEvict(void) {
     oram_utils::CheckStatus(
         oram_crypto::Cryptor::UniformRandom(0, partition_size_ - 1, &id),
         "Failed to sample a new slot id.");
-    Evict(id);
+    if (Evict(id) != Status::kOK) {
+      return Status::kInvalidOperation;
+    }
   }
+
+  return Status::kOK;
 }
 
 // SequentialEvict determines the number of blocks to evict num based on a
@@ -438,8 +448,12 @@ Status OramController::SequentialEvict(void) {
   for (size_t i = 0; i < evict_num; i++) {
     // cnt is a global counter for the sequential scan.
     counter_ = (counter_ + 1) % partition_size_;
-    Evict(counter_);
+    if (Evict(counter_) != Status::kOK) {
+      return Status::kInvalidOperation;
+    }
   }
+
+  return Status::kOK;
 }
 
 Status OramController::Run(uint32_t block_num, uint32_t bucket_size) {
