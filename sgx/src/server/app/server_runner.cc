@@ -313,6 +313,8 @@ grpc::Status SGXORAMService::read_block(grpc::ServerContext* server_context,
 
   read_reply->set_data(data, encrypted_data_size);
   read_reply->set_success(true);
+
+  free(data);
   return grpc::Status::OK;
 }
 

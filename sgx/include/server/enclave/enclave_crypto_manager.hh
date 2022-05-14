@@ -58,6 +58,8 @@ class EnclaveCryptoManager final {
   EnclaveCryptoManager();
 
  public:
+  virtual ~EnclaveCryptoManager();
+
   static std::shared_ptr<EnclaveCryptoManager> get_instance(void);
 
   sgx_ecc_state_handle_t* get_state_handle(void) { return &state_handle; }
@@ -101,21 +103,30 @@ class EnclaveCryptoManager final {
   std::string enclave_sha_256(const std::string& message);
 
   /**
-   * @brief Encrypt the message using AES (rijndael) block cipher in Galois /
-   *        Counter mode.
+   * @brief Another version of the encryption function for better
+   *        performance.
    *
-   * @note  A very interesting aspect of AES-GCM mode is that it does not
-   *        require any padding, which means the output length is exactly the
-   *        same as the input length. GCM uses CTR internally. It encrypts a
-   *        counter value for each block, but it only uses as many bits as
-   *        required from the last block.
-   *
-   * @param message
-   * @return std::string
+   * @param plaintext
+   * @param plaintext_size
+   * @param ciphertext
+   * @return sgx_status_t
    */
-  std::string enclave_aes_128_gcm_encrypt(const std::string& message);
+  sgx_status_t enclave_aes_128_gcm_encrypt(const uint8_t* plaintext,
+                                           size_t plaintext_size,
+                                           uint8_t* ciphertext);
 
-  std::string enclave_aes_128_gcm_decrypt(const std::string& message);
+  /**
+   * @brief Another version of the decryption function for better
+   *        performance.
+   *
+   * @param ciphertext
+   * @param ciphertext_size
+   * @param plaintext
+   * @return sgx_status_t
+   */
+  sgx_status_t enclave_aes_128_gcm_decrypt(const uint8_t* ciphertext,
+                                           size_t ciphertext_size,
+                                           uint8_t* plaintext);
 };
 
 static const std::string kCandidate =

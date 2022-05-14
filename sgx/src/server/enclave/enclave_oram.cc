@@ -28,8 +28,8 @@
 #include <enclave/enclave_oram_access.hh>
 #include <enclave/enclave_crypto_manager.hh>
 
-static inline bool check_slot_header(const char* const header_str,
-                                     uint32_t level) {
+static inline bool check_slot_header(
+    const sgx_oram::oram_slot_header_t* const header_str, uint32_t level) {
   const sgx_oram::oram_slot_header_t* header =
       reinterpret_cast<const sgx_oram::oram_slot_header_t*>(header_str);
   return header->level == level;
@@ -74,12 +74,12 @@ void get_position_and_decrypt(sgx_oram::oram_position_t* const position,
   }
 
   // Decrypt the position.
-  const std::string position_encrypted =
-      crypto_manager->enclave_aes_128_gcm_decrypt(std::string(
-          reinterpret_cast<char*>(ciphertext), ENCRYPTED_POSITION_SIZE));
-  // Copy the plaintext back to the buffer we've just prepared.
-  memcpy(position, position_encrypted.data(), ORAM_POSITION_SIZE);
-  // Finally, free the buffer we've just allocated.
+  status = crypto_manager->enclave_aes_128_gcm_decrypt(
+      ciphertext, ENCRYPTED_POSITION_SIZE,
+      reinterpret_cast<uint8_t*>(position));
+  enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_decrypt()");
+  
+  // Clean up the memory.
   enclave_utils::safe_free(ciphertext);
 }
 
@@ -148,7 +148,8 @@ static sgx_status_t populate_leaf_slot(
     // Then fill in the data.
     memset(block_ptr->data, 0, DEFAULT_ORAM_DATA_SIZE);
     block_ptr->data[0] = block_ptr->header.address;
-
+    // Free the position.
+    enclave_utils::safe_free(position);
     // Do not forget to  decrement the numebr of dummy blocks of the slot.
     header->dummy_number--;
   }
@@ -218,22 +219,20 @@ void get_slot_and_decrypt(const std::string& slot_hash, uint8_t* slot_buffer,
     }
 
     // Decrypt the target slot.
-    const std::string decrypted_slot =
-        crypto_manager->enclave_aes_128_gcm_decrypt(
-            std::string(reinterpret_cast<char*>(ciphertext), ciphertext_size));
+    status = crypto_manager->enclave_aes_128_gcm_decrypt(
+        ciphertext, ciphertext_size, slot_buffer);
     // Free the buffer we've just allocated.
     enclave_utils::safe_free(ciphertext);
-    // Copy back to the buffer.
-    memcpy(slot_buffer, decrypted_slot.data(), decrypted_slot.size());
+    enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_decrypt()");
   } else {
     // We fetch the target slot from the enclave cache.
     std::shared_ptr<EnclaveCache> cache_manager =
         EnclaveCache::get_instance_for_slot_body();
-    std::string ans = cache_manager->read(slot_hash, slot_size);
+    const std::string ans = cache_manager->read(slot_hash, slot_size);
     // Then decrypt it.
-    ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
-    // Copy back to the buffer.
-    memcpy(slot_buffer, ans.data(), ans.size());
+    sgx_status_t status = crypto_manager->enclave_aes_128_gcm_decrypt(
+        (uint8_t*)ans.c_str(), ans.size(), slot_buffer);
+    enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_decrypt()");
   }
 }
 
@@ -265,27 +264,26 @@ std::string get_slot_header_and_decrypt(uint32_t level, uint32_t offset,
           "The enclave proxy cannot fetch the target slot header.");
     }
 
-    const std::string decrypted_header =
-        crypto_manager->enclave_aes_128_gcm_decrypt(
-            std::string(reinterpret_cast<char*>(ciphertext), ciphertext_size));
+    status = crypto_manager->enclave_aes_128_gcm_decrypt(
+        ciphertext, ciphertext_size, (uint8_t*)header);
     // Free the buffer we've just allocated.
     enclave_utils::safe_free(ciphertext);
-    if (!check_slot_header(decrypted_header.data(), level)) {
+    enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_decrypt()");
+
+    if (!check_slot_header(header, level)) {
       ocall_panic_and_flush("The slot header is invalid.");
     }
-    // Copy back to the buffer.
-    memcpy(header, decrypted_header.data(), decrypted_header.size());
   } else {
     std::shared_ptr<EnclaveCache> cache_manager =
         EnclaveCache::get_instance_for_slot_header();
     std::string ans = cache_manager->read(slot_hash);
     // Then decrypt it.
-    ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
-    if (!check_slot_header(ans.data(), level)) {
+    sgx_status_t status = crypto_manager->enclave_aes_128_gcm_decrypt(
+        (uint8_t*)ans.c_str(), ans.size(), (uint8_t*)header);
+    enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_decrypt()");
+    if (!check_slot_header(header, level)) {
       ocall_panic_and_flush("The slot header is invalid (cache enabled).");
     }
-    // Copy back to the buffer.
-    memcpy(header, ans.data(), ans.size());
   }
 
   return slot_hash;
@@ -407,8 +405,7 @@ static sgx_status_t init_so2_slots(uint32_t* const level_size_information,
       // Epilogue.
       encrypt_header_and_store(header);
       encrypt_slot_and_store((uint8_t*)slot, slot_size, i, j);
-      enclave_utils::safe_free(header);
-      enclave_utils::safe_free(slot);
+      enclave_utils::safe_free_all(2, header, slot);
     }
   }
 
@@ -423,14 +420,23 @@ void encrypt_position_and_store(
   // We do not store positions into the cache.
   const std::string position_hash =
       crypto_manager->enclave_sha_256(std::to_string(position->address));
-  const std::string encrypted_position =
-      crypto_manager->enclave_aes_128_gcm_encrypt(
-          std::string(reinterpret_cast<const char*>(position),
-                      sizeof(sgx_oram::oram_position_t)));
-  sgx_status_t status = ocall_write_position(
-      position_hash.c_str(), (uint8_t*)encrypted_position.data(),
-      encrypted_position.size());
+  // Prepare the buffer for the ciphertext.
+  const size_t encrypt_position_size =
+      ORAM_POSITION_SIZE + ORAM_CRYPTO_INFO_SIZE;
+  uint8_t* const encrypted_position =
+      (uint8_t*)malloc(ORAM_POSITION_SIZE + ORAM_CRYPTO_INFO_SIZE);
+
+  sgx_status_t status = SGX_ERROR_UNEXPECTED;
+
+  status = crypto_manager->enclave_aes_128_gcm_encrypt(
+      (uint8_t*)position, ORAM_POSITION_SIZE, encrypted_position);
+  enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_encrypt()");
+  status = ocall_write_position(position_hash.c_str(), encrypted_position,
+                                encrypt_position_size);
   enclave_utils::check_sgx_status(status, "ocall_write_position()");
+
+  // Finally, do not forget to free the buffer.
+  enclave_utils::safe_free(encrypted_position);
 }
 
 void encrypt_header_and_store(
@@ -442,23 +448,32 @@ void encrypt_header_and_store(
   const uint32_t level = header->level;
   const uint32_t offset = header->offset;
   const std::string slot_hash = calculate_slot_fingerprint(level, offset);
-  // Then encrypt the header.
-  const std::string encrypted_header =
-      crypto_manager->enclave_aes_128_gcm_encrypt(std::string(
-          reinterpret_cast<const char*>(header), ORAM_SLOT_HEADER_SIZE));
+
+  // Prepare the buffer for the ciphertext.
+  const size_t encrypted_header_size =
+      ORAM_SLOT_HEADER_SIZE + ORAM_CRYPTO_INFO_SIZE;
+  uint8_t* const encrypted_header = (uint8_t*)malloc(encrypted_header_size);
+  sgx_status_t status = SGX_ERROR_UNEXPECTED;
+  status = crypto_manager->enclave_aes_128_gcm_encrypt(
+      (uint8_t*)header, ORAM_SLOT_HEADER_SIZE, encrypted_header);
+  enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_encrypt()");
 
   if (!cache_enabled) {
     // Store the encrypted header.
     sgx_status_t status = ocall_write_slot_header(
-        slot_hash.c_str(), (uint8_t*)encrypted_header.data(),
-        encrypted_header.size());
+        slot_hash.c_str(), encrypted_header, encrypted_header_size);
     enclave_utils::check_sgx_status(status, "ocall_write_slot_header()");
   } else {
     // Get the cache instance for storing the header.
     std::shared_ptr<EnclaveCache> cache_manager =
         EnclaveCache::get_instance_for_slot_header();
-    cache_manager->write(slot_hash, encrypted_header, false);
+    const std::string ans = std::string(
+        reinterpret_cast<char*>(encrypted_header), encrypted_header_size);
+    cache_manager->write(slot_hash, ans, false);
   }
+
+  // Finally, do not forget to free the buffer.
+  enclave_utils::safe_free(encrypted_header);
 }
 
 // This function encrypts the given slot and then stores the result in the
@@ -473,23 +488,32 @@ void encrypt_slot_and_store(const uint8_t* const slot, size_t slot_size,
   // Calculate the hash value of the slot by its current level and the
   // offset at the current level.
   const std::string slot_hash = calculate_slot_fingerprint(level, offset);
+
   // Encrypt the slot.
-  const std::string encrypted_slot =
-      crypto_manager->enclave_aes_128_gcm_encrypt(
-          std::string(reinterpret_cast<const char*>(slot), slot_size));
+  const size_t encrypted_slot_size = slot_size + ORAM_CRYPTO_INFO_SIZE;
+  uint8_t* const encrypted_slot = (uint8_t*)malloc(encrypted_slot_size);
+  sgx_status_t status = SGX_ERROR_UNEXPECTED;
+  status = crypto_manager->enclave_aes_128_gcm_encrypt(slot, slot_size,
+                                                       encrypted_slot);
+  enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_encrypt()");
 
   if (!cache_enabled) {
     // Write the slot to the SGX storage.
-    sgx_status_t status =
-        ocall_write_slot(slot_hash.c_str(), (uint8_t*)encrypted_slot.data(),
-                         encrypted_slot.size());
+    sgx_status_t status = ocall_write_slot(slot_hash.c_str(), encrypted_slot,
+                                           encrypted_slot_size);
     enclave_utils::check_sgx_status(status, "ocall_write_slot()");
   } else {
     // Write the slot to the cache.
     std::shared_ptr<EnclaveCache> cache_manager =
         EnclaveCache::get_instance_for_slot_body();
-    cache_manager->write(slot_hash, encrypted_slot, true);
+    cache_manager->write(slot_hash,
+                         std::string(reinterpret_cast<char*>(encrypted_slot),
+                                     encrypted_slot_size),
+                         true);
   }
+
+  // Finally, do not forget to free the buffer.
+  enclave_utils::safe_free(encrypted_slot);
 }
 
 sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
@@ -523,10 +547,17 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
   }
 
   // Encrypt the data.
-  const std::string encrypted_data =
-      crypto_manager->enclave_aes_128_gcm_encrypt(
-          std::string((char*)data, DEFAULT_ORAM_DATA_SIZE));
-  memcpy(data, encrypted_data.data(), encrypted_data.size());
+  const size_t encrypted_data_size =
+      DEFAULT_ORAM_DATA_SIZE + ORAM_CRYPTO_INFO_SIZE;
+  uint8_t* const encrypted_data = (uint8_t*)malloc(encrypted_data_size);
+
+  sgx_status_t status = SGX_ERROR_UNEXPECTED;
+  status = crypto_manager->enclave_aes_128_gcm_encrypt(
+      data, DEFAULT_ORAM_DATA_SIZE, encrypted_data);
+  enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_encrypt()");
+
+  memcpy(data, encrypted_data, DEFAULT_ORAM_DATA_SIZE);
+  enclave_utils::safe_free_all(2, position, encrypted_data);
 
   return SGX_SUCCESS;
 }

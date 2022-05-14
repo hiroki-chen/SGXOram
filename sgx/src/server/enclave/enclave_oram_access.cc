@@ -127,6 +127,7 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
   // Get the slot storage.
   sgx_oram::oram_block_t* slot_storage = (sgx_oram::oram_block_t*)s2;
   // Then we do an one-pass on the slot S2.
+#pragma omp parallel for if (slot_size > 65535)
   for (size_t i = 0; i < slot_size; i++) {
     // Get the block.
     sgx_oram::oram_block_t* block = slot_storage + i;
@@ -388,6 +389,7 @@ void sub_evict_s2(sgx_oram::oram_slot_header_t* const header, uint8_t* const s2,
   const size_t slot_size = header->slot_size;
   sgx_oram::oram_block_t* slot_storage = (sgx_oram::oram_block_t*)s2;
 
+#pragma omp parallel for if (slot_size > 65535)
   for (size_t i = 0; i < slot_size; i++) {
     sgx_oram::oram_block_t* const block = slot_storage + i;
 
@@ -420,6 +422,7 @@ void sub_evict_s3(sgx_oram::oram_slot_header_t* const header, uint8_t* const s3,
   // Prepare a buffer for storing populated boolean variable.
   uint8_t* populated = (uint8_t*)malloc(ORAM_BLOCK_SIZE);
 
+#pragma omp parallel for if (slot_size > 65535)
   for (size_t i = 0; i < slot_size; i++) {
     sgx_oram::oram_block_t* const block = slot_storage + i;
     position -= block->header.type ==

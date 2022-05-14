@@ -28,6 +28,7 @@
 #define ORAM_BLOCK_SIZE sizeof(sgx_oram::oram_block_t)
 #define ORAM_SLOT_INTERNAL_SIZE sizeof(sgx_oram::oram_slot_t)
 #define ORAM_SLOT_LEAF_SIZE sizeof(sgx_oram::oram_slot_leaf_t)
+#define ORAM_CRYPTO_INFO_SIZE SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE
 
 #define WORD_SIZE 4
 

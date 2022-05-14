@@ -461,17 +461,26 @@ sgx_status_t SGXAPI ecall_check_verification_message(uint8_t* message,
                                                      size_t message_size) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
-  const std::string decrypted_message =
-      crypto_manager->enclave_aes_128_gcm_decrypt(
-          std::string((char*)message, message_size));
+  // const std::string decrypted_message =
+  //     crypto_manager->enclave_aes_128_gcm_decrypt(
+  //         std::string((char*)message, message_size));
+  const size_t decrypted_message_size = message_size - ORAM_CRYPTO_INFO_SIZE;
+  uint8_t* const decrypted_message = (uint8_t*)malloc(decrypted_message_size);
+  sgx_status_t status = crypto_manager->enclave_aes_128_gcm_decrypt(
+      message, message_size, decrypted_message);
+  enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_decrypt()");
 
-  ENCLAVE_LOG("[enclave] Decrypted message: %s", decrypted_message.data());
+  ENCLAVE_LOG("[enclave] Decrypted message: %s", decrypted_message);
 
-  if (decrypted_message.compare("Hello") != 0) {
+  if (std::string(reinterpret_cast<char*>(decrypted_message),
+                  decrypted_message_size)
+          .compare("Hello") != 0) {
     ENCLAVE_LOG("[enclave] The verification message is not correct!");
+    enclave_utils::safe_free(decrypted_message);
     return SGX_ERROR_UNEXPECTED;
   } else {
     ENCLAVE_LOG("[enclave] The verification message is correct!");
+    enclave_utils::safe_free(decrypted_message);
     return SGX_SUCCESS;
   }
 }

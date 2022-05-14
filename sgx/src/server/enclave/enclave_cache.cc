@@ -294,15 +294,15 @@ sgx_status_t SGXAPI ecall_test_oram_cache() {
   // }
   // ENCLAVE_LOG("[enclave] -- Cache test for sequential write is passed.\n");
 
-  ENCLAVE_LOG("[enclave] ++ Start testing the cache: type = read.\n");
-  int n = 100;
-  while (n--) {
-    const std::string key =
-        crypto_manager->enclave_sha_256(enclave_utils::enclave_strcat(
-            std::to_string(1).c_str(), "_", std::to_string(2).c_str()));
-    std::string ans = cache->read(key, false);
-    ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
-  }
-  ENCLAVE_LOG("[enclave] -- Cache test for read is passed.\n");
+  // ENCLAVE_LOG("[enclave] ++ Start testing the cache: type = read.\n");
+  // int n = 100;
+  // while (n--) {
+  //   const std::string key =
+  //       crypto_manager->enclave_sha_256(enclave_utils::enclave_strcat(
+  //           std::to_string(1).c_str(), "_", std::to_string(2).c_str()));
+  //   std::string ans = cache->read(key, false);
+  //   ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
+  // }
+  // ENCLAVE_LOG("[enclave] -- Cache test for read is passed.\n");
   return SGX_SUCCESS;
 }

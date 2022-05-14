@@ -189,7 +189,7 @@ void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
     ENCLAVE_LOG("[enclave] lhs or rhs is not aligned to 32.\n");
     return;
   }
-
+  
 #pragma omp parallel for if (lhs_size >= 65535)
   // Performs bitwise AND operation on two arrays in 32-bit chunks.
   // We assume that the arrays are of the same size multiple of 32.
@@ -316,41 +316,57 @@ uint64_t get_current_time(void) {
 
 void slot_segment_write(const char* slot_fingerprint, const uint8_t* const slot,
                         size_t slot_size, size_t seg_size) {
-  // Write the slot in segments.
-  size_t seg_num = std::floor(slot_size * 1. / seg_size);
+  if (seg_size == 0) {
+    // Segmentation is disabled.
+    sgx_status_t status = ocall_write_slot(slot_fingerprint, slot, slot_size);
+    check_sgx_status(status, "ocall_write_slot()");
+  } else {
+    // Write the slot in segments.
+    size_t seg_num = std::floor(slot_size * 1. / seg_size);
 
-  for (size_t i = 0; i < seg_num; i++) {
-    sgx_status_t status = ocall_write_slot_seg(
-        slot_fingerprint, i * seg_size, slot + i * seg_size, seg_size, 0);
-    check_sgx_status(status, "ocall_write_slot_seg()");
-  }
+#pragma omp parallel for
+    for (size_t i = 0; i < seg_num; i++) {
+      sgx_status_t status = ocall_write_slot_seg(
+          slot_fingerprint, i * seg_size, slot + i * seg_size, seg_size, 0);
+      check_sgx_status(status, "ocall_write_slot_seg()");
+    }
 
-  // Write the last segment.
-  size_t last_seg_size = slot_size % seg_size;
-  if (last_seg_size != 0) {
-    ocall_write_slot_seg(slot_fingerprint, seg_num * seg_size,
-                         slot + seg_num * seg_size, last_seg_size, 1);
+    // Write the last segment.
+    size_t last_seg_size = slot_size % seg_size;
+    if (last_seg_size != 0) {
+      ocall_write_slot_seg(slot_fingerprint, seg_num * seg_size,
+                           slot + seg_num * seg_size, last_seg_size, 1);
+    }
   }
 }
 
 void slot_segment_read(const char* slot_fingerprint, uint8_t* slot,
                        size_t slot_size, size_t seg_size) {
-  // Read the slot in segments.
-  size_t seg_num = std::floor(slot_size * 1. / seg_size);
-  size_t dummy;
-  for (size_t i = 0; i < seg_num; i++) {
-    sgx_status_t status = ocall_read_slot_seg(
-        &dummy, slot_fingerprint, i * seg_size, slot + i * seg_size, seg_size);
-    check_sgx_status(status, "ocall_read_slot_seg()");
-  }
-
-  // Read the last segment.
-  size_t last_seg_size = slot_size % seg_size;
-  if (last_seg_size != 0) {
+  if (seg_size == 0) {
+    // Segmentation is disabled.
+    size_t dummy;
     sgx_status_t status =
-        ocall_read_slot_seg(&dummy, slot_fingerprint, seg_num * seg_size,
-                            slot + seg_num * seg_size, last_seg_size);
-    check_sgx_status(status, "ocall_read_slot_seg()");
+        ocall_read_slot(&dummy, slot_fingerprint, slot, slot_size);
+    check_sgx_status(status, "ocall_read_slot()");
+  } else {
+    // Read the slot in segments.
+    size_t seg_num = std::floor(slot_size * 1. / seg_size);
+    size_t dummy;
+    for (size_t i = 0; i < seg_num; i++) {
+      sgx_status_t status =
+          ocall_read_slot_seg(&dummy, slot_fingerprint, i * seg_size,
+                              slot + i * seg_size, seg_size);
+      check_sgx_status(status, "ocall_read_slot_seg()");
+    }
+
+    // Read the last segment.
+    size_t last_seg_size = slot_size % seg_size;
+    if (last_seg_size != 0) {
+      sgx_status_t status =
+          ocall_read_slot_seg(&dummy, slot_fingerprint, seg_num * seg_size,
+                              slot + seg_num * seg_size, last_seg_size);
+      check_sgx_status(status, "ocall_read_slot_seg()");
+    }
   }
 }
 
