@@ -16,26 +16,53 @@
  */
 #include <memory>
 
-#include <gflags/gflags.h>
+#include <signal.h>
+#include <execinfo.h>
+
+#include <absl/flags/flag.h>
+#include <absl/flags/parse.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "oram_client.h"
 
-DEFINE_string(address, "localhost", "The address of the server.");
-DEFINE_string(port, "1234", "The port of the server.");
-DEFINE_string(crt_path, "", "The path of the certificate file.");
+ABSL_FLAG(std::string, address, "localhost", "The address of the server.");
+ABSL_FLAG(std::string, port, "1234", "The port of the server.");
+ABSL_FLAG(std::string, crt_path, "", "The path of the certificate file.");
 
 // ORAM PARAMS.
-DEFINE_uint32(block_num, 1e6, "The number of blocks.");
-DEFINE_uint32(bucket_size, 4, "The size of the bucket.");
+ABSL_FLAG(uint32_t, block_num, 1e6, "The number of blocks.");
+ABSL_FLAG(uint32_t, bucket_size, 4,
+          "The size of each bucket. (Z in Path ORAM)");
 
 std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("oram_client");
 
-int main(int argc, char* argv[]) {
-  gflags::SetUsageMessage("The PartitionORAM Client");
-  gflags::SetVersionString("0.0.1");
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+void Handler(int signal) {
+  logger->info("Client stopped.");
+  logger->flush();
+
+  // Print the stack trace.
+  void* array[10];
+  size_t size;
+
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 4);
+
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", signal);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
+}
+
+int main(int argc, char** argv) {
+  // Ignore the https proxy for gRPC client.
+  unsetenv("https_proxy");
+
+  // Register the signal handler.
+  signal(SIGINT, Handler);
+  signal(SIGABRT, Handler);
+
+  absl::ParseCommandLine(argc, argv);
 
   spdlog::set_default_logger(logger);
   spdlog::set_level(spdlog::level::debug);
@@ -43,16 +70,17 @@ int main(int argc, char* argv[]) {
 
   std::unique_ptr<partition_oram::Client> client =
       std::make_unique<partition_oram::Client>(
-          FLAGS_address, FLAGS_port, FLAGS_crt_path, FLAGS_bucket_size,
-          FLAGS_block_num);
+          absl::GetFlag(FLAGS_address), absl::GetFlag(FLAGS_port),
+          absl::GetFlag(FLAGS_crt_path), absl::GetFlag(FLAGS_bucket_size),
+          absl::GetFlag(FLAGS_block_num));
+
   client->Run();
   client->StartKeyExchange();
   client->SendHello();
   client->InitOram();
   client->TestOram();
-  
+
   client->CloseConnection();
 
-  gflags::ShutDownCommandLineFlags();
   return 0;
 }

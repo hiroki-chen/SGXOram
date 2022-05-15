@@ -42,7 +42,7 @@ class PathOramController {
   p_oram_position_t position_map_;
   // The stash should be tied to the slots of Partition ORAM, so we use
   // pointers to manipulate the stash.
-  p_oram_stash_t* stash_;
+  p_oram_stash_t stash_;
   // An object used to call some methods of ORAM storage on the cloud.
   std::shared_ptr<server::Stub> stub_;
   // Cryptography manager.
@@ -64,7 +64,6 @@ class PathOramController {
   PathOramController(uint32_t id, uint32_t block_num, uint32_t bucket_size);
 
   void SetStub(std::shared_ptr<server::Stub> stub) { stub_ = stub; }
-  void SetStash(p_oram_stash_t* const stash) { stash_ = stash; }
 
   Status InitOram(void);
   Status FillWithData(const std::vector<oram_block_t>& data);
@@ -83,6 +82,7 @@ class OramController {
   size_t partition_size_;
   size_t bucket_size_;
   size_t nu_;
+  size_t block_num_;
   static size_t counter_;
   // Position map: [key] -> [slot_id].
   p_oram_position_t position_map_;

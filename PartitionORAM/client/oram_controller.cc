@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <chrono>
 
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/bin_to_hex.h>
@@ -145,12 +146,9 @@ Status PathOramController::FillWithData(const std::vector<oram_block_t>& data) {
         oram_utils::CheckStatus(
             oram_crypto::Cryptor::UniformRandom(begin, end, &path),
             "UniformRandom error");
-        logger->debug("Path = {} for range [{}, {}]", path, begin, end);
         bucket_this_level.emplace_back(data[p_data]);
         // Update the position map.
         position_map_[data[p_data].header.block_id] = path;
-        logger->debug("Block {} is stored at path {}",
-                      data[p_data].header.block_id, path);
         p_data++;
       }
 
@@ -206,7 +204,6 @@ Status PathOramController::ReadBucket(uint32_t path, uint32_t level,
 
 Status PathOramController::WriteBucket(uint32_t path, uint32_t level,
                                        const p_oram_bucket_t& bucket) {
-  logger->info("WriteBucket: path: {}, level: {}", path, level);
   grpc::ClientContext context;
   WritePathRequest request;
   WritePathResponse response;
@@ -234,14 +231,14 @@ Status PathOramController::WriteBucket(uint32_t path, uint32_t level,
 p_oram_stash_t PathOramController::FindSubsetOf(uint32_t current_path) {
   p_oram_stash_t subset;
 
-  auto iter = stash_->begin();
-  while (iter != stash_->end()) {
+  auto iter = stash_.begin();
+  while (iter != stash_.end()) {
     const uint32_t block_path = position_map_[iter->header.block_id];
     if (subset.size() < bucket_size_) {
       if (block_path == current_path) {
         subset.emplace_back(*iter);
         // Delete the current block and re-adjust the iterator.
-        iter = stash_->erase(iter);
+        iter = stash_.erase(iter);
       } else {
         iter++;
       }
@@ -271,7 +268,6 @@ Status PathOramController::Access(Operation op_type, uint32_t address,
   // Randomly remap the position of block a to a new random position.
   // Let x denote the block’s old position.
   const uint32_t x = position_map_[address];
-  logger->info("The address {} has the path {}.", address, x);
   // Update the position map.
   if (!dummy) {
     position_map_[address] = new_path;
@@ -302,19 +298,18 @@ Status PathOramController::Access(Operation op_type, uint32_t address,
       // If there is no such block, we add it to the stash.
       //
       // <=> S = S ∪ ReadBucket(P(x, l))
-      auto iter = std::find_if(stash_->begin(), stash_->end(),
+      auto iter = std::find_if(stash_.begin(), stash_.end(),
                                BlockEqual(block.header.block_id));
-      if (iter == stash_->end() && block.header.type == BlockType::kNormal) {
-        stash_->emplace_back(block);
+      if (iter == stash_.end() && block.header.type == BlockType::kNormal) {
+        stash_.emplace_back(block);
       }
     }
   }
 
   // Step 6-9: Update block, if any.
   // If the access is a write, update the data stored for block a.
-  oram_utils::PrintStash(*stash_);
-  auto iter = std::find_if(stash_->begin(), stash_->end(), BlockEqual(address));
-  PANIC_IF(iter == stash_->end(), "Failed to find the block in the stash.");
+  auto iter = std::find_if(stash_.begin(), stash_.end(), BlockEqual(address));
+  PANIC_IF(iter == stash_.end(), "Failed to find the block in the stash.");
 
   // Update the block.
   if (op_type == Operation::kWrite) {
@@ -457,12 +452,14 @@ Status OramController::SequentialEvict(void) {
 }
 
 Status OramController::Run(uint32_t block_num, uint32_t bucket_size) {
-  logger->info("The Partition Oram Controller is running...");
-
+  logger->info("[+] The Partition Oram Controller is running...");
   // Determine the size of each sub-ORAM and the number of slot number.
   const size_t squared = std::ceil(std::sqrt(block_num));
   partition_size_ = std::ceil(squared * (1 + kPartitionAdjustmentFactor));
+  block_num_ = block_num;
 
+  logger->debug("The Partition ORAM's config: partition_size = {} ",
+                partition_size_);
   // Initialize all the slots.
   for (size_t i = 0; i < squared; i++) {
     p_oram_stash_t stash;
@@ -475,7 +472,6 @@ Status OramController::Run(uint32_t block_num, uint32_t bucket_size) {
     path_oram_controllers_.emplace_back(
         std::make_unique<PathOramController>(i, partition_size_, bucket_size));
     path_oram_controllers_.back()->SetStub(stub_);
-    path_oram_controllers_.back()->SetStash(&slots_[i]);
 
     // Then invoke the intialization procedure.
     Status status = path_oram_controllers_.back()->InitOram();
@@ -498,25 +494,72 @@ Status OramController::TestPathOram(uint32_t controller_id) {
 
   const size_t level = controller->GetTreeLevel();
   const size_t tree_size = (POW2(level + 1) - 1) * bucket_size_;
-  controller->FillWithData(
-      std::move(oram_utils::SampleRandomBucket(partition_size_, tree_size)));
+  const p_oram_bucket_t raw_data =
+      std::move(oram_utils::SampleRandomBucket(partition_size_, tree_size));
+
+  controller->FillWithData(raw_data);
   controller->PrintOramTree();
 
-  for (size_t r = 0; r < 100; r++) {
-    for (size_t i = 0; i < partition_size_; i++) {
-      oram_block_t block;
-      Status status = controller->Access(Operation::kRead, i, &block, false);
-      oram_utils::CheckStatus(status, "Failed to read block.");
+  logger->info("[+] Begin testing Path ORAM...");
+  auto begin = std::chrono::high_resolution_clock::now();
 
-      PANIC_IF((block.data[0] != i), "Failed to read the correct block.");
-    }
+  for (size_t i = 0; i < partition_size_; i++) {
+    oram_block_t block;
+    Status status = controller->Access(Operation::kRead, i, &block, false);
+    oram_utils::CheckStatus(status, "Failed to read block.");
+
+    logger->debug("[+] Read block {}: {}", block.header.block_id,
+                  block.data[0]);
   }
+
+  for (size_t i = 0; i < partition_size_; i++) {
+    oram_block_t block;
+    block.header.block_id = i;
+    block.header.type = BlockType::kNormal;
+    block.data[0] = partition_size_ - i;
+    Status status = controller->Access(Operation::kWrite, i, &block, false);
+    oram_utils::CheckStatus(status, "Failed to write block.");
+  }
+
+  for (size_t i = 0; i < partition_size_; i++) {
+    oram_block_t block;
+    Status status = controller->Access(Operation::kRead, i, &block, false);
+    oram_utils::CheckStatus(status, "Failed to read block.");
+
+    logger->debug("[+] Read block {}: {}", block.header.block_id,
+                  block.data[0]);
+  }
+
+  auto end = std::chrono::high_resolution_clock::now();
+  logger->info(
+      "[-] End Testing Path ORAM. Time elapsed: {} ms.",
+      std::chrono::duration_cast<std::chrono::milliseconds>(end - begin)
+          .count());
 
   return Status::kOK;
 }
 
 Status OramController::TestPartitionOram(void) {
-  
+  logger->info("[+] Begin testing Partition ORAM...");
+
+  // Initialize all the PathORAM Controllers.
+  for (size_t i = 0; i < path_oram_controllers_.size(); i++) {
+    const size_t level = path_oram_controllers_[i]->GetTreeLevel();
+    const size_t tree_size = (POW2(level + 1) - 1) * bucket_size_;
+    path_oram_controllers_[i]->FillWithData(
+        std::move(oram_utils::SampleRandomBucket(partition_size_, tree_size)));
+  }
+
+  for (size_t i = 0; i < partition_size_; i++) {
+    oram_block_t block;
+    Status status = Access(Operation::kRead, i, &block);
+    oram_utils::CheckStatus(status, "Cannot access partition ORAM!");
+
+    PANIC_IF((block.data[0] != i), "Failed to read the correct block.");
+  }
+
+  logger->info("[-] End testing Partition ORAM.");
+  return Status::kOK;
 }
 
 }  // namespace partition_oram

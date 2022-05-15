@@ -150,7 +150,7 @@ int Client::InitOram(void) {
 
 int Client::TestOram(void) {
   controller_->TestPathOram(0);
-
+  // controller_->TestPartitionOram();
   return 0;
 }
 }  // namespace partition_oram
