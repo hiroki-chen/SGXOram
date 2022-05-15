@@ -116,6 +116,7 @@ class OramController {
 
   // A reserved interface for testing one of the PathORAM controllers.
   Status TestPathOram(uint32_t controller_id);
+  Status TestPartitionOram(void);
 
   virtual ~OramController() {}
 };

@@ -318,9 +318,9 @@ Status PathOramController::Access(Operation op_type, uint32_t address,
 
   // Update the block.
   if (op_type == Operation::kWrite) {
-    memcpy(iter->data, data, ORAM_BLOCK_SIZE);
+    memcpy(&(*iter), data, ORAM_BLOCK_SIZE);
   } else {
-    memcpy(data, iter->data, ORAM_BLOCK_SIZE);
+    memcpy(data, &(*iter), ORAM_BLOCK_SIZE);
   }
 
   // STEP 10-15: Write the path.
@@ -511,6 +511,12 @@ Status OramController::TestPathOram(uint32_t controller_id) {
       PANIC_IF((block.data[0] != i), "Failed to read the correct block.");
     }
   }
+
+  return Status::kOK;
+}
+
+Status OramController::TestPartitionOram(void) {
+  
 }
 
 }  // namespace partition_oram
