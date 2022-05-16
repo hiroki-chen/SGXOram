@@ -92,7 +92,7 @@ void ConvertToString(const partition_oram::oram_block_t* const block,
 
 void CheckStatus(partition_oram::Status status, const std::string& reason) {
   if (status != partition_oram::Status::kOK) {
-    logger->error("{}", reason);
+    logger->error("{}: {}", partition_oram::kErrorList.at(status), reason);
     abort();
   }
 }
@@ -117,15 +117,16 @@ void PadStash(partition_oram::p_oram_stash_t* const stash,
 }
 
 partition_oram::p_oram_bucket_t SampleRandomBucket(size_t size,
-                                                   size_t tree_size) {
+                                                   size_t tree_size,
+                                                   size_t initial_offset) {
   partition_oram::p_oram_bucket_t bucket;
 
   for (size_t i = 0; i < tree_size; ++i) {
     partition_oram::oram_block_t block;
-    block.header.block_id = i;
+    block.header.block_id = i + initial_offset;
     block.header.type = i < size ? partition_oram::BlockType::kNormal
                                  : partition_oram::BlockType::kDummy;
-    block.data[0] = i;
+    block.data[0] = i + initial_offset;
 
     if (oram_crypto::Cryptor::RandomBytes(block.data + 1,
                                           DEFAULT_ORAM_DATA_SIZE - 1) !=
@@ -177,7 +178,7 @@ void PrintStash(const partition_oram::p_oram_stash_t& stash) {
 
 void PrintOramTree(const partition_oram::server_storage_t& storage) {
   logger->debug("The size of the ORAM tree is {}", storage.size());
-  
+
   for (auto iter = storage.begin(); iter != storage.end(); ++iter) {
     logger->debug("Tag {}, {}: ", iter->first.first, iter->first.second);
 

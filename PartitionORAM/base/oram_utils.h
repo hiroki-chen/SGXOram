@@ -45,7 +45,7 @@ std::vector<std::string> SerializeToStringVector(const partition_oram::p_oram_bu
 
 partition_oram::p_oram_bucket_t DeserializeFromStringVector(const std::vector<std::string>& data);
 
-partition_oram::p_oram_bucket_t SampleRandomBucket(size_t size, size_t tree_size);
+partition_oram::p_oram_bucket_t SampleRandomBucket(size_t size, size_t tree_size, size_t initial_offset);
 
 void SafeFree(void* ptr);
 

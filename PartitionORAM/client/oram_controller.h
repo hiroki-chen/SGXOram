@@ -102,6 +102,8 @@ class OramController {
   Status Evict(uint32_t id);
   Status SequentialEvict(void);
   Status RandomEvict(void);
+
+  Status ProcessSlot(const std::vector<oram_block_t>& data, uint32_t slot_id);
   // ==================== End private methods ==================== //
 
  public:
@@ -113,6 +115,7 @@ class OramController {
 
   Status Access(Operation op_type, uint32_t address, oram_block_t* const data);
   Status Run(uint32_t block_num, uint32_t bucket_size);
+  Status FillWithData(const std::vector<oram_block_t>& data);
 
   // A reserved interface for testing one of the PathORAM controllers.
   Status TestPathOram(uint32_t controller_id);
