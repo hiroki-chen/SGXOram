@@ -119,6 +119,7 @@ void PadStash(partition_oram::p_oram_stash_t* const stash,
 partition_oram::p_oram_bucket_t SampleRandomBucket(size_t size,
                                                    size_t tree_size,
                                                    size_t initial_offset) {
+  size >>= 1;
   partition_oram::p_oram_bucket_t bucket;
 
   for (size_t i = 0; i < tree_size; ++i) {

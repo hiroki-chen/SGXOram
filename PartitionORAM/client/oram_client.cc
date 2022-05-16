@@ -46,6 +46,7 @@ void Client::Run(void) {
   // The stub can be shared between multiple objects.
   controller_->SetStub(stub_);
   controller_->SetBucketSize(bucket_size_);
+  controller_->SetNu(3);
 
   // Test if crypto is working.
   std::string test_str = "Hello, world!";

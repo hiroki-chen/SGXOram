@@ -23,16 +23,19 @@
 #include <unistd.h>
 #include <memory>
 
-#include <gflags/gflags.h>
+#include <absl/flags/flag.h>
+#include <absl/flags/parse.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-
 // Configurations for the server.
-DEFINE_string(address, "0.0.0.0", "The server's IP address");
-DEFINE_string(port, "1234", "The server's port");
-DEFINE_string(key_path, "", "The path to the key file");
-DEFINE_string(crt_path, "", "The path to the certificate file");
+ABSL_FLAG(std::string, address, "0.0.0.0", "The server's IP address.");
+ABSL_FLAG(std::string, port, "1234", "The server's port.");
+ABSL_FLAG(std::string, key_path, "../key/sslcred.key",
+          "The path to the key file.");
+ABSL_FLAG(std::string, crt_path, "../key/sslcred.crt",
+          "The path to the certificate file.");
+ABSL_FLAG(int, log_level, spdlog::level::info, "The severity of the logger.");
 
 std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("oram_server");
 
@@ -58,20 +61,19 @@ int main(int argc, char* argv[]) {
   signal(SIGABRT, handler);
   signal(SIGINT, handler);
   // Parse the command line arguments.
-  gflags::SetUsageMessage("The ParitionORAM Server");
-  gflags::SetVersionString("0.0.1");
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  absl::ParseCommandLine(argc, argv);
 
   // Initialize the logger.
   spdlog::set_default_logger(logger);
-  spdlog::set_level(spdlog::level::debug);
+  spdlog::set_level(
+      static_cast<spdlog::level::level_enum>(absl::GetFlag(FLAGS_log_level)));
   spdlog::flush_every(std::chrono::seconds(3));
 
   std::unique_ptr<partition_oram::ServerRunner> server_runner =
       std::make_unique<partition_oram::ServerRunner>(
-          FLAGS_address, FLAGS_port, FLAGS_key_path, FLAGS_crt_path);
+          absl::GetFlag(FLAGS_address), absl::GetFlag(FLAGS_port),
+          absl::GetFlag(FLAGS_key_path), absl::GetFlag(FLAGS_crt_path));
   server_runner->Run();
 
-  gflags::ShutDownCommandLineFlags();
   return 0;
 }

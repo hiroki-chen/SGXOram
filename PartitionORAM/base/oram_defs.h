@@ -92,7 +92,9 @@ static const std::unordered_map<Status, std::string> kErrorList = {
     {Status::kObjectNotFound, "The object is not found"},
     {Status::kUnknownError, "Unknown error"}};
 
-static const float kPartitionAdjustmentFactor = .05;
+// This factor can also be used to control the size of the Path ORAM to prevent
+// storage overflow.
+static const float kPartitionAdjustmentFactor = 1;
 
 static const uint32_t kMaximumOramStorageNum = 1e5;
 

@@ -87,6 +87,8 @@ grpc::Status PartitionORAMService::ReadPath(grpc::ServerContext* context,
   const uint32_t path = request->path();
   const uint32_t level = request->level();
 
+  logger->info("PathORAM id: {}, path: {}, level: {}", id, path, level);
+
   if (id >= storages_.size()) {
     const std::string error_message =
         oram_utils::StrCat("PathORAM id: ", id, " does not exist.");
@@ -136,6 +138,9 @@ grpc::Status PartitionORAMService::WritePath(grpc::ServerContext* context,
   p_oram_bucket_t bucket = std::move(
       oram_utils::DeserializeFromStringVector(std::vector<std::string>(
           request->bucket().begin(), request->bucket().end())));
+          
+  logger->debug("After deserialize:");
+  oram_utils::PrintStash(bucket);
 
   // Write the path.
   Status status =

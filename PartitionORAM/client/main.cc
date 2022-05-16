@@ -35,6 +35,9 @@ ABSL_FLAG(uint32_t, block_num, 1e6, "The number of blocks.");
 ABSL_FLAG(uint32_t, bucket_size, 4,
           "The size of each bucket. (Z in Path ORAM)");
 
+// Log setting
+ABSL_FLAG(int, log_level, spdlog::level::info, "The level of the log.");
+
 std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("oram_client");
 
 void Handler(int signal) {
@@ -65,7 +68,8 @@ int main(int argc, char** argv) {
   absl::ParseCommandLine(argc, argv);
 
   spdlog::set_default_logger(logger);
-  spdlog::set_level(spdlog::level::debug);
+  spdlog::set_level(
+      static_cast<spdlog::level::level_enum>(absl::GetFlag(FLAGS_log_level)));
   spdlog::flush_every(std::chrono::seconds(3));
 
   std::unique_ptr<partition_oram::Client> client =

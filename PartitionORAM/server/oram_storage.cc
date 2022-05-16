@@ -50,8 +50,7 @@ Status OramServerStorage::ReadPath(uint32_t level, uint32_t path,
   // The offset should be calculated by the level and path.
   const uint32_t offset = std::floor(path * 1. / POW2(level_ - level));
   const server_storage_tag_t tag = std::make_pair(level, offset);
-  logger->info("Read offset {} at level {} for path {}.", offset, level,
-                  path);
+  logger->info("Read offset {} at level {} for path {}.", offset, level, path);
 
   auto iter = storage_.find(tag);
   if (iter == storage_.end()) {
@@ -59,8 +58,12 @@ Status OramServerStorage::ReadPath(uint32_t level, uint32_t path,
     // Not found.
     return Status::kObjectNotFound;
   } else {
-    std::copy(iter->second.begin(), iter->second.end(),
-              std::back_inserter(*out_bucket));
+    std::for_each(iter->second.begin(), iter->second.end(),
+                  [&out_bucket](oram_block_t& block) {
+                    out_bucket->emplace_back(block);
+                    // block.header.type = BlockType::kInvalid;
+                  });
+
     return Status::kOK;
   }
 }
@@ -93,8 +96,10 @@ Status OramServerStorage::AccurateWritePath(uint32_t level, uint32_t offset,
     return Status::kObjectNotFound;
   } else {
     iter->second.clear();
-    std::copy(in_bucket.begin(), in_bucket.end(),
-              std::back_inserter(iter->second));
+    std::for_each(in_bucket.begin(), in_bucket.end(),
+                  [&iter](const oram_block_t& block) {
+                    iter->second.emplace_back(block);
+                  });
     return Status::kOK;
   }
 }
