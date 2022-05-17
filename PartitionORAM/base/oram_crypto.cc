@@ -39,7 +39,8 @@ Cryptor::~Cryptor() {
 }
 
 std::shared_ptr<Cryptor> Cryptor::GetInstance(void) {
-  std::shared_ptr<Cryptor> instance = std::shared_ptr<Cryptor>(new Cryptor());
+  static std::shared_ptr<Cryptor> instance =
+      std::shared_ptr<Cryptor>(new Cryptor());
   return instance;
 }
 
@@ -59,12 +60,10 @@ partition_oram::Status Cryptor::Encrypt(const uint8_t* message, size_t length,
   CryptoPrelogue();
   PANIC_IF(!is_negotiated, "Cryptor is not negotiated.");
 
-  // Use the key to encrypte the data.
-
   // Fill in the IV.
   out->resize(crypto_aead_aes256gcm_ABYTES + length);
   unsigned long long ciphertext_len;
-  randombytes_buf(iv, ORAM_CRYPTO_RANDOM_SIZE);
+
   int ret = crypto_aead_aes256gcm_encrypt(
       (uint8_t*)out->data(), &ciphertext_len, message, length, nullptr, 0, NULL,
       iv, session_key_rx_);
@@ -93,7 +92,7 @@ partition_oram::Status Cryptor::Decrypt(const uint8_t* message, size_t length,
   unsigned long long decrypted_len;
   int ret = crypto_aead_aes256gcm_decrypt(decrypted, (ull*)&message_len,
                                           nullptr, message, length, nullptr, 0,
-                                          iv, session_key_tx_);
+                                          iv, session_key_rx_);
   *out = std::string((char*)decrypted, message_len);
 
   // Free the memory.
@@ -131,7 +130,7 @@ partition_oram::Status Cryptor::SampleKeyPair(void) {
 }
 
 partition_oram::Status Cryptor::SampleSessionKey(const std::string& peer_pk,
-                                                   bool type) {
+                                                 bool type) {
   CryptoPrelogue();
 
   // Check the length of the peer's public key.
@@ -182,7 +181,8 @@ std::pair<std::string, std::string> Cryptor::GetSessionKeyPair(void) {
   return key_pair;
 }
 
-partition_oram::Status Cryptor::UniformRandom(uint32_t min, uint32_t max, uint32_t* const out) {
+partition_oram::Status Cryptor::UniformRandom(uint32_t min, uint32_t max,
+                                              uint32_t* const out) {
   if (min > max) {
     logger->error("The minimum value is greater than the maximum value.");
     return partition_oram::Status::kInvalidArgument;

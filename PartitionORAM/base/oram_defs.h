@@ -70,6 +70,8 @@ enum class BlockType {
 typedef struct _oram_block_header_t {
   uint32_t block_id;
   BlockType type;
+  uint8_t iv[12];
+  uint8_t mac_tag[16];
 } oram_block_header_t;
 
 // The block for ORAM storage.

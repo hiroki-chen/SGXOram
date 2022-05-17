@@ -32,8 +32,8 @@ namespace partition_oram {
 // The ownership of ORAM main controller cannot be multiple.
 // This cannot be shared.
 std::unique_ptr<OramController> OramController::GetInstance() {
-  std::unique_ptr<OramController> instance(new OramController());
-  return instance;
+  static std::unique_ptr<OramController> instance(new OramController());
+  return std::move(instance);
 }
 
 size_t OramController::counter_ = 0;
@@ -50,6 +50,7 @@ PathOramController::PathOramController(uint32_t id, uint32_t block_num,
       "PathORAM Config:\n"
       "id: {}, number_of_leafs: {}, bucket_size: {}, tree_height: {}\n",
       id_, number_of_leafs_, bucket_size_, tree_level_);
+  cryptor_ = oram_crypto::Cryptor::GetInstance();
 }
 
 Status PathOramController::PrintOramTree(void) {
@@ -80,7 +81,10 @@ Status PathOramController::AccurateWriteBucket(uint32_t level, uint32_t offset,
   request.set_type(Type::kInit);
 
   // Copy the buckets into the buffer of WriteBucketRequest.
-  for (const auto& block : bucket) {
+  for (auto block : bucket) {
+    // Encrypt the block.
+    oram_utils::EncryptBlock(&block, cryptor_.get());
+
     std::string block_str;
     oram_utils::ConvertToString(&block, &block_str);
     request.add_bucket(block_str);
@@ -203,6 +207,10 @@ Status PathOramController::ReadBucket(uint32_t path, uint32_t level,
   for (size_t j = 0; j < bucket_size; j++) {
     oram_block_t* const block = (oram_block_t*)malloc(ORAM_BLOCK_SIZE);
     oram_utils::ConvertToBlock(response.bucket(j), block);
+
+    // Decrypt the block.
+    oram_utils::DecryptBlock(block, cryptor_.get());
+
     bucket->emplace_back(*block);
     oram_utils::SafeFree(block);
   }
@@ -222,7 +230,10 @@ Status PathOramController::WriteBucket(uint32_t path, uint32_t level,
   request.set_type(Type::kNormal);
 
   // Copy the buckets into the buffer of WriteBucketRequest.
-  for (const auto& block : bucket) {
+  for (auto block : bucket) {
+    // Encrypt the block.
+    oram_utils::EncryptBlock(&block, cryptor_.get());
+
     std::string block_str;
     oram_utils::ConvertToString(&block, &block_str);
     request.add_bucket(block_str);

@@ -22,6 +22,7 @@
 #include <sstream>
 
 #include "oram_defs.h"
+#include "oram_crypto.h"
 
 #define ASSERT_MSG(x) !(std::cerr << "Assertion failed: " << x << std::endl)
 #define PANIC_IF(cond, message) assert(!(cond) || ASSERT_MSG(message))
@@ -62,6 +63,11 @@ void PadStash(partition_oram::p_oram_stash_t* const stash, const size_t bucket_s
 void PrintStash(const partition_oram::p_oram_stash_t& stash);
 
 void PrintOramTree(const partition_oram::server_storage_t& storage);
+
+void EncryptBlock(partition_oram::oram_block_t* const block, oram_crypto::Cryptor* const cryptor);
+
+void DecryptBlock(partition_oram::oram_block_t* const block, oram_crypto::Cryptor* const cryptor);
+
 }  // namespace oram_utils
 
 #endif  // PARTITION_ORAM_BASE_ORAM_UTILS_H_

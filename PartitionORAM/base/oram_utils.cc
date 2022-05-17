@@ -189,4 +189,58 @@ void PrintOramTree(const partition_oram::server_storage_t& storage) {
     }
   }
 }
+
+void EncryptBlock(partition_oram::oram_block_t* const block,
+                  oram_crypto::Cryptor* const cryptor) {
+  if (block->header.type != partition_oram::BlockType::kNormal) {
+    return;
+  }
+  // First let us generate the iv.
+  partition_oram::Status status = cryptor->RandomBytes(block->header.iv, 12);
+  CheckStatus(status, "Failed to generate iv!");
+
+  // Second prepare the buffer.
+  std::string enc;
+  status = cryptor->Encrypt(block->data, DEFAULT_ORAM_DATA_SIZE,
+                            block->header.iv, &enc);
+  CheckStatus(status, "Failed to encrypt data!");
+
+  logger->debug("encrypted data: {}", spdlog::to_hex(enc));
+
+  // Third, let us split the mac tag to the header.
+  memcpy(block->header.mac_tag, enc.data() + enc.size() - 16, 16);
+
+  // Finally, let us copy the encrypted data to the block.
+  memcpy(block->data, enc.data(), enc.size() - 16);
+}
+
+void DecryptBlock(partition_oram::oram_block_t* const block,
+                  oram_crypto::Cryptor* const cryptor) {
+  if (block->header.type != partition_oram::BlockType::kNormal) {
+    return;
+  }
+  // First, let us prepare the buffer.
+  uint8_t* enc_data = (uint8_t*)malloc(DEFAULT_ORAM_DATA_SIZE + 16);
+
+  // Second, let us copy the encrypted data to the buffer.
+  memcpy(enc_data, block->data, DEFAULT_ORAM_DATA_SIZE);
+
+  // Third, let us copy the mac tag to the buffer.
+  memcpy(enc_data + DEFAULT_ORAM_DATA_SIZE, block->header.mac_tag, 16);
+
+  logger->debug("encrypted data: {}",
+                spdlog::to_hex(std::string((const char*)enc_data,
+                                           DEFAULT_ORAM_DATA_SIZE + 16)));
+
+  // Fourth, let us decrypt the data.
+  std::string dec;
+  partition_oram::Status status = cryptor->Decrypt(
+      enc_data, DEFAULT_ORAM_DATA_SIZE + 16, block->header.iv, &dec);
+  CheckStatus(status, "Failed to decrypt data!");
+
+  // Finally, let us copy the decrypted data to the block.
+  memcpy(block->data, dec.data(), dec.size());
+
+  SafeFree(enc_data);
+}
 }  // namespace oram_utils

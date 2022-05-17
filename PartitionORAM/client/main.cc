@@ -28,7 +28,7 @@
 
 ABSL_FLAG(std::string, address, "localhost", "The address of the server.");
 ABSL_FLAG(std::string, port, "1234", "The port of the server.");
-ABSL_FLAG(std::string, crt_path, "", "The path of the certificate file.");
+ABSL_FLAG(std::string, crt_path, "../key/sslcred.crt", "The path of the certificate file.");
 
 // ORAM PARAMS.
 ABSL_FLAG(uint32_t, block_num, 1e6, "The number of blocks.");
@@ -80,7 +80,7 @@ int main(int argc, char** argv) {
 
   client->Run();
   client->StartKeyExchange();
-  client->SendHello();
+  // client->SendHello();
   client->InitOram();
   client->TestOram();
 
