@@ -410,8 +410,9 @@ sgx_status_t SGXAPI ecall_sample_key_pair(uint8_t* pubkey, size_t pubkey_size) {
   std::string pk = std::move(
       enclave_utils::hex_to_string((uint8_t*)(crypto_manager->get_public_key()),
                                    sizeof(sgx_ec256_public_t)));
-  std::string sk = std::move(enclave_utils::hex_to_string(
-      (uint8_t*)(crypto_manager->get_secret_key()), SGX_ECP256_KEY_SIZE));
+  std::string sk = std::move(
+      enclave_utils::hex_to_string((uint8_t*)(crypto_manager->get_secret_key()),
+                                   sizeof(sgx_aes_gcm_128bit_key_t)));
   ENCLAVE_LOG("[enclave] Key pair sampled! PK: %s, SK: %s", pk.data(),
               sk.data());
 
@@ -434,7 +435,7 @@ sgx_status_t SGXAPI ecall_compute_shared_key(const uint8_t* pubkey,
       crypto_manager->get_secret_key(), &client_public_key, &shared_key,
       *crypto_manager->get_state_handle());
   std::string shared = std::move(enclave_utils::hex_to_string(
-      (uint8_t*)(&shared_key), SGX_ECP256_KEY_SIZE));
+      (uint8_t*)(&shared_key), sizeof(sgx_aes_gcm_128bit_key_t)));
   ENCLAVE_LOG("[enclave] Shared key computed: %s", shared.data());
 
   // Derive secret keys from the shared key.
@@ -461,16 +462,14 @@ sgx_status_t SGXAPI ecall_check_verification_message(uint8_t* message,
                                                      size_t message_size) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
-  // const std::string decrypted_message =
-  //     crypto_manager->enclave_aes_128_gcm_decrypt(
-  //         std::string((char*)message, message_size));
+
   const size_t decrypted_message_size = message_size - ORAM_CRYPTO_INFO_SIZE;
   uint8_t* const decrypted_message = (uint8_t*)malloc(decrypted_message_size);
   sgx_status_t status = crypto_manager->enclave_aes_128_gcm_decrypt(
       message, message_size, decrypted_message);
   enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_decrypt()");
 
-  ENCLAVE_LOG("[enclave] Decrypted message: %s", decrypted_message);
+  ENCLAVE_LOG("[enclave] Decrypted message size %zu, : %s", decrypted_message_size, decrypted_message);
 
   if (std::string(reinterpret_cast<char*>(decrypted_message),
                   decrypted_message_size)

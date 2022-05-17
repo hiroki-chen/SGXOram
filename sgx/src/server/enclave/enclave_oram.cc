@@ -249,7 +249,7 @@ std::string get_slot_header_and_decrypt(uint32_t level, uint32_t offset,
 
   if (!cache_enabled) {
     const size_t ciphertext_size =
-        ORAM_SLOT_HEADER_SIZE + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE;
+        ORAM_SLOT_HEADER_SIZE + ORAM_CRYPTO_INFO_SIZE;
     uint8_t* ciphertext = (uint8_t*)malloc(ciphertext_size);
     memset(ciphertext, 0, ciphertext_size);
     sgx_status_t status = SGX_ERROR_UNEXPECTED;

@@ -324,7 +324,7 @@ void slot_segment_write(const char* slot_fingerprint, const uint8_t* const slot,
     // Write the slot in segments.
     size_t seg_num = std::floor(slot_size * 1. / seg_size);
 
-#pragma omp parallel for
+// #pragma omp parallel for
     for (size_t i = 0; i < seg_num; i++) {
       sgx_status_t status = ocall_write_slot_seg(
           slot_fingerprint, i * seg_size, slot + i * seg_size, seg_size, 0);

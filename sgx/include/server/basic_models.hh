@@ -28,18 +28,19 @@
 #define ORAM_BLOCK_SIZE sizeof(sgx_oram::oram_block_t)
 #define ORAM_SLOT_INTERNAL_SIZE sizeof(sgx_oram::oram_slot_t)
 #define ORAM_SLOT_LEAF_SIZE sizeof(sgx_oram::oram_slot_leaf_t)
-#define ORAM_CRYPTO_INFO_SIZE SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE
+#define ORAM_CRYPTO_INFO_SIZE (SGX_AESGCM_IV_SIZE + SGX_AESGCM_MAC_SIZE)
 
 #define WORD_SIZE 4
 
 #define ENCRYPTED_POSITION_SIZE \
-  sizeof(sgx_oram::oram_position_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
+  (sizeof(sgx_oram::oram_position_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE)
 
-#define ENCRYPTED_SLOT_SIZE \
-  sizeof(sgx_oram::oram_slot_leaf_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
+#define ENCRYPTED_SLOT_SIZE                                   \
+  (sizeof(sgx_oram::oram_slot_leaf_t) + SGX_AESGCM_MAC_SIZE + \
+   SGX_AESGCM_IV_SIZE)
 
 #define ENCRYPTED_BLOCK_SIZE \
-  sizeof(sgx_oram::oram_block_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE
+  (sizeof(sgx_oram::oram_block_t) + SGX_AESGCM_MAC_SIZE + SGX_AESGCM_IV_SIZE)
 
 // - If the compiler does not give the macro, use the default value.
 // - Note that these two macros MUST BE pre-determined in order to give the size
@@ -156,7 +157,7 @@ typedef enum _oram_operation_t {
 } oram_operation_t;
 
 typedef enum _cache_type_t {
-  ENCLAVE_CACHE_SLOT_BODY= 0,
+  ENCLAVE_CACHE_SLOT_BODY = 0,
   ENCLAVE_CACHE_SLOT_HEADER = 1,
   ENCLAVE_CACHE_INVALID = 2,
 } cache_type_t;
