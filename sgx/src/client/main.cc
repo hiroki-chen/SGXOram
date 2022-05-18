@@ -17,6 +17,7 @@
 #include <gflags/gflags.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <client/client.hh>
 #include <client/utils.hh>
@@ -35,10 +36,18 @@ DEFINE_double(constant, 1.0, "A special constant for the ORAM tree");
 DEFINE_uint32(round, 1, "The number of rounds of the ORAM access");
 DEFINE_uint32(oram_type, 1, "The type of the ORAM used by the client.");
 DEFINE_uint32(access_num, 100, "The number of accesses to the ORAM.");
+DEFINE_int32(log_level, spdlog::level::level_enum::info,
+             "The log level of the client.");
+DEFINE_bool(log_to_stderr, false, "Enable logging to stderr");
 
-std::shared_ptr<spdlog::logger> logger = spdlog::rotating_logger_mt(
-    client_name, client_log_dir + "/" + client_name + "_" + get_log_file_name(),
-    client_log_size, client_log_num);
+std::shared_ptr<spdlog::logger> logger;
+// Create a file sink.
+std::shared_ptr<spdlog::sinks::rotating_file_sink_mt> file_sink =
+    std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+        client_log_dir + "/" + client_name + "_" + get_log_file_name(),
+        client_log_size, client_log_num);
+
+std::vector<spdlog::sink_ptr> sinks;
 
 int main(int argc, char** argv) {
   // Parse the command line arguments.
@@ -47,10 +56,23 @@ int main(int argc, char** argv) {
   gflags::SetVersionString("0.0.1");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
+  // Initialize all sinks.
+  file_sink->set_level(static_cast<spdlog::level::level_enum>(FLAGS_log_level));
+  file_sink->set_pattern(log_pattern);
+  sinks.emplace_back(file_sink);
+
+  if (FLAGS_log_to_stderr) {
+    std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> console_sink =
+        std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    console_sink->set_level(
+        static_cast<spdlog::level::level_enum>(FLAGS_log_level));
+    sinks.emplace_back(console_sink);
+  }
+
   // Initialize the logger.
+  logger =
+      std::make_shared<spdlog::logger>(client_name, begin(sinks), end(sinks));
   spdlog::set_default_logger(logger);
-  spdlog::set_level(spdlog::level::debug);
-  spdlog::set_pattern(log_pattern);
 
   try {
     std::unique_ptr<Client> client =

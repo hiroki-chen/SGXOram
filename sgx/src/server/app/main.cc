@@ -19,6 +19,8 @@
 #include <gflags/gflags.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/rotating_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+
 #include <sgx_urts.h>
 #include <stdio.h>
 #include <execinfo.h>
@@ -50,22 +52,29 @@ void handler(int sig) {
   exit(1);
 }
 
+std::shared_ptr<spdlog::sinks::rotating_file_sink_mt> file_sink =
+    std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
+        server_log_dir + "/" + server_name + "_" + get_log_file_name(),
+        server_log_size, server_log_num);
+
 // Configurations for the server.
 DEFINE_string(address, "localhost", "The server's IP address");
 DEFINE_string(port, "1234", "The server's port");
 DEFINE_bool(verbose, true, "Whether to print verbose information");
 DEFINE_bool(cache_enabled, true, "Whether to enable the enclave cache");
-DEFINE_uint32(seg_size, 0, "The size of the slot segment (0 => disable segmentation)");
+DEFINE_bool(log_to_stderr, false, "Enable logging to stderr");
+DEFINE_uint32(seg_size, 0,
+              "The size of the slot segment (0 => disable segmentation)");
+DEFINE_int32(log_level, spdlog::level::level_enum::info,
+             "The log level (0 => trace, 1 => debug, ...)");
 
 // Configurations for the enclave.
 static sgx_enclave_id_t global_eid = 0;
 // A global variable.
 std::unique_ptr<Server> server_runner;
 
-std::shared_ptr<spdlog::logger> logger = spdlog::rotating_logger_mt(
-    server_name,
-    server_log_dir + "/" + server_name + +"_" + get_log_file_name(),
-    server_log_size, server_log_num);
+std::shared_ptr<spdlog::logger> logger;
+std::vector<spdlog::sink_ptr> sinks;
 
 int SGX_CDECL main(int argc, char** argv) {
   signal(SIGSEGV, handler);
@@ -77,10 +86,23 @@ int SGX_CDECL main(int argc, char** argv) {
   gflags::SetVersionString("0.0.1");
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
+  // Initialize the sink.
+  file_sink->set_level(static_cast<spdlog::level::level_enum>(FLAGS_log_level));
+  file_sink->set_pattern(log_pattern);
+  sinks.emplace_back(file_sink);
+
+  if (FLAGS_log_to_stderr) {
+    std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> stdout_sink =
+        std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    stdout_sink->set_level(
+        static_cast<spdlog::level::level_enum>(FLAGS_log_level));
+    sinks.emplace_back(stdout_sink);
+  }
+
   // Initialize the logger.
+  logger =
+      std::make_shared<spdlog::logger>("server", sinks.begin(), sinks.end());
   spdlog::set_default_logger(logger);
-  spdlog::set_level(spdlog::level::debug);
-  spdlog::set_pattern(log_pattern);
 
   // Nullify the input arguments.
   (void)(argc);

@@ -178,7 +178,6 @@ static void assemble_slot(sgx_oram::oram_block_t* slot,
     sgx_status_t status = populate_leaf_slot(header, slot, permutation,
                                              permutation_size, *offset);
     enclave_utils::check_sgx_status(status, "populate_leaf_slot()");
-    ENCLAVE_LOG("offset = %u", *offset);
     *offset += bucket_size >> 1;
   }
 }

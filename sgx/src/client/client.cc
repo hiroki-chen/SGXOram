@@ -64,8 +64,15 @@ Client::Client(const std::string& address, const std::string& port) {
   ssl_opts.pem_root_certs = cacert;
   std::shared_ptr<grpc::ChannelCredentials> ssl_creds =
       grpc::SslCredentials(ssl_opts);
-  stub_ = oram::sgx_oram::NewStub(std::shared_ptr<grpc::Channel>(
-      grpc::CreateChannel(address + ":" + port, ssl_creds)));
+  std::shared_ptr<grpc::Channel> channel = std::shared_ptr<grpc::Channel>(
+      grpc::CreateChannel(address + ":" + port, ssl_creds));
+
+  if (channel->GetState(true) != GRPC_CHANNEL_READY) {
+    logger->error("The peer is not ready for connection!");
+    exit(1);
+  }
+  
+  stub_ = oram::sgx_oram::NewStub(channel);
 }
 
 int Client::init_enclave(void) {
@@ -128,7 +135,7 @@ int Client::init_oram(void) {
   std::array<uint8_t, 1024> buffer;
   memcpy(buffer.data(), encrypted_verification_message.data(),
          encrypted_verification_message.size());
-  logger->info("The encrypted verification message is: {}",
+  logger->debug("The encrypted verification message is: {}",
                spdlog::to_hex(buffer));
   // Print the LOG.
   logger->info("Sending parameters of the ORAM to the server!");
