@@ -78,7 +78,7 @@ void get_position_and_decrypt(sgx_oram::oram_position_t* const position,
       ciphertext, ENCRYPTED_POSITION_SIZE,
       reinterpret_cast<uint8_t*>(position));
   enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_decrypt()");
-  
+
   // Clean up the memory.
   enclave_utils::safe_free(ciphertext);
 }
@@ -121,9 +121,10 @@ static sgx_status_t populate_leaf_slot(
       EnclaveCryptoManager::get_instance();
 
   const uint32_t slot_begin = header->range_begin;
-  const uint32_t real_number = crypto_manager->get_oram_config()->number >> 1;
+  const uint32_t real_number =
+      ((crypto_manager->get_oram_config()->number) >> 1);
 
-  size_t i = 0, limit = (DEFAULT_BUCKET_SIZE >> 1);
+  size_t i = 0, limit = ((header->slot_size) >> 1);
   // The loop should end when i reaches the halve of the slot size or the
   // offset is larger than the needed size.
   // Note that blocks in the same bucket have the same block id. So the offset
@@ -177,6 +178,7 @@ static void assemble_slot(sgx_oram::oram_block_t* slot,
     sgx_status_t status = populate_leaf_slot(header, slot, permutation,
                                              permutation_size, *offset);
     enclave_utils::check_sgx_status(status, "populate_leaf_slot()");
+    ENCLAVE_LOG("offset = %u", *offset);
     *offset += bucket_size >> 1;
   }
 }

@@ -618,6 +618,5 @@ void position_prefetch(sgx_oram::oram_position_t* const position,
       (uint8_t*)(&address), (uint8_t*)(&block->header.address), WORD_SIZE,
       WORD_SIZE);
 
-  ENCLAVE_LOG("[enclave] Prefetching position for address %d...", address);
   get_position_and_decrypt(position, address);
 }

@@ -200,6 +200,11 @@ class Server final {
            service->storage_slot_body.end();
   }
 
+  bool is_position_in_storage(const char* fingerprint) {
+    return service->position_map.find(fingerprint) !=
+           service->position_map.end();
+  }
+
   std::string get_position(const std::string& address) {
     return service->position_map[address];
   }

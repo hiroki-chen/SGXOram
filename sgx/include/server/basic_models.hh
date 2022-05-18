@@ -20,7 +20,7 @@
 #include <stdint.h>
 
 // Fixed.
-#define DEFAULT_ORAM_DATA_SIZE 512
+#define DEFAULT_ORAM_DATA_SIZE 4096
 
 #define ORAM_BLOCK_HEADER_SIZE sizeof(sgx_oram::oram_block_header_t)
 #define ORAM_SLOT_HEADER_SIZE sizeof(sgx_oram::oram_slot_header_t)

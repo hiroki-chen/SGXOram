@@ -111,21 +111,17 @@ std::string decompress_data(const std::string& data) {
   return decompressed_data;
 }
 
-// The position map is non-recursive, so it is not safe!
-// We need to store the position map in a recursive manner.
-// Use with care!!
 size_t ocall_read_position(const char* position_fingerprint, uint8_t* position,
                            size_t position_size) {
-  const std::string position_str =
-      server_runner->get_position(position_fingerprint);
-
-  if (position_str.empty()) {
+  if (!server_runner->is_position_in_storage(position_fingerprint)) {
     logger->error("Position with fingerprint {} is not found!",
                   position_fingerprint);
 
-    // We return 0 to
+    // We return 0 to indicate a failure.
     return 0;
   }
+  const std::string position_str =
+      server_runner->get_position(position_fingerprint);
 
   // Decompress the position.
   const std::string decompressed_position = decompress_data(position_str);

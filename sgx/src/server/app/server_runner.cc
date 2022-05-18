@@ -528,6 +528,8 @@ grpc::Status SGXORAMService::init_oram(
     permutation[i] = oram_init_request->permutation(i);
   }
 
+  logger->debug("real number: {}", real_number);
+
   if (!check_verification_message(verification_message)) {
     const std::string error_message = "Failed to verify the message!";
     logger->error(error_message);
