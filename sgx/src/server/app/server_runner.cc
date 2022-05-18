@@ -537,11 +537,10 @@ grpc::Status SGXORAMService::init_oram(
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   }
 
-  // Calculate the level of the ORAM tree.
-  const uint32_t bucket_number =
-      std::ceil(oram_config.number * 1.0 / oram_config.bucket_size);
   oram_config.level =
-      std::ceil(std::log(bucket_number) / std::log(oram_config.way)) + 1;
+      std::ceil(std::log((oram_config.number + oram_config.way) * 1. /
+                         (oram_config.bucket_size + oram_config.way)) * 1. /
+                std::log(oram_config.way)) + 1;
   // Print the configuration.
   print_oram_config(oram_config);
 

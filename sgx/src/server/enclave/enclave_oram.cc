@@ -83,9 +83,67 @@ void get_position_and_decrypt(sgx_oram::oram_position_t* const position,
   enclave_utils::safe_free(ciphertext);
 }
 
-static sgx_status_t populate_internal_slot(
-    sgx_oram::oram_slot_header_t* const header,
-    sgx_oram::oram_block_t* const slot) {
+static sgx_status_t populate_slot(sgx_oram::oram_slot_header_t* const header,
+                                  sgx_oram::oram_block_t* const slot,
+                                  const uint32_t* const permutation,
+                                  size_t permutation_size, uint32_t offset) {
+  ENCLAVE_LOG("[enclave] populating the slot...");
+
+  if (header->type != sgx_oram::oram_slot_type_t::ORAM_SLOT_TYPE_LEAF &&
+      header->type != sgx_oram::oram_slot_type_t::ORAM_SLOT_TYPE_INTERNAL) {
+    ENCLAVE_LOG("[enclave] Unknown slot type!");
+    return SGX_ERROR_INVALID_PARAMETER;
+  }
+
+  const std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
+  const size_t slot_size = header->slot_size;
+  const uint32_t slot_begin = header->range_begin;
+  const uint32_t real_number = crypto_manager->get_oram_config()->number >> 1;
+
+  size_t i = 0, limit = (slot_size >> 1);
+  // The loop should end when i reaches the halve of the slot size or the
+  // offset is larger than the needed size.
+  // Note that blocks in the same bucket have the same block id. So the offset
+  // is DEFAULT_BUCKET_SIZE times bigger than the actual offset; therefore, we
+  // need to multiply slot_begin by the macro DEFAULT_BUCKET_SIZE.
+  for (; (i + offset) <= real_number && (i < limit); i++) {
+    sgx_oram::oram_block_t* const p_block = slot + i;
+    // Fill in the block with metadata first.
+    p_block->header.type = sgx_oram::ORAM_BLOCK_TYPE_NORMAL;
+    p_block->header.bid = slot_begin;
+    p_block->header.address = permutation[i + offset];
+
+    ENCLAVE_LOG("[enclave] address = %u", permutation[i + offset]);
+
+    // Assemble the <k, v> pair.
+    sgx_oram::oram_position_t* position =
+        (sgx_oram::oram_position_t*)malloc(ORAM_POSITION_SIZE);
+    assemble_position(header->level, slot_begin, permutation[offset + i],
+                      position);
+    // Encrypt the position and the store it to the ouside.
+    encrypt_position_and_store(position);
+    // Then fill in the data.
+    memset(p_block->data, 0, DEFAULT_ORAM_DATA_SIZE);
+    p_block->data[0] = p_block->header.address;
+    // Free the position.
+    enclave_utils::safe_free(position);
+    // Do not forget to  decrement the numebr of dummy blocks of the slot.
+    header->dummy_number--;
+  }
+
+  for (; i < slot_size; i++) {
+    sgx_oram::oram_block_t* const block_ptr = slot + i;
+    // Mark the block as empty.
+    block_ptr->header.type = sgx_oram::ORAM_BLOCK_TYPE_DUMMY;
+  }
+
+  return SGX_SUCCESS;
+}
+
+[[deprecated]]
+sgx_status_t populate_internal_slot(sgx_oram::oram_slot_header_t* const header,
+                                    sgx_oram::oram_block_t* const slot) {
   // ENCLAVE_LOG("[enclave] Populating internal slot at level: %d...",
   //             slot->header.level);
   // Report an error if the type of the slot is incorrect.
@@ -105,10 +163,11 @@ static sgx_status_t populate_internal_slot(
   return SGX_SUCCESS;
 }
 
-static sgx_status_t populate_leaf_slot(
-    sgx_oram::oram_slot_header_t* const header,
-    sgx_oram::oram_block_t* const slot, const uint32_t* const permutation,
-    size_t permutation_size, uint32_t offset) {
+[[deprecated]]
+sgx_status_t populate_leaf_slot(sgx_oram::oram_slot_header_t* const header,
+                                sgx_oram::oram_block_t* const slot,
+                                const uint32_t* const permutation,
+                                size_t permutation_size, uint32_t offset) {
   const size_t slot_size = header->slot_size;
   // First we should perform a sanity check on
   // whether the slot is really a leaf node.
@@ -170,16 +229,20 @@ static void assemble_slot(sgx_oram::oram_block_t* slot,
                           uint32_t bucket_size, uint32_t way, bool is_leaf,
                           const uint32_t* const permutation,
                           size_t permutation_size, uint32_t* const offset) {
-  if (!is_leaf) {
-    sgx_status_t status = populate_internal_slot(header, slot);
-    enclave_utils::check_sgx_status(status, "populate_internal_slot()");
-  } else {
-    // Intialize the content of the slot.
-    sgx_status_t status = populate_leaf_slot(header, slot, permutation,
-                                             permutation_size, *offset);
-    enclave_utils::check_sgx_status(status, "populate_leaf_slot()");
-    *offset += bucket_size >> 1;
-  }
+  // if (!is_leaf) {
+  //   sgx_status_t status = populate_internal_slot(header, slot);
+  //   enclave_utils::check_sgx_status(status, "populate_internal_slot()");
+  // } else {
+  //   // Intialize the content of the slot.
+  //   sgx_status_t status = populate_leaf_slot(header, slot, permutation,
+  //                                            permutation_size, *offset);
+  //   enclave_utils::check_sgx_status(status, "populate_leaf_slot()");
+  //   *offset += bucket_size >> 1;
+  // }
+  sgx_status_t status =
+      populate_slot(header, slot, permutation, permutation_size, *offset);
+  enclave_utils::check_sgx_status(status, "populate_slot()");
+  *offset += ((header->slot_size) >> 1);
 }
 
 // This function fetches the target slot from the outside memory by calculting

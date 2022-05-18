@@ -87,21 +87,19 @@ int SGX_CDECL main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   // Initialize the sink.
-  file_sink->set_level(static_cast<spdlog::level::level_enum>(FLAGS_log_level));
   file_sink->set_pattern(log_pattern);
   sinks.emplace_back(file_sink);
 
   if (FLAGS_log_to_stderr) {
     std::shared_ptr<spdlog::sinks::stdout_color_sink_mt> stdout_sink =
         std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    stdout_sink->set_level(
-        static_cast<spdlog::level::level_enum>(FLAGS_log_level));
     sinks.emplace_back(stdout_sink);
   }
 
   // Initialize the logger.
   logger =
       std::make_shared<spdlog::logger>("server", sinks.begin(), sinks.end());
+  logger->set_level(static_cast<spdlog::level::level_enum>(FLAGS_log_level));
   spdlog::set_default_logger(logger);
 
   // Nullify the input arguments.

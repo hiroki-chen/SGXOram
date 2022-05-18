@@ -67,11 +67,13 @@ Client::Client(const std::string& address, const std::string& port) {
   std::shared_ptr<grpc::Channel> channel = std::shared_ptr<grpc::Channel>(
       grpc::CreateChannel(address + ":" + port, ssl_creds));
 
-  if (channel->GetState(true) != GRPC_CHANNEL_READY) {
-    logger->error("The peer is not ready for connection!");
-    exit(1);
-  }
-  
+  // Wait for the server to start.
+  grpc_connectivity_state state;
+  do {
+    state = channel->GetState(true);
+  } while (state == grpc_connectivity_state::GRPC_CHANNEL_IDLE ||
+           state == grpc_connectivity_state::GRPC_CHANNEL_CONNECTING);
+
   stub_ = oram::sgx_oram::NewStub(channel);
 }
 
@@ -136,7 +138,7 @@ int Client::init_oram(void) {
   memcpy(buffer.data(), encrypted_verification_message.data(),
          encrypted_verification_message.size());
   logger->debug("The encrypted verification message is: {}",
-               spdlog::to_hex(buffer));
+                spdlog::to_hex(buffer));
   // Print the LOG.
   logger->info("Sending parameters of the ORAM to the server!");
 
