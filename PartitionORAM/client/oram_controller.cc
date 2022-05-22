@@ -651,7 +651,7 @@ Status OramController::TestPartitionOram(void) {
 
   auto begin = std::chrono::high_resolution_clock::now();
   logger->info("[+] Begin testing Partition ORAM...");
-  for (size_t i = 0; i < partition_size_; i++) {
+  for (size_t i = 0; i < 10; i++) {
     oram_block_t block;
     logger->debug("[+] Reading {} ...", i);
     Status status = Access(Operation::kRead, i, &block);
@@ -662,10 +662,10 @@ Status OramController::TestPartitionOram(void) {
                   block.data[0]);
   }
   auto end = std::chrono::high_resolution_clock::now();
-  logger->info(
-      "[-] End testing Partition ORAM. Time elapsed: {} ms.",
-      std::chrono::duration_cast<std::chrono::milliseconds>(end - begin)
-          .count());
+  logger->info("[-] End testing Partition ORAM. Time elapsed per block: {} ms.",
+               std::chrono::duration_cast<std::chrono::milliseconds>(
+                   (end - begin) / 10)
+                   .count());
   return Status::kOK;
 }
 

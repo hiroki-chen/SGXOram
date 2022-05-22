@@ -96,7 +96,7 @@ static const std::unordered_map<Status, std::string> kErrorList = {
 
 // This factor can also be used to control the size of the Path ORAM to prevent
 // storage overflow.
-static const float kPartitionAdjustmentFactor = 1;
+static const float kPartitionAdjustmentFactor = .5;
 
 static const uint32_t kMaximumOramStorageNum = 1e5;
 
