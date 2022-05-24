@@ -95,7 +95,9 @@ grpc::Status PartitionORAMService::ReadPath(grpc::ServerContext* context,
     return grpc::Status(grpc::StatusCode::NOT_FOUND, error_message);
   }
 
-  // Read the path.
+  // Read the path and record the time it used.
+  auto begin = std::chrono::high_resolution_clock::now();
+
   p_oram_bucket_t bucket;
   if (storages_[id]->ReadPath(level, path, &bucket) != Status::kOK) {
     const std::string error_message =
@@ -103,6 +105,12 @@ grpc::Status PartitionORAMService::ReadPath(grpc::ServerContext* context,
                            " in PathORAM id: ", id);
     return grpc::Status(grpc::StatusCode::INTERNAL, error_message);
   }
+  auto end = std::chrono::high_resolution_clock::now();
+  logger->info(
+      "Elapsed time when reading a path: {} us",
+      std::chrono::duration_cast<std::chrono::microseconds>(end - begin)
+          .count());
+
   logger->debug("After read path:");
   oram_utils::PrintStash(bucket);
 
@@ -138,7 +146,7 @@ grpc::Status PartitionORAMService::WritePath(grpc::ServerContext* context,
   p_oram_bucket_t bucket = std::move(
       oram_utils::DeserializeFromStringVector(std::vector<std::string>(
           request->bucket().begin(), request->bucket().end())));
-          
+
   logger->debug("After deserialize:");
   oram_utils::PrintStash(bucket);
 
@@ -216,6 +224,21 @@ grpc::Status PartitionORAMService::SendHello(grpc::ServerContext* context,
   }
 
   logger->info("Successfully verified: {}.", message);
+  return grpc::Status::OK;
+}
+
+grpc::Status PartitionORAMService::ReportServerInformation(
+    grpc::ServerContext* context, const google::protobuf::Empty* request,
+    google::protobuf::Empty* response) {
+  logger->info("Report server information...");
+
+  double storage_size = 0;
+  for (const auto& storage : storages_) {
+    storage_size += storage->ReportStorage();
+  }
+
+  logger->info("The total storage size is {} MB.", storage_size);
+
   return grpc::Status::OK;
 }
 

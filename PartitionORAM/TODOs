@@ -1,3 +1,3 @@
 1. If blocks from other slots are written to another slot, then we firstly write it to the stash, and then update the position map, waiting for being written back to the server. [FIXED]
 2. To prevent overflow of Path ORAM server, we initialize each Path ORAM controller with extra dummy blocks, i.e., for each Path ORAM storage, it consists of dummy blocks and real blocks with the same number. [FIXED]
-3. Do some refactor?
+3. Add lz4 to compress the data on the server. [ADDED]

@@ -38,9 +38,8 @@ OramServerStorage::OramServerStorage(uint32_t id, size_t capacity,
 
     for (uint32_t j = 0; j < cur_size; j++) {
       const server_storage_tag_t tag = std::make_pair(i, j);
-      p_oram_bucket_t bucket;
-      oram_utils::PadStash(&bucket, bucket_size_);
-      storage_.insert(std::make_pair(tag, bucket));
+      server_storage_data data;
+      storage_[tag] = data;
     }
   }
 }
@@ -59,9 +58,14 @@ Status OramServerStorage::ReadPath(uint32_t level, uint32_t path,
     return Status::kObjectNotFound;
   } else {
     std::for_each(iter->second.begin(), iter->second.end(),
-                  [&out_bucket](oram_block_t& block) {
+                  [&out_bucket](const std::string& data) {
+                    // Decompress the data.
+                    oram_block_t block;
+                    oram_utils::DataDecompress(
+                        reinterpret_cast<const uint8_t*>(data.data()),
+                        data.size(), reinterpret_cast<uint8_t*>(&block));
+
                     out_bucket->emplace_back(block);
-                    // block.header.type = BlockType::kInvalid;
                   });
 
     return Status::kOK;
@@ -82,26 +86,48 @@ Status OramServerStorage::AccurateWritePath(uint32_t level, uint32_t offset,
   logger->info("Write offset {} at level {}. ", offset, level);
   const server_storage_tag_t tag = std::make_pair(level, offset);
 
+  auto iter = storage_.find(tag);
+  uint8_t buf[DEFAULT_COMPRESSED_BUF_SIZE];
+
   if (type == partition_oram::Type::kInit) {
-    std::copy(in_bucket.begin(), in_bucket.end(),
-              std::back_inserter(storage_[tag]));
+    for (size_t i = 0; i < in_bucket.size(); i++) {
+      const size_t compressed_size = oram_utils::DataCompress(
+          (uint8_t*)(&in_bucket[i]), ORAM_BLOCK_SIZE, buf);
+
+      iter->second.emplace_back(
+          std::string(reinterpret_cast<const char*>(buf), compressed_size));
+    }
 
     return Status::kOK;
   }
 
-  auto iter = storage_.find(tag);
   if (iter == storage_.end() && type == partition_oram::Type::kNormal) {
     logger->error("OramServerStorage::WritePath: Cannot find the bucket.");
     // Not found.
     return Status::kObjectNotFound;
   } else {
+    return Status::kOK;
     iter->second.clear();
-    std::for_each(in_bucket.begin(), in_bucket.end(),
-                  [&iter](const oram_block_t& block) {
-                    iter->second.emplace_back(block);
-                  });
+
+    for (size_t i = 0; i < in_bucket.size(); i++) {
+      const size_t compressed_size = oram_utils::DataCompress(
+          (uint8_t*)(&in_bucket[i]), ORAM_BLOCK_SIZE, buf);
+
+      iter->second.emplace_back(
+          std::string(reinterpret_cast<const char*>(buf), compressed_size));
+    }
+
     return Status::kOK;
   }
 }
 
+float OramServerStorage::ReportStorage(void) const {
+  // Calculate the overall size of the storage in Megabytes.
+  uint64_t storage_size = 0;
+  for (const auto& iter : storage_) {
+    storage_size += iter.second.size() * sizeof(oram_block_t);
+  }
+
+  return storage_size * 1. / POW2(20);
+}
 }  // namespace partition_oram

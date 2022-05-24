@@ -28,6 +28,8 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include "base/oram_utils.h"
+
 // Configurations for the server.
 ABSL_FLAG(std::string, address, "0.0.0.0", "The server's IP address.");
 ABSL_FLAG(std::string, port, "1234", "The server's port.");

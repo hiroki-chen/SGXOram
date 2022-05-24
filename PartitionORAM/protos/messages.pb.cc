@@ -261,7 +261,7 @@ const char descriptor_table_protodef_messages_2eproto[] PROTOBUF_SECTION_VARIABL
   "ypeH\000\210\001\001\022\023\n\006offset\030\006 \001(\rH\001\210\001\001B\007\n\005_typeB\t"
   "\n\007_offset\"\023\n\021WritePathResponse*<\n\004Type\022\017"
   "\n\013kSequential\020\000\022\013\n\007kRandom\020\001\022\t\n\005kInit\020\002\022"
-  "\013\n\007kNormal\020\0032\251\004\n\006server\022E\n\010InitOram\022\037.pa"
+  "\013\n\007kNormal\020\0032\366\004\n\006server\022E\n\010InitOram\022\037.pa"
   "rtition_oram.InitOramRequest\032\026.google.pr"
   "otobuf.Empty\"\000\022O\n\rPrintOramTree\022$.partit"
   "ion_oram.PrintOramTreeRequest\032\026.google.p"
@@ -275,14 +275,16 @@ const char descriptor_table_protodef_messages_2eproto[] PROTOBUF_SECTION_VARIABL
   "m.KeyExchangeRequest\032#.partition_oram.Ke"
   "yExchangeResponse\"\000\022C\n\tSendHello\022\034.parti"
   "tion_oram.HelloMessage\032\026.google.protobuf"
-  ".Empty\"\000b\006proto3"
+  ".Empty\"\000\022K\n\027ReportServerInformation\022\026.go"
+  "ogle.protobuf.Empty\032\026.google.protobuf.Em"
+  "pty\"\000b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_messages_2eproto_deps[1] = {
   &::descriptor_table_google_2fprotobuf_2fempty_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_messages_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_messages_2eproto = {
-  false, false, 1216, descriptor_table_protodef_messages_2eproto, "messages.proto", 
+  false, false, 1293, descriptor_table_protodef_messages_2eproto, "messages.proto", 
   &descriptor_table_messages_2eproto_once, descriptor_table_messages_2eproto_deps, 1, 9,
   schemas, file_default_instances, TableStruct_messages_2eproto::offsets,
   file_level_metadata_messages_2eproto, file_level_enum_descriptors_messages_2eproto, file_level_service_descriptors_messages_2eproto,

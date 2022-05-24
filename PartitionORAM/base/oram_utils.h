@@ -42,32 +42,44 @@ std::string StrCat(const std::string& s, Args&&... args) {
 
 std::vector<std::string> ReadDataFromFile(const std::string& path);
 
-std::vector<std::string> SerializeToStringVector(const partition_oram::p_oram_bucket_t& bucket);
+std::vector<std::string> SerializeToStringVector(
+    const partition_oram::p_oram_bucket_t& bucket);
 
-partition_oram::p_oram_bucket_t DeserializeFromStringVector(const std::vector<std::string>& data);
+partition_oram::p_oram_bucket_t DeserializeFromStringVector(
+    const std::vector<std::string>& data);
 
-partition_oram::p_oram_bucket_t SampleRandomBucket(size_t size, size_t tree_size, size_t initial_offset);
+partition_oram::p_oram_bucket_t SampleRandomBucket(size_t size,
+                                                   size_t tree_size,
+                                                   size_t initial_offset);
 
 void SafeFree(void* ptr);
 
 void SafeFreeAll(size_t ptr_num, ...);
 
-void ConvertToBlock(const std::string& data, partition_oram::oram_block_t* const block);
+void ConvertToBlock(const std::string& data,
+                    partition_oram::oram_block_t* const block);
 
-void ConvertToString(const partition_oram::oram_block_t* const block, std::string* const data);
+void ConvertToString(const partition_oram::oram_block_t* const block,
+                     std::string* const data);
 
 void CheckStatus(partition_oram::Status status, const std::string& reason);
 
-void PadStash(partition_oram::p_oram_stash_t* const stash, const size_t bucket_size);
+void PadStash(partition_oram::p_oram_stash_t* const stash,
+              const size_t bucket_size);
 
 void PrintStash(const partition_oram::p_oram_stash_t& stash);
 
 void PrintOramTree(const partition_oram::server_storage_t& storage);
 
-void EncryptBlock(partition_oram::oram_block_t* const block, oram_crypto::Cryptor* const cryptor);
+void EncryptBlock(partition_oram::oram_block_t* const block,
+                  oram_crypto::Cryptor* const cryptor);
 
-void DecryptBlock(partition_oram::oram_block_t* const block, oram_crypto::Cryptor* const cryptor);
+void DecryptBlock(partition_oram::oram_block_t* const block,
+                  oram_crypto::Cryptor* const cryptor);
 
+size_t DataCompress(const uint8_t* data, size_t data_size, uint8_t* const out);
+
+size_t DataDecompress(const uint8_t* data, size_t data_size, uint8_t* const out);
 }  // namespace oram_utils
 
 #endif  // PARTITION_ORAM_BASE_ORAM_UTILS_H_

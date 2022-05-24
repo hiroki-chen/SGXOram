@@ -9,5 +9,12 @@ The code is constructed upon some important libraries:
 * `spdlog` for logging.
 * `Libsodium` for cryptographic tools.
 
-You can install dependencies manually or by the shell script `deps.sh` if you are running Ubuntu. Note that C++17 is required, and `gRPC` library should be built by C++17.
- 
+You can run the test by the following command:
+
+```sh
+chmod -x ./test.sh;
+cd ./build;
+../test.sh;
+```
+
+The output will be sent to the file in the `./build` directory with the current timestamp.

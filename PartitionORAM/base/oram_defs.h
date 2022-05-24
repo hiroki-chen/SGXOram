@@ -24,6 +24,7 @@
 #include <absl/container/flat_hash_map.h>
 
 #define DEFAULT_ORAM_DATA_SIZE 4096
+#define DEFAULT_COMPRESSED_BUF_SIZE 8192
 
 #define ORAM_BLOCK_SIZE sizeof(partition_oram::oram_block_t)
 
@@ -96,7 +97,7 @@ static const std::unordered_map<Status, std::string> kErrorList = {
 
 // This factor can also be used to control the size of the Path ORAM to prevent
 // storage overflow.
-static const float kPartitionAdjustmentFactor = .5;
+static const float kPartitionAdjustmentFactor = 1.;
 
 static const uint32_t kMaximumOramStorageNum = 1e5;
 
@@ -108,9 +109,10 @@ using p_oram_position_t = std::unordered_map<uint32_t, uint32_t>;
 // Alias for Partition ORAM.
 using pp_oram_slot_t = std::vector<std::vector<oram_block_t>>;
 // Alias for server storage.
+using server_storage_data = std::vector<std::string>;
 using server_storage_tag_t = std::pair<uint32_t, uint32_t>;
 using server_storage_t =
-    absl::flat_hash_map<server_storage_tag_t, p_oram_bucket_t>;
+    absl::flat_hash_map<server_storage_tag_t, server_storage_data>;
 
 struct BlockEqual {
  private:

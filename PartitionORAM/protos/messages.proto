@@ -25,6 +25,9 @@ service server {
   rpc KeyExchange(KeyExchangeRequest) returns (KeyExchangeResponse) {}
 
   rpc SendHello(HelloMessage) returns (google.protobuf.Empty) {}
+
+  rpc ReportServerInformation(google.protobuf.Empty) 
+    returns (google.protobuf.Empty) {}
 }
 
 enum Type {

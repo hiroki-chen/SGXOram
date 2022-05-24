@@ -22,6 +22,7 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/bin_to_hex.h>
+#include <lz4.h>
 
 #include "oram_crypto.h"
 
@@ -184,8 +185,14 @@ void PrintOramTree(const partition_oram::server_storage_t& storage) {
     logger->debug("Tag {}, {}: ", iter->first.first, iter->first.second);
 
     for (const auto& block : iter->second) {
-      logger->debug("id: {}, type: {}", block.header.block_id,
-                    (int)block.header.type);
+      // Decompress the storage.
+      partition_oram::oram_block_t decompressed_block;
+      DataDecompress(reinterpret_cast<const uint8_t*>(block.data()),
+                     block.size(),
+                     reinterpret_cast<uint8_t*>(&decompressed_block));
+
+      logger->debug("id: {}, type: {}", decompressed_block.header.block_id,
+                    (int)decompressed_block.header.type);
     }
   }
 }
@@ -242,5 +249,39 @@ void DecryptBlock(partition_oram::oram_block_t* const block,
   memcpy(block->data, dec.data(), dec.size());
 
   SafeFree(enc_data);
+}
+
+size_t DataCompress(const uint8_t* data, size_t data_size, uint8_t* const out) {
+  // Compress the source std::string with lz4 compression libarary.
+  // The compressed data will be stored in the destination buffer.
+  // The destination will be pre-allocated by the correct size.
+  const size_t max_allowed_size = LZ4_compressBound(data_size);
+  size_t compressed_size = LZ4_compress_default(
+      reinterpret_cast<const char*>(data), reinterpret_cast<char*>(out),
+      data_size, max_allowed_size);
+
+  if (compressed_size == 0) {
+    logger->error("Failed to compress data!");
+    abort();
+  }
+
+  return compressed_size;
+}
+
+size_t DataDecompress(const uint8_t* data, size_t data_size,
+                      uint8_t* const out) {
+  // Decompress the source std::string with lz4 compression
+  // library.
+  const size_t max_allowed_size = data_size * 2;
+  size_t decompressed_size = LZ4_decompress_safe(
+      reinterpret_cast<const char*>(data), reinterpret_cast<char*>(out),
+      data_size, max_allowed_size);
+
+  if (decompressed_size == 0) {
+    logger->error("Failed to decompress data!");
+    abort();
+  }
+
+  return decompressed_size;
 }
 }  // namespace oram_utils

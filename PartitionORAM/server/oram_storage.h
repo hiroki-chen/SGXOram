@@ -49,6 +49,8 @@ class OramServerStorage {
                            partition_oram::Type type);
 
   server_storage_t get_storage(void) const { return storage_; }
+
+  float ReportStorage(void) const;
 };
 }  // namespace partition_oram
 
