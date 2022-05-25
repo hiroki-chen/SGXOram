@@ -28,6 +28,9 @@
 #include <enclave/enclave_oram_access.hh>
 #include <enclave/enclave_crypto_manager.hh>
 
+extern int64_t access_time;
+extern int64_t eviction_time;
+
 static inline bool check_slot_header(
     const sgx_oram::oram_slot_header_t* const header_str, uint32_t level) {
   const sgx_oram::oram_slot_header_t* header =
@@ -141,9 +144,9 @@ static sgx_status_t populate_slot(sgx_oram::oram_slot_header_t* const header,
   return SGX_SUCCESS;
 }
 
-[[deprecated]]
-sgx_status_t populate_internal_slot(sgx_oram::oram_slot_header_t* const header,
-                                    sgx_oram::oram_block_t* const slot) {
+[[deprecated]] sgx_status_t populate_internal_slot(
+    sgx_oram::oram_slot_header_t* const header,
+    sgx_oram::oram_block_t* const slot) {
   // ENCLAVE_LOG("[enclave] Populating internal slot at level: %d...",
   //             slot->header.level);
   // Report an error if the type of the slot is incorrect.
@@ -163,11 +166,10 @@ sgx_status_t populate_internal_slot(sgx_oram::oram_slot_header_t* const header,
   return SGX_SUCCESS;
 }
 
-[[deprecated]]
-sgx_status_t populate_leaf_slot(sgx_oram::oram_slot_header_t* const header,
-                                sgx_oram::oram_block_t* const slot,
-                                const uint32_t* const permutation,
-                                size_t permutation_size, uint32_t offset) {
+[[deprecated]] sgx_status_t populate_leaf_slot(
+    sgx_oram::oram_slot_header_t* const header,
+    sgx_oram::oram_block_t* const slot, const uint32_t* const permutation,
+    size_t permutation_size, uint32_t offset) {
   const size_t slot_size = header->slot_size;
   // First we should perform a sanity check on
   // whether the slot is really a leaf node.
@@ -583,6 +585,9 @@ void encrypt_slot_and_store(const uint8_t* const slot, size_t slot_size,
 sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
                                uint8_t* data, size_t data_len) {
   ENCLAVE_LOG("[enclave] Accessing data at address %d.\n", block_address);
+
+  const uint64_t begin = enclave_utils::get_current_time();
+
   // Get the instance of the cryptomanager.
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
@@ -622,6 +627,13 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
 
   memcpy(data, encrypted_data, DEFAULT_ORAM_DATA_SIZE);
   enclave_utils::safe_free_all(2, position, encrypted_data);
+
+  const uint64_t end = enclave_utils::get_current_time();
+
+  // Divide the elapsed time by 2,700,000 => to ms.
+  ENCLAVE_LOG("[enclave] time used = %u", (end - begin));
+  ocall_report_time("[enclave] Access time: {} us.", access_time / 2700);
+  ocall_report_time("[enclave] Eviction time: {} us.", eviction_time / 2700);
 
   return SGX_SUCCESS;
 }

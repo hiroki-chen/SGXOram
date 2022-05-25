@@ -75,6 +75,10 @@ void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_panic_and_flush, (const char* reason));
 #define OCALL_FLUSH_LOG_DEFINED__
 void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_flush_log, (void));
 #endif
+#ifndef OCALL_REPORT_TIME_DEFINED__
+#define OCALL_REPORT_TIME_DEFINED__
+void SGX_UBRIDGE(SGX_NOCONVENTION, ocall_report_time, (const char* message, int64_t tick));
+#endif
 #ifndef PTHREAD_WAIT_TIMEOUT_OCALL_DEFINED__
 #define PTHREAD_WAIT_TIMEOUT_OCALL_DEFINED__
 int SGX_UBRIDGE(SGX_CDECL, pthread_wait_timeout_ocall, (unsigned long long waiter, unsigned long long timeout));

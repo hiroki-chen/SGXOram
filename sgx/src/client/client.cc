@@ -16,6 +16,7 @@
  */
 #include <client/client.hh>
 
+#include <chrono>
 #include <array>
 #include <fstream>
 #include <sstream>
@@ -314,11 +315,28 @@ int Client::test_oram_cache(void) {
 
 int Client::test_oram(void) {
   logger->info("Begin testing the ORAM!");
+
+  // End-to-end time.
+  auto begin = std::chrono::high_resolution_clock::now();
   for (size_t i = 0; i < FLAGS_access_num; i++) {
     if (read_block(i) != 0) {
       return -1;
     }
   }
+  auto end = std::chrono::high_resolution_clock::now();
+  auto duration =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+  logger->info("The time for reading {} blocks is {} us.", FLAGS_access_num,
+               duration.count());
+
+  return 0;
+}
+
+int Client::print_storage_information(void) {
+  grpc::ClientContext context;
+  google::protobuf::Empty empty;
+
+  stub_->print_storage_information(&context, empty, &empty);
 
   return 0;
 }

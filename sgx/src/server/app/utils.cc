@@ -41,8 +41,13 @@ void ocall_printf(const char* message) {
   logger->debug(message);
 }
 
+void ocall_report_time(const char* message, int64_t tick) {
+  // Report the elapsed time by converting the tick to timepoint.
+  logger->info(message, tick);
+}
+
 void ocall_panic_and_flush(const char* reason) {
-  logger->error("An fatal error happened in the enclave, the reason is: {}.",
+  logger->error("A fatal error happened in the enclave, the reason is: {}.",
                 reason);
   logger->flush();
 
@@ -100,7 +105,7 @@ std::string compress_data(const std::string& data) {
 }
 
 std::string decompress_data(const std::string& data) {
-  // Decompress the source std::string with lz4 compression libarary.
+  // Decompress the source std::string with lz4 compression library.
   std::string decompressed_data;
   const size_t max_allowed_size = data.size() * 2;
   decompressed_data.resize(max_allowed_size);

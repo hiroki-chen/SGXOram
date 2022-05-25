@@ -33,6 +33,7 @@ static const char* sgx_oram_method_names[] = {
   "/oram.sgx_oram/write_block",
   "/oram.sgx_oram/test_oram_cache",
   "/oram.sgx_oram/close_connection",
+  "/oram.sgx_oram/print_storage_information",
 };
 
 std::unique_ptr< sgx_oram::Stub> sgx_oram::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -53,6 +54,7 @@ sgx_oram::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, 
   , rpcmethod_write_block_(sgx_oram_method_names[8], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_test_oram_cache_(sgx_oram_method_names[9], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_close_connection_(sgx_oram_method_names[10], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_print_storage_information_(sgx_oram_method_names[11], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status sgx_oram::Stub::init_enclave(::grpc::ClientContext* context, const ::oram::InitRequest& request, ::oram::InitReply* response) {
@@ -308,6 +310,29 @@ void sgx_oram::Stub::async::close_connection(::grpc::ClientContext* context, con
   return result;
 }
 
+::grpc::Status sgx_oram::Stub::print_storage_information(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::google::protobuf::Empty* response) {
+  return ::grpc::internal::BlockingUnaryCall< ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_print_storage_information_, context, request, response);
+}
+
+void sgx_oram::Stub::async::print_storage_information(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_print_storage_information_, context, request, response, std::move(f));
+}
+
+void sgx_oram::Stub::async::print_storage_information(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_print_storage_information_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* sgx_oram::Stub::PrepareAsyncprint_storage_informationRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_print_storage_information_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* sgx_oram::Stub::Asyncprint_storage_informationRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncprint_storage_informationRaw(context, request, cq);
+  result->StartCall();
+  return result;
+}
+
 sgx_oram::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       sgx_oram_method_names[0],
@@ -419,6 +444,16 @@ sgx_oram::Service::Service() {
              ::google::protobuf::Empty* resp) {
                return service->close_connection(ctx, req, resp);
              }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      sgx_oram_method_names[11],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< sgx_oram::Service, ::google::protobuf::Empty, ::google::protobuf::Empty, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](sgx_oram::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::google::protobuf::Empty* req,
+             ::google::protobuf::Empty* resp) {
+               return service->print_storage_information(ctx, req, resp);
+             }, this)));
 }
 
 sgx_oram::Service::~Service() {
@@ -495,6 +530,13 @@ sgx_oram::Service::~Service() {
 }
 
 ::grpc::Status sgx_oram::Service::close_connection(::grpc::ServerContext* context, const ::oram::CloseRequest* request, ::google::protobuf::Empty* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status sgx_oram::Service::print_storage_information(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response) {
   (void) context;
   (void) request;
   (void) response;

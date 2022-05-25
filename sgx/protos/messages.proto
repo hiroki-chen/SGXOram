@@ -36,6 +36,8 @@ service sgx_oram {
   rpc test_oram_cache(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 
   rpc close_connection(CloseRequest) returns (google.protobuf.Empty) {}
+
+  rpc print_storage_information(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
 message InitRequest {

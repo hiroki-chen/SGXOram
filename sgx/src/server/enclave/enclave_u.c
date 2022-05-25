@@ -203,6 +203,11 @@ typedef struct ms_ocall_panic_and_flush_t {
 	const char* ms_reason;
 } ms_ocall_panic_and_flush_t;
 
+typedef struct ms_ocall_report_time_t {
+	const char* ms_message;
+	int64_t ms_tick;
+} ms_ocall_report_time_t;
+
 typedef struct ms_pthread_wait_timeout_ocall_t {
 	int ms_retval;
 	unsigned long long ms_waiter;
@@ -358,6 +363,14 @@ static sgx_status_t SGX_CDECL enclave_ocall_flush_log(void* pms)
 	return SGX_SUCCESS;
 }
 
+static sgx_status_t SGX_CDECL enclave_ocall_report_time(void* pms)
+{
+	ms_ocall_report_time_t* ms = SGX_CAST(ms_ocall_report_time_t*, pms);
+	ocall_report_time(ms->ms_message, ms->ms_tick);
+
+	return SGX_SUCCESS;
+}
+
 static sgx_status_t SGX_CDECL enclave_pthread_wait_timeout_ocall(void* pms)
 {
 	ms_pthread_wait_timeout_ocall_t* ms = SGX_CAST(ms_pthread_wait_timeout_ocall_t*, pms);
@@ -424,9 +437,9 @@ static sgx_status_t SGX_CDECL enclave_sgx_thread_set_multiple_untrusted_events_o
 
 static const struct {
 	size_t nr_ocall;
-	void * table[22];
+	void * table[23];
 } ocall_table_enclave = {
-	22,
+	23,
 	{
 		(void*)enclave_ocall_is_header_in_storage,
 		(void*)enclave_ocall_is_body_in_storage,
@@ -442,6 +455,7 @@ static const struct {
 		(void*)enclave_ocall_write_position,
 		(void*)enclave_ocall_panic_and_flush,
 		(void*)enclave_ocall_flush_log,
+		(void*)enclave_ocall_report_time,
 		(void*)enclave_pthread_wait_timeout_ocall,
 		(void*)enclave_pthread_create_ocall,
 		(void*)enclave_pthread_wakeup_ocall,

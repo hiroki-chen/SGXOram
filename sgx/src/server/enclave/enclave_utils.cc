@@ -276,7 +276,7 @@ void oblivious_assign(bool condition, bool* lhs, bool* rhs) {
 uint32_t uniform_random(uint32_t lower, uint32_t upper) {
   if (upper < lower) {
     ocall_panic_and_flush(
-        "Cannot perform uniform_random because upper < lower!");
+        "Cannot perform uniform_random because upper < lower");
   }
 
   // @ref Chromium's base/rand_util.cc for the implementation.

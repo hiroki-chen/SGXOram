@@ -24,6 +24,11 @@
 
 bool constant = true;
 
+// Global counters that record the time elapsed for different phases of
+// OARM_ACCESS.
+int64_t access_time = 0;
+int64_t eviction_time = 0;
+
 static inline bool is_in_range(uint32_t num,
                                sgx_oram::oram_slot_header_t* const slot) {
   const uint32_t begin = slot->range_begin;
@@ -482,6 +487,7 @@ void sub_evict_s2_epilogue(uint32_t dummy_number, uint32_t begin, uint32_t end,
 // In this function, three slots are involved to fetch the block from
 // the ORAM tree, although a slot is implicitly accessed by another function
 // called by this function.
+// TODO: Add the timer for seperately calculting the eviction / access time.
 void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
                  uint8_t* const data, size_t data_size, bool condition_s1,
                  bool condition_s2, sgx_oram::oram_position_t* const position) {
@@ -524,14 +530,23 @@ void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
   get_slot_and_decrypt(s1_hash, (uint8_t*)s1_storage, s1_size);
   get_slot_and_decrypt(s2_hash, (uint8_t*)s2_storage, s2_size);
 
+  int64_t begin = enclave_utils::get_current_time();
   // Invoke sub_access.
   sub_access(op_type, condition_s1, condition_s2, s1_header, s2_header,
              s1_storage, s1_size, s2_storage, s2_size, data, current_level,
              position);
-  return;
+  int64_t end = enclave_utils::get_current_time();
+
+  access_time += (end - begin);
+
   // Invoke sub_evict.
   ENCLAVE_LOG("[enclave] Invoking sub_evict for level %d...", current_level);
+
+  begin = enclave_utils::get_current_time();
   sub_evict(s2_header, s2_storage, s2_size, current_level, position);
+  end = enclave_utils::get_current_time();
+
+  eviction_time += (end - begin);
 
   enclave_utils::safe_free_all(4, s1_storage, s2_storage, s1_header, s2_header);
 }

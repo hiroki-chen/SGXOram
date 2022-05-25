@@ -29,7 +29,7 @@ CXX_FLAGS ?= -std=c++17 -Wall -Wextra -fPIC -I$(INCLUDE_PATH)
 ifeq ($(MODE), DEBUG)
 	CXX_FLAGS += -O0 -g
 else
-	CXX_FLAGS += -O2 -g
+	CXX_FLAGS += -O3
 endif
 
 all: mkdir server client

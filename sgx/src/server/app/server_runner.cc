@@ -300,10 +300,14 @@ grpc::Status SGXORAMService::read_block(grpc::ServerContext* server_context,
   status = ecall_access_data(*global_eid, &status, 0, address, data,
                              encrypted_data_size);
   auto end = std::chrono::high_resolution_clock::now();
-  auto duration =
+  auto duration_microsecond =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+  auto duration_milisecond =
       std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-  logger->info("The server has read the block at address {} in {} ms.", address,
-               duration.count());
+  logger->info("The server has read the block at address {} in {} microsecond.",
+               address, duration_microsecond.count());
+  logger->info("The server has read the block at address {} in {} milisecond.",
+               address, duration_milisecond.count());
 
   if (status != SGX_SUCCESS) {
     const std::string error_message = "Enclave cannot access the data!";
@@ -502,6 +506,27 @@ grpc::Status SGXORAMService::remote_attestation_final(
   return grpc::Status::OK;
 }
 
+grpc::Status SGXORAMService::print_storage_information(
+    grpc::ServerContext* server_context, const google::protobuf::Empty* request,
+    google::protobuf::Empty* response) {
+  uint64_t size_in_byte = 0;
+
+  for (auto iter = storage_slot_body.begin(); iter != storage_slot_body.end();
+       iter++) {
+    size_in_byte += iter->second.size();
+  }
+
+  for (auto iter = storage_slot_header.begin();
+       iter != storage_slot_header.end(); iter++) {
+    size_in_byte += iter->second.size();
+  }
+
+  const double size = size_in_byte * 1. / std::pow(2, 20);
+  logger->info("The size of the storage is {} MB.", size);
+
+  return grpc::Status::OK;
+}
+
 grpc::Status SGXORAMService::init_oram(
     grpc::ServerContext* server_context,
     const oram::OramInitRequest* oram_init_request,
@@ -537,10 +562,9 @@ grpc::Status SGXORAMService::init_oram(
     return grpc::Status(grpc::FAILED_PRECONDITION, error_message);
   }
 
-  oram_config.level =
-      std::ceil(std::log((oram_config.number + oram_config.way) * 1. /
-                         (oram_config.bucket_size + oram_config.way)) * 1. /
-                std::log(oram_config.way)) + 1;
+  const double num = std::ceil((oram_config.number + oram_config.way) * 1. /
+                               (oram_config.bucket_size + oram_config.way));
+  oram_config.level = std::ceil(std::log(num) / std::log(oram_config.way)) + 1;
   // Print the configuration.
   print_oram_config(oram_config);
 

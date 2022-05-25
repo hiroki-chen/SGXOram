@@ -167,5 +167,9 @@ enclave {
     void ocall_panic_and_flush([ in, string ] const char* reason);
 
     void ocall_flush_log();
+
+    // Report time.
+    // Message should be a formatted string used for spdlog::fmt.
+    void ocall_report_time([ in, string ] const char* message, int64_t tick);
   };
 };

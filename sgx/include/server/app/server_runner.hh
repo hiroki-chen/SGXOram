@@ -125,6 +125,11 @@ class SGXORAMService final : public oram::sgx_oram::Service {
       grpc::ServerContext* server_context, const google::protobuf::Empty* empty,
       google::protobuf::Empty* empty_response) override;
 
+  grpc::Status print_storage_information(
+      grpc::ServerContext* server_context,
+      const google::protobuf::Empty* request,
+      google::protobuf::Empty* response) override;
+
   // ===================================================== //
   // Functions for remote attestation.
   grpc::Status remote_attestation_begin(

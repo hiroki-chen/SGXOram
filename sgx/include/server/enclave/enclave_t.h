@@ -51,6 +51,7 @@ sgx_status_t SGX_CDECL ocall_read_position(size_t* retval, const char* position_
 sgx_status_t SGX_CDECL ocall_write_position(const char* position_finderprint, const uint8_t* position, size_t position_size);
 sgx_status_t SGX_CDECL ocall_panic_and_flush(const char* reason);
 sgx_status_t SGX_CDECL ocall_flush_log(void);
+sgx_status_t SGX_CDECL ocall_report_time(const char* message, int64_t tick);
 sgx_status_t SGX_CDECL pthread_wait_timeout_ocall(int* retval, unsigned long long waiter, unsigned long long timeout);
 sgx_status_t SGX_CDECL pthread_create_ocall(int* retval, unsigned long long self);
 sgx_status_t SGX_CDECL pthread_wakeup_ocall(int* retval, unsigned long long waiter);
