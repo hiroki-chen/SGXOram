@@ -37,6 +37,8 @@ service sgx_oram {
 
   rpc close_connection(CloseRequest) returns (google.protobuf.Empty) {}
 
+  rpc destroy_enclave(google.protobuf.Empty) returns (google.protobuf.Empty) {}
+
   rpc print_storage_information(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 

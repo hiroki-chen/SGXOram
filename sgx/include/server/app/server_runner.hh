@@ -121,6 +121,10 @@ class SGXORAMService final : public oram::sgx_oram::Service {
                          const oram::OramInitRequest* oram_init_request,
                          google::protobuf::Empty* empty) override;
 
+  grpc::Status destroy_enclave(grpc::ServerContext* server_context,
+                               const google::protobuf::Empty* request,
+                               google::protobuf::Empty* empty) override;
+
   grpc::Status test_oram_cache(
       grpc::ServerContext* server_context, const google::protobuf::Empty* empty,
       google::protobuf::Empty* empty_response) override;

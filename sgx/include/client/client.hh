@@ -77,6 +77,8 @@ class Client final : public oram::sgx_oram::Service {
   int test_oram(void);
 
   int print_storage_information(void);
+
+  int destroy_enclave(void);
 };
 
 #endif

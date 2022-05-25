@@ -340,3 +340,10 @@ int Client::print_storage_information(void) {
 
   return 0;
 }
+
+int Client::destroy_enclave(void) {
+  grpc::ClientContext context;
+  google::protobuf::Empty empty;
+
+  return stub_->destroy_enclave(&context, empty, &empty).ok() ? 0 : -1;
+}

@@ -343,6 +343,28 @@ grpc::Status SGXORAMService::close_connection(
   }
 }
 
+grpc::Status SGXORAMService::destroy_enclave(
+    grpc::ServerContext* server_context, const google::protobuf::Empty* request,
+    google::protobuf::Empty* empty) {
+  logger->info("Trying to destroy enclave by peer: {}", server_context->peer());
+
+  if (sgx_destroy_enclave(*global_eid) != SGX_SUCCESS) {
+    logger->error("Failed to destroy enclave");
+    return grpc::Status(grpc::StatusCode::INTERNAL,
+                        "Failed to destroy enclave");
+  } else {
+    logger->info("Enclave destroyed");
+
+    // Reset all the status.
+    storage_slot_body.clear();
+    storage_slot_header.clear();
+    position_map.clear();
+    memset(&oram_config, 0, sizeof(OramConfiguration));
+    
+    return grpc::Status::OK;
+  }
+}
+
 grpc::Status SGXORAMService::remote_attestation_begin(
     grpc::ServerContext* server_context,
     const oram::InitialMessage* initial_message, oram::Message0* reply) {

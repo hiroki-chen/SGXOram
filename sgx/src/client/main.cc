@@ -84,7 +84,8 @@ int main(int argc, char** argv) {
     // Put all the needed operations below.
     client->test_oram();
     client->print_storage_information();
-    client->close_connection();
+    // client->close_connection();
+    client->destroy_enclave();
   } catch (const std::exception& e) {
     (e.what());
   }
