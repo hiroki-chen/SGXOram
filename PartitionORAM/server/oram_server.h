@@ -71,6 +71,10 @@ class PartitionORAMService final : public server::Service {
   grpc::Status ReportServerInformation(
       grpc::ServerContext* context, const google::protobuf::Empty* request,
       google::protobuf::Empty* response) override;
+
+  grpc::Status ResetServer(grpc::ServerContext* context,
+                           const google::protobuf::Empty* request,
+                           google::protobuf::Empty* response) override;
 };
 
 class ServerRunner {

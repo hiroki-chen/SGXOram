@@ -28,7 +28,8 @@
 
 ABSL_FLAG(std::string, address, "localhost", "The address of the server.");
 ABSL_FLAG(std::string, port, "1234", "The port of the server.");
-ABSL_FLAG(std::string, crt_path, "../key/sslcred.crt", "The path of the certificate file.");
+ABSL_FLAG(std::string, crt_path, "../key/sslcred.crt",
+          "The path of the certificate file.");
 
 // ORAM PARAMS.
 ABSL_FLAG(uint32_t, block_num, 1e6, "The number of blocks.");
@@ -37,6 +38,9 @@ ABSL_FLAG(uint32_t, bucket_size, 4,
 
 // Log setting
 ABSL_FLAG(int, log_level, spdlog::level::info, "The level of the log.");
+
+// Start experiment series.
+ABSL_FLAG(bool, start_experiment, false, "Start experiment series.");
 
 std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("oram_client");
 
@@ -77,14 +81,29 @@ int main(int argc, char** argv) {
           absl::GetFlag(FLAGS_address), absl::GetFlag(FLAGS_port),
           absl::GetFlag(FLAGS_crt_path), absl::GetFlag(FLAGS_bucket_size),
           absl::GetFlag(FLAGS_block_num));
-
   client->Run();
   client->StartKeyExchange();
-  // client->SendHello();
-  client->InitOram();
-  client->TestOram();
 
-  client->CloseConnection();
+  if (absl::GetFlag(FLAGS_start_experiment)) {
+    for (size_t i = 6; i <= 21; i++) {
+      const size_t block_num = POW2(i);
+
+      logger->info("------------------------------");
+      logger->info("Start experiment with block_num = {}", block_num);
+      client->InitOram();
+      client->TestOram();
+      client->ResetServer();
+      client->Reset(block_num);
+      logger->info("-----------------------------");
+    }
+    client->CloseConnection();
+  } else {
+    // client->SendHello();
+    client->InitOram();
+    client->TestOram();
+
+    client->CloseConnection();
+  }
 
   return 0;
 }

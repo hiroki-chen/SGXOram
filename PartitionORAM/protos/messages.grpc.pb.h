@@ -98,6 +98,13 @@ class server final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncReportServerInformation(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncReportServerInformationRaw(context, request, cq));
     }
+    virtual ::grpc::Status ResetServer(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::google::protobuf::Empty* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> AsyncResetServer(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(AsyncResetServerRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>> PrepareAsyncResetServer(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>>(PrepareAsyncResetServerRaw(context, request, cq));
+    }
     class async_interface {
      public:
       virtual ~async_interface() {}
@@ -122,6 +129,8 @@ class server final {
       virtual void SendHello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void ReportServerInformation(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ReportServerInformation(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
+      virtual void ResetServer(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ResetServer(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
     typedef class async_interface experimental_async_interface;
     virtual class async_interface* async() { return nullptr; }
@@ -143,6 +152,8 @@ class server final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncSendHelloRaw(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* AsyncReportServerInformationRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncReportServerInformationRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* AsyncResetServerRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::google::protobuf::Empty>* PrepareAsyncResetServerRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -203,6 +214,13 @@ class server final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncReportServerInformation(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncReportServerInformationRaw(context, request, cq));
     }
+    ::grpc::Status ResetServer(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::google::protobuf::Empty* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> AsyncResetServer(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(AsyncResetServerRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>> PrepareAsyncResetServer(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>>(PrepareAsyncResetServerRaw(context, request, cq));
+    }
     class async final :
       public StubInterface::async_interface {
      public:
@@ -222,6 +240,8 @@ class server final {
       void SendHello(::grpc::ClientContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
       void ReportServerInformation(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
       void ReportServerInformation(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
+      void ResetServer(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, std::function<void(::grpc::Status)>) override;
+      void ResetServer(::grpc::ClientContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit async(Stub* stub): stub_(stub) { }
@@ -249,6 +269,8 @@ class server final {
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncSendHelloRaw(::grpc::ClientContext* context, const ::partition_oram::HelloMessage& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* AsyncReportServerInformationRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncReportServerInformationRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* AsyncResetServerRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::google::protobuf::Empty>* PrepareAsyncResetServerRaw(::grpc::ClientContext* context, const ::google::protobuf::Empty& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_InitOram_;
     const ::grpc::internal::RpcMethod rpcmethod_PrintOramTree_;
     const ::grpc::internal::RpcMethod rpcmethod_ReadPath_;
@@ -257,6 +279,7 @@ class server final {
     const ::grpc::internal::RpcMethod rpcmethod_KeyExchange_;
     const ::grpc::internal::RpcMethod rpcmethod_SendHello_;
     const ::grpc::internal::RpcMethod rpcmethod_ReportServerInformation_;
+    const ::grpc::internal::RpcMethod rpcmethod_ResetServer_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -277,6 +300,7 @@ class server final {
     virtual ::grpc::Status KeyExchange(::grpc::ServerContext* context, const ::partition_oram::KeyExchangeRequest* request, ::partition_oram::KeyExchangeResponse* response);
     virtual ::grpc::Status SendHello(::grpc::ServerContext* context, const ::partition_oram::HelloMessage* request, ::google::protobuf::Empty* response);
     virtual ::grpc::Status ReportServerInformation(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response);
+    virtual ::grpc::Status ResetServer(::grpc::ServerContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_InitOram : public BaseClass {
@@ -438,7 +462,27 @@ class server final {
       ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_InitOram<WithAsyncMethod_PrintOramTree<WithAsyncMethod_ReadPath<WithAsyncMethod_WritePath<WithAsyncMethod_CloseConnection<WithAsyncMethod_KeyExchange<WithAsyncMethod_SendHello<WithAsyncMethod_ReportServerInformation<Service > > > > > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_ResetServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_ResetServer() {
+      ::grpc::Service::MarkMethodAsync(8);
+    }
+    ~WithAsyncMethod_ResetServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ResetServer(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestResetServer(::grpc::ServerContext* context, ::google::protobuf::Empty* request, ::grpc::ServerAsyncResponseWriter< ::google::protobuf::Empty>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_InitOram<WithAsyncMethod_PrintOramTree<WithAsyncMethod_ReadPath<WithAsyncMethod_WritePath<WithAsyncMethod_CloseConnection<WithAsyncMethod_KeyExchange<WithAsyncMethod_SendHello<WithAsyncMethod_ReportServerInformation<WithAsyncMethod_ResetServer<Service > > > > > > > > > AsyncService;
   template <class BaseClass>
   class WithCallbackMethod_InitOram : public BaseClass {
    private:
@@ -655,7 +699,34 @@ class server final {
     virtual ::grpc::ServerUnaryReactor* ReportServerInformation(
       ::grpc::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
   };
-  typedef WithCallbackMethod_InitOram<WithCallbackMethod_PrintOramTree<WithCallbackMethod_ReadPath<WithCallbackMethod_WritePath<WithCallbackMethod_CloseConnection<WithCallbackMethod_KeyExchange<WithCallbackMethod_SendHello<WithCallbackMethod_ReportServerInformation<Service > > > > > > > > CallbackService;
+  template <class BaseClass>
+  class WithCallbackMethod_ResetServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_ResetServer() {
+      ::grpc::Service::MarkMethodCallback(8,
+          new ::grpc::internal::CallbackUnaryHandler< ::google::protobuf::Empty, ::google::protobuf::Empty>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::google::protobuf::Empty* request, ::google::protobuf::Empty* response) { return this->ResetServer(context, request, response); }));}
+    void SetMessageAllocatorFor_ResetServer(
+        ::grpc::MessageAllocator< ::google::protobuf::Empty, ::google::protobuf::Empty>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(8);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::google::protobuf::Empty, ::google::protobuf::Empty>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_ResetServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ResetServer(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* ResetServer(
+      ::grpc::CallbackServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_InitOram<WithCallbackMethod_PrintOramTree<WithCallbackMethod_ReadPath<WithCallbackMethod_WritePath<WithCallbackMethod_CloseConnection<WithCallbackMethod_KeyExchange<WithCallbackMethod_SendHello<WithCallbackMethod_ReportServerInformation<WithCallbackMethod_ResetServer<Service > > > > > > > > > CallbackService;
   typedef CallbackService ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_InitOram : public BaseClass {
@@ -789,6 +860,23 @@ class server final {
     }
     // disable synchronous version of this method
     ::grpc::Status ReportServerInformation(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_ResetServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_ResetServer() {
+      ::grpc::Service::MarkMethodGeneric(8);
+    }
+    ~WithGenericMethod_ResetServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ResetServer(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -951,6 +1039,26 @@ class server final {
     }
     void RequestReportServerInformation(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_ResetServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_ResetServer() {
+      ::grpc::Service::MarkMethodRaw(8);
+    }
+    ~WithRawMethod_ResetServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ResetServer(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestResetServer(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1127,6 +1235,28 @@ class server final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual ::grpc::ServerUnaryReactor* ReportServerInformation(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_ResetServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_ResetServer() {
+      ::grpc::Service::MarkMethodRawCallback(8,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->ResetServer(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_ResetServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ResetServer(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* ResetServer(
       ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
   };
   template <class BaseClass>
@@ -1345,9 +1475,36 @@ class server final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedReportServerInformation(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::google::protobuf::Empty,::google::protobuf::Empty>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_InitOram<WithStreamedUnaryMethod_PrintOramTree<WithStreamedUnaryMethod_ReadPath<WithStreamedUnaryMethod_WritePath<WithStreamedUnaryMethod_CloseConnection<WithStreamedUnaryMethod_KeyExchange<WithStreamedUnaryMethod_SendHello<WithStreamedUnaryMethod_ReportServerInformation<Service > > > > > > > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_ResetServer : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithStreamedUnaryMethod_ResetServer() {
+      ::grpc::Service::MarkMethodStreamed(8,
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::google::protobuf::Empty, ::google::protobuf::Empty>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::google::protobuf::Empty, ::google::protobuf::Empty>* streamer) {
+                       return this->StreamedResetServer(context,
+                         streamer);
+                  }));
+    }
+    ~WithStreamedUnaryMethod_ResetServer() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status ResetServer(::grpc::ServerContext* /*context*/, const ::google::protobuf::Empty* /*request*/, ::google::protobuf::Empty* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedResetServer(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::google::protobuf::Empty,::google::protobuf::Empty>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_InitOram<WithStreamedUnaryMethod_PrintOramTree<WithStreamedUnaryMethod_ReadPath<WithStreamedUnaryMethod_WritePath<WithStreamedUnaryMethod_CloseConnection<WithStreamedUnaryMethod_KeyExchange<WithStreamedUnaryMethod_SendHello<WithStreamedUnaryMethod_ReportServerInformation<WithStreamedUnaryMethod_ResetServer<Service > > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_InitOram<WithStreamedUnaryMethod_PrintOramTree<WithStreamedUnaryMethod_ReadPath<WithStreamedUnaryMethod_WritePath<WithStreamedUnaryMethod_CloseConnection<WithStreamedUnaryMethod_KeyExchange<WithStreamedUnaryMethod_SendHello<WithStreamedUnaryMethod_ReportServerInformation<Service > > > > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_InitOram<WithStreamedUnaryMethod_PrintOramTree<WithStreamedUnaryMethod_ReadPath<WithStreamedUnaryMethod_WritePath<WithStreamedUnaryMethod_CloseConnection<WithStreamedUnaryMethod_KeyExchange<WithStreamedUnaryMethod_SendHello<WithStreamedUnaryMethod_ReportServerInformation<WithStreamedUnaryMethod_ResetServer<Service > > > > > > > > > StreamedService;
 };
 
 }  // namespace partition_oram

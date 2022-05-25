@@ -74,7 +74,10 @@ class PathOramController {
 
   uint32_t GetTreeLevel(void) const { return tree_level_; }
 
-  virtual ~PathOramController() {}
+  virtual ~PathOramController() {
+    stub_.reset();
+    cryptor_.reset();
+  }
 };
 
 // This class is the implementation of the ORAM controller for Partition ORAM.
@@ -120,6 +123,13 @@ class OramController {
   // A reserved interface for testing one of the PathORAM controllers.
   Status TestPathOram(uint32_t controller_id);
   Status TestPartitionOram(void);
+
+  void Reset(uint32_t block_num) {
+    block_num_ = block_num;
+    position_map_.clear();
+    slots_.clear();
+    path_oram_controllers_.clear();
+  }
 
   virtual ~OramController() {}
 };

@@ -59,6 +59,17 @@ grpc::Status PartitionORAMService::InitOram(grpc::ServerContext* context,
   return grpc::Status::OK;
 }
 
+grpc::Status PartitionORAMService::ResetServer(grpc::ServerContext* context,
+                         const google::protobuf::Empty* request,
+                         google::protobuf::Empty* response) {
+  logger->info("From peer: {}, Reset server.", context->peer());
+
+  storages_.clear();
+  cryptor_.reset();
+
+  return grpc::Status::OK;
+}
+
 grpc::Status PartitionORAMService::PrintOramTree(
     grpc::ServerContext* context, const PrintOramTreeRequest* request,
     google::protobuf::Empty* response) {

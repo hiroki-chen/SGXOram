@@ -28,6 +28,8 @@ service server {
 
   rpc ReportServerInformation(google.protobuf.Empty) 
     returns (google.protobuf.Empty) {}
+
+  rpc ResetServer(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
 enum Type {

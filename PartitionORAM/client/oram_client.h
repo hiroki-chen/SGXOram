@@ -59,6 +59,13 @@ class Client {
   int CloseConnection(void);
   int InitOram(void);
   int TestOram(void);
+  int ResetServer(void);
+
+  void Reset(uint32_t block_num) {
+    block_num_ = block_num;
+
+    controller_->Reset(block_num);
+  }
 
   virtual ~Client() {}
 };

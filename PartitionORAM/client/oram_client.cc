@@ -121,6 +121,22 @@ int Client::SendHello(void) {
   return 0;
 }
 
+int Client::ResetServer(void) {
+  grpc::ClientContext context;
+  google::protobuf::Empty empty;
+
+  grpc::Status status = stub_->ResetServer(&context, empty, &empty);
+
+  if (!status.ok()) {
+    logger->error(status.error_message());
+    return -1;
+  }
+
+  logger->info("The server is reset.");
+
+  return 0;
+}
+
 int Client::CloseConnection(void) {
   grpc::ClientContext context;
   google::protobuf::Empty empty;
