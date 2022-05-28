@@ -23,6 +23,8 @@
 
 #include <basic_models.hh>
 
+extern int64_t ocall_latency;
+
 sgx_status_t init_oram(uint32_t* permutation, size_t permutation_size);
 
 void encrypt_slot_and_store(const uint8_t* const slot, size_t slot_size,

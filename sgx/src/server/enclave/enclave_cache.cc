@@ -92,11 +92,15 @@ void EnclaveCache::replace_item(const std::string& key,
         // (uint8_t*)old_value.data(),
         //                           old_value.size());
         // enclave_utils::check_sgx_status(status, "ocall_write_slot()");
-        enclave_utils::slot_segment_write(old_key.c_str(), (uint8_t*)old_value.data(),
+        enclave_utils::slot_segment_write(old_key.c_str(),
+                                          (uint8_t*)old_value.data(),
                                           old_value.size(), seg_size_);
       } else {
+        int64_t begin = enclave_utils::get_current_time();
         ocall_write_slot_header(old_key.c_str(), (uint8_t*)old_value.data(),
                                 old_value.size());
+        int64_t end = enclave_utils::get_current_time();
+        ocall_latency += (end - begin);
       }
     }
 
@@ -150,8 +154,12 @@ std::string EnclaveCache::internal_read(const std::string& key, size_t size,
                                        buf_size, seg_size_);
       // enclave_utils::check_sgx_status(status, "slot_segment_read()");
     } else {
+      int64_t begin = enclave_utils::get_current_time();
       status = ocall_read_slot_header(&buf_size, key.c_str(),
                                       (uint8_t*)buf.data(), buf_size);
+      int64_t end = enclave_utils::get_current_time();
+      ocall_latency += (end - begin);
+
       enclave_utils::check_sgx_status(status, "ocall_read_slot_header()");
     }
 
@@ -185,124 +193,5 @@ sgx_status_t SGXAPI ecall_test_oram_cache() {
   const uint32_t level = crypto_manager->get_oram_config()->level;
   const uint32_t way = crypto_manager->get_oram_config()->way;
 
-  // The roadmap is to traverse all the slots by the cache and check if the
-  // slot header is correct. There are two things we need to test:
-  // - Read
-  // - Write. We take the write-back strategy.
-  // ENCLAVE_LOG(
-  //     "[enclave] ++ Start testing the cache: type = sequential access.\n");
-  // for (uint32_t i = 0; i < level; i++) {
-  //   const uint32_t level_size = std::pow(way, i);
-
-  //   size_t slot_size = (i == level - 1) ? sizeof(sgx_oram::oram_slot_leaf_t)
-  //                                       : sizeof(sgx_oram::oram_slot_t);
-  //   uint8_t* const slot_buf = (uint8_t*)malloc(slot_size);
-
-  //   for (uint32_t j = 0; j < level_size; j++) {
-  //     const std::string key =
-  //     crypto_manager->enclave_sha_256(enclave_utils::enclave_strcat(
-  //         std::to_string(i).c_str(), "_", std::to_string(j).c_str()));
-  //     std::string ans = cache->read(key, i == level - 1);
-  //     // Decrypt the slot.
-  //     ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
-
-  //     if (ans.size() != slot_size) {
-  //       ENCLAVE_LOG("[enclave] Read error on key %s",
-  //                   ::hex_to_string((uint8_t*)key.data()).c_str());
-  //       ocall_panic_and_flush("Read error on key.");
-  //     } else {
-  //       memcpy(slot_buf, ans.data(), slot_size);
-
-  //       // Check header.
-  //       sgx_oram::oram_slot_header_t* const slot_header =
-  //           (sgx_oram::oram_slot_header_t*)slot_buf;
-
-  //       if (slot_header->level != i || slot_header->offset != j) {
-  //         ENCLAVE_LOG("[enclave] Read error on key %s",
-  //                     enclave_utils::hex_to_string((uint8_t*)key.data()).c_str());
-  //         ocall_panic_and_flush("Read error on key.");
-  //       }
-  //     }
-  //   }
-
-  //   enclave_utils::safe_free(slot_buf);
-  // }
-  // ENCLAVE_LOG("[enclave] -- Cache test for sequential access is passed.\n");
-
-  // ENCLAVE_LOG("[enclave] ++ Start testing the cache: type = random
-  // access.\n"); uint32_t n = 10000; while (n--) {
-  //   const uint32_t level_cur = enclave_utils::uniform_random(0, level - 1);
-  //   const uint32_t offset = enclave_utils::uniform_random(0, std::pow(way,
-  //   level_cur) - 1);
-
-  //   ENCLAVE_LOG("[enclave] Random access: level = %d, offset = %d.\n",
-  //               level_cur, offset);
-
-  //   const std::string key = crypto_manager->enclave_sha_256(
-  //       enclave_utils::enclave_strcat(std::to_string(level_cur).c_str(), "_",
-  //                      std::to_string(offset).c_str()));
-
-  //   std::string ans = cache->read(key, level_cur == level - 1);
-  //   ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
-  //   size_t slot_size = (level_cur == level - 1)
-  //                          ? sizeof(sgx_oram::oram_slot_leaf_t)
-  //                          : sizeof(sgx_oram::oram_slot_t);
-  //   uint8_t* const slot_buf = (uint8_t*)malloc(slot_size);
-  //   memcpy(slot_buf, ans.data(), slot_size);
-
-  //   // Check header.
-  //   sgx_oram::oram_slot_header_t* const slot_header =
-  //       (sgx_oram::oram_slot_header_t*)slot_buf;
-  //   if (slot_header->level != level_cur || slot_header->offset != offset) {
-  //     ENCLAVE_LOG("[enclave] Read error on key %s",
-  //                 enclave_utils::hex_to_string((uint8_t*)key.data()).c_str());
-  //     ocall_panic_and_flush("Read error on key.");
-  //   }
-
-  //   enclave_utils::safe_free(slot_buf);
-  // }
-  // ENCLAVE_LOG("[enclave] -- Cache test for random access is passed.\n");
-
-  // ENCLAVE_LOG(
-  //     "[enclave] ++ Start testing the cache: type = sequential write.\n");
-  // for (uint32_t i = 0; i < level; i++) {
-  //   const uint32_t level_size = std::pow(way, i);
-  //   size_t slot_size = (i == level - 1) ? sizeof(sgx_oram::oram_slot_leaf_t)
-  //                                       : sizeof(sgx_oram::oram_slot_t);
-  //   uint8_t* const slot_buf = (uint8_t*)malloc(slot_size);
-
-  //   for (uint32_t j = 0; j < level_size; j++) {
-  //     // First read the content of the slot.
-  //     const std::string key =
-  //     crypto_manager->enclave_sha_256(enclave_utils::enclave_strcat(
-  //         std::to_string(i).c_str(), "_", std::to_string(j).c_str()));
-  //     std::string ans = cache->read(key, i == level - 1);
-  //     ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
-  //     memcpy(slot_buf, ans.data(), slot_size);
-
-  //     sgx_oram::oram_block_t* const block =
-  //         (sgx_oram::oram_block_t*)(slot_buf +
-  //                                   sizeof(sgx_oram::oram_slot_header_t));
-  //     block->data[0] = std::to_string(i).c_str()[0];
-
-  //     // Write back the content.
-  //     std::string cipher_text = crypto_manager->enclave_aes_128_gcm_encrypt(
-  //         std::string((char*)slot_buf, slot_size));
-  //     cache->write(key, cipher_text, i == level - 1);
-  //   }
-  //   enclave_utils::safe_free(slot_buf);
-  // }
-  // ENCLAVE_LOG("[enclave] -- Cache test for sequential write is passed.\n");
-
-  // ENCLAVE_LOG("[enclave] ++ Start testing the cache: type = read.\n");
-  // int n = 100;
-  // while (n--) {
-  //   const std::string key =
-  //       crypto_manager->enclave_sha_256(enclave_utils::enclave_strcat(
-  //           std::to_string(1).c_str(), "_", std::to_string(2).c_str()));
-  //   std::string ans = cache->read(key, false);
-  //   ans = crypto_manager->enclave_aes_128_gcm_decrypt(ans);
-  // }
-  // ENCLAVE_LOG("[enclave] -- Cache test for read is passed.\n");
   return SGX_SUCCESS;
 }

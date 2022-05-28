@@ -25,6 +25,8 @@
 
 #include <basic_models.hh>
 
+extern int64_t ocall_latency;
+
 #define CACHE_DIRTY_BIT 0b1
 
 constexpr size_t maximum_cache_size_in_bytes = 96 * 1024 * 1024;

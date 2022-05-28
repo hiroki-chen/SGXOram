@@ -26,6 +26,8 @@
 
 #include <basic_models.hh>
 
+extern int64_t ocall_latency;
+
 #ifndef ENCLAVE_LOG
 #define ENCLAVE_LOG(format, ...) \
   { enclave_utils::printf(format, ##__VA_ARGS__); }

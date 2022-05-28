@@ -22,6 +22,7 @@
 #include <sgx_urts.h>
 
 #include <enclave/enclave_t.h>
+
 namespace enclave_utils {
 // Error code for SGX API calls
 static sgx_error_list sgx_errlist = {
@@ -318,13 +319,16 @@ void slot_segment_write(const char* slot_fingerprint, const uint8_t* const slot,
                         size_t slot_size, size_t seg_size) {
   if (seg_size == 0) {
     // Segmentation is disabled.
+    int64_t begin = get_current_time();
     sgx_status_t status = ocall_write_slot(slot_fingerprint, slot, slot_size);
+    int64_t end = get_current_time();
+    ocall_latency += (end - begin);
+
     check_sgx_status(status, "ocall_write_slot()");
   } else {
     // Write the slot in segments.
     size_t seg_num = std::floor(slot_size * 1. / seg_size);
 
-// #pragma omp parallel for
     for (size_t i = 0; i < seg_num; i++) {
       sgx_status_t status = ocall_write_slot_seg(
           slot_fingerprint, i * seg_size, slot + i * seg_size, seg_size, 0);
@@ -345,8 +349,13 @@ void slot_segment_read(const char* slot_fingerprint, uint8_t* slot,
   if (seg_size == 0) {
     // Segmentation is disabled.
     size_t dummy;
+
+    int64_t begin = get_current_time();
     sgx_status_t status =
         ocall_read_slot(&dummy, slot_fingerprint, slot, slot_size);
+    int64_t end = get_current_time();
+    ocall_latency += (end - begin);
+
     check_sgx_status(status, "ocall_read_slot()");
   } else {
     // Read the slot in segments.

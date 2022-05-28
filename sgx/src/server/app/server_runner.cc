@@ -360,7 +360,7 @@ grpc::Status SGXORAMService::destroy_enclave(
     storage_slot_header.clear();
     position_map.clear();
     memset(&oram_config, 0, sizeof(OramConfiguration));
-    
+
     return grpc::Status::OK;
   }
 }
@@ -669,12 +669,6 @@ sgx_status_t SGXORAMService::init_enclave(sgx_enclave_id_t* const global_eid) {
 }
 
 bool SGXORAMService::check_verification_message(const std::string& message) {
-  std::array<uint8_t, 1024> message_array;
-  std::copy(message.begin(), message.end(), message_array.begin());
-  logger->info("The verification message is {}.",
-               spdlog::to_hex(message_array.begin(),
-                              message_array.begin() + message.size()));
-
   if (ecall_check_verification_message(*global_eid, &status,
                                        (uint8_t*)message.c_str(),
                                        message.size()) != SGX_SUCCESS) {

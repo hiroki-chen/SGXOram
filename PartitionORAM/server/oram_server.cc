@@ -288,8 +288,7 @@ void ServerRunner::Run(void) {
   }
 
   grpc::ServerBuilder builder;
-  std::string address;
-  address = "0.0.0.0:1234";
+  const std::string address = oram_utils::StrCat(address_, ":", port_);
   builder.AddListeningPort(address, creds_);
   builder.RegisterService(service_.get());
 

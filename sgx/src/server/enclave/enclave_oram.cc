@@ -31,6 +31,8 @@
 extern int64_t access_time;
 extern int64_t eviction_time;
 
+int64_t ocall_latency = 0;
+
 static inline bool check_slot_header(
     const sgx_oram::oram_slot_header_t* const header_str, uint32_t level) {
   const sgx_oram::oram_slot_header_t* header =
@@ -273,10 +275,13 @@ void get_slot_and_decrypt(const std::string& slot_hash, uint8_t* slot_buffer,
     // leaf slot to prevent buffer overflow.
     // Here, the variable slot_size is useless, but we use it as sanity check.
     sgx_status_t status = SGX_ERROR_UNEXPECTED;
+
+    int64_t begin = enclave_utils::get_current_time();
     status = ocall_read_slot(&slot_size, slot_hash.c_str(), ciphertext,
                              ciphertext_size);
-    // enclave_utils::slot_segment_read(slot_hash.c_str(), ciphertext,
-    //                                  ciphertext_size);
+    int64_t end = enclave_utils::get_current_time();
+    ocall_latency += (end - begin);
+
     enclave_utils::check_sgx_status(status, "get_slot_and_decrypt()");
 
     // Check if the slot is valid.
@@ -320,8 +325,13 @@ std::string get_slot_header_and_decrypt(uint32_t level, uint32_t offset,
     memset(ciphertext, 0, ciphertext_size);
     sgx_status_t status = SGX_ERROR_UNEXPECTED;
     size_t dummy;
+
+    int64_t begin = enclave_utils::get_current_time();
     status = ocall_read_slot_header(&dummy, slot_hash.c_str(), ciphertext,
                                     ciphertext_size);
+    int64_t end = enclave_utils::get_current_time();
+    ocall_latency += (end - begin);
+
     enclave_utils::check_sgx_status(status, "get_slot_header_and_decrypt()");
 
     // Check if the slot is valid.
@@ -525,9 +535,13 @@ void encrypt_header_and_store(
   enclave_utils::check_sgx_status(status, "enclave_aes_128_gcm_encrypt()");
 
   if (!cache_enabled) {
+    int64_t begin = enclave_utils::get_current_time();
     // Store the encrypted header.
     sgx_status_t status = ocall_write_slot_header(
         slot_hash.c_str(), encrypted_header, encrypted_header_size);
+    int64_t end = enclave_utils::get_current_time();
+    ocall_latency += (end - begin);
+
     enclave_utils::check_sgx_status(status, "ocall_write_slot_header()");
   } else {
     // Get the cache instance for storing the header.
@@ -585,6 +599,7 @@ void encrypt_slot_and_store(const uint8_t* const slot, size_t slot_size,
 sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
                                uint8_t* data, size_t data_len) {
   ENCLAVE_LOG("[enclave] Accessing data at address %d.\n", block_address);
+  // ocall_latency = 0;
 
   const uint64_t begin = enclave_utils::get_current_time();
 
@@ -634,6 +649,8 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
   ENCLAVE_LOG("[enclave] time used = %u", (end - begin));
   ocall_report_time("[enclave] Access time: {} us.", access_time / 2700);
   ocall_report_time("[enclave] Eviction time: {} us.", eviction_time / 2700);
+  ocall_report_time("[enclave] Accumulative Ocall latency: {} us.",
+                    ocall_latency / 2700);
 
   return SGX_SUCCESS;
 }
