@@ -31,44 +31,49 @@ fi
 
 line=1;
 
-for ((i=5; i<=6; i++)); do
+for ((i=6; i<=21; i++)); do
     block=$(echo "$((2 ** ${i}))");
     printf "${MAGENTA}    Testing block number: ${block}...${NC}\n";
     
     # Start the server in the background.
-    ./build/bin/server.bin --port=5678 --seg_size=0 --cache_enabled=0 --log_level=2 --log_to_stderr > ./test/log-server.log 2>&1 &
-    
-    # Wait for the server to start.
-    sleep 1;
+    ./build/bin/server.bin --port=5678 --seg_size=0 --cache_enabled=1 --log_level=2 --log_to_stderr > ./test/log-server.log &
+
+    sleep 3;
     
     # Read a line from the file.
     client_cmd=$(awk 'NR=='${line}'{print $0}' ${client_src});
     
     # Start the client.
-    eval '${client_cmd}' > ./test/log-client.log 2>&1;
+    eval '${client_cmd}' > ./test/log-client.log;
     
     # Extract the end-to-end latency.
     latency=$(grep "The time for reading" ./test/log-client.log | awk '{ for (i=1;i<=NF;i++) { if ($i == "us.") { print $(i-1) } } }');
     echo "[+] End-to-end latency for block_num ${block}: ${latency} us" >> "$file";
-
+    
     # Extract the server latency.
     latency=$(grep "The server has read the block" ./test/log-server.log | awk '{ for (i=1;i<=NF;i++) { if ($i == "microsecond.") { print $(i-1) } } }' | head);
     echo "[+] Server latency for block_num ${block}: ${latency} us" >> "$file";
-
+    
     # Extract the access time.
     access_time=$(grep "Access time:" ./test/log-server.log | awk '{ for (i=1;i<=NF;i++) { if ($i == "us.") { print $(i-1) } } }');
     echo "[+] Access time for block_num ${block}: ${access_time} us" >> "$file";
-
+    
     # Extract the eviction time.
     eviction_time=$(grep "Eviction time:" ./test/log-server.log | awk '{ for (i=1;i<=NF;i++) { if ($i == "us.") { print $(i-1) } } }');
     echo "[+] Eviction time for block_num ${block}: ${eviction_time} us" >> "$file";
-
+    
+    # Extract the ocall latency.
+    ocall_latency=$(grep "Accumulative Ocall latency:" ./test/log-server.log | awk '{ for (i=1;i<=NF;i++) { if ($i == "us.") { print $(i - 1) } } }');
+    echo "[+] Accumulative ocall latency for block_num ${block}: ${ocall_latency} us" >> "$file";
+    
     # Extract the storage.
     storage=$(grep "The size of the storage is" ./test/log-server.log | awk '{ for (i=1;i<=NF;i++) { if ($i == "MB.") { print $(i-1) } } }');
     echo "[+] Storage for block_num ${block}: ${storage} MB" >> "$file";
-
+    
     # Append an empty line.
     echo "" >> "$file";
+
+    line=$(($line + 1));
 done
 
 printf "${MAGENTA}[+] Successfully tested the SO2 ORAM. Goodbye.${NC}\n";
