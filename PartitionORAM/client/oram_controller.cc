@@ -53,6 +53,13 @@ PathOramController::PathOramController(uint32_t id, uint32_t block_num,
   cryptor_ = oram_crypto::Cryptor::GetInstance();
 }
 
+size_t PathOramController::ReportClientStorage(void) const {
+  // For the client storage of the Path ORAM, we need to report the number of
+  // blocks in the client storage. We exclude the storage of position map for
+  // a more straightforward comparison.
+  return stash_.size() * ORAM_BLOCK_SIZE;
+}
+
 Status PathOramController::PrintOramTree(void) {
   grpc::ClientContext context;
   PrintOramTreeRequest request;
@@ -686,11 +693,29 @@ Status OramController::TestPartitionOram(void) {
                   block.data[0]);
   }
   auto end = std::chrono::high_resolution_clock::now();
+
+  // Report the storage.
+  const double storage = ReportClientStorage();
+  logger->info("[-] The client storage is {} MB.", storage / 1024 / 1024);
   logger->info(
       "[-] End testing Partition ORAM. Time elapsed per block: {} us.",
       std::chrono::duration_cast<std::chrono::microseconds>((end - begin) / 10)
           .count());
   return Status::kOK;
+}
+
+size_t OramController::ReportClientStorage(void) const {
+  size_t client_storage = 0;
+
+  std::for_each(
+      path_oram_controllers_.begin(), path_oram_controllers_.end(),
+      [&client_storage](
+          const std::unique_ptr<PathOramController>& path_oram_controller) {
+        client_storage += path_oram_controller->ReportClientStorage();
+      });
+
+  client_storage += slots_.size() * ORAM_BLOCK_SIZE;
+  return client_storage;
 }
 
 }  // namespace partition_oram

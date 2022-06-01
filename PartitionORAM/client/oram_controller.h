@@ -73,6 +73,7 @@ class PathOramController {
                 bool dummy);
 
   uint32_t GetTreeLevel(void) const { return tree_level_; }
+  size_t ReportClientStorage(void) const;
 
   virtual ~PathOramController() {
     stub_.reset();
@@ -123,6 +124,8 @@ class OramController {
   // A reserved interface for testing one of the PathORAM controllers.
   Status TestPathOram(uint32_t controller_id);
   Status TestPartitionOram(void);
+
+  size_t ReportClientStorage(void) const;
 
   void Reset(uint32_t block_num) {
     block_num_ = block_num;
