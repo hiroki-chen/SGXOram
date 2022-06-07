@@ -17,6 +17,7 @@
 #ifndef ENCLAVE_ORAM_ACCESS_HH
 #define ENCLAVE_ORAM_ACCESS_HH
 
+#include <string>
 #include <cstddef>
 
 #include <basic_models.hh>
@@ -57,10 +58,11 @@ void sub_evict_s3(sgx_oram::oram_slot_header_t* const header, uint8_t* const s3,
                   sgx_oram::oram_position_t* const position_target,
                   uint32_t position);
 
-void sub_evict_s2_epilogue(uint32_t dummy_number, uint32_t begin, uint32_t end,
+void sub_evict_s2_epilogue(uint32_t begin, uint32_t end, uint32_t current_level,
                            sgx_oram::oram_block_t* block_evict,
                            uint32_t* const counter, uint32_t* const position,
-                           uint32_t* const bid);
+                           uint32_t* const bid, std::string* const slot_hash,
+                           sgx_oram::oram_slot_header_t* const header);
 
 void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
                  uint8_t* const data, size_t data_size, bool condition_s1,

@@ -101,7 +101,7 @@ void string_to_hex(const std::string& in, uint8_t* out) {
   }
 }
 
-void print_block(sgx_oram::oram_block_t* const block) {
+void print_block(const sgx_oram::oram_block_t* const block) {
   ENCLAVE_LOG("------------------------------");
   ENCLAVE_LOG("[enclave] Block: ");
   ENCLAVE_LOG("[enclave]  - address: %d", block->header.address);
@@ -122,6 +122,18 @@ void print_slot_metadata(const sgx_oram::oram_slot_header_t* const header) {
   ENCLAVE_LOG("[enclave]  - dummy_number: %u", header->dummy_number);
   ENCLAVE_LOG("[enclave]  - slot_size: %u", header->slot_size);
   ENCLAVE_LOG("------------------------------");
+}
+
+void print_slot_body(const sgx_oram::oram_slot_header_t* const header,
+                     const sgx_oram::oram_block_t* const slot, size_t size) {
+  ENCLAVE_LOG("\n");
+  print_slot_metadata(header);
+
+  for (size_t i = 0; i < size; i++) {
+    print_block(slot + i);
+  }
+
+  ENCLAVE_LOG("\n");
 }
 
 void print_permutation(const uint32_t* permutation, uint32_t size) {
@@ -190,7 +202,7 @@ void band(const uint8_t* __restrict__ lhs, const uint8_t* __restrict__ rhs,
     ENCLAVE_LOG("[enclave] lhs or rhs is not aligned to 32.\n");
     return;
   }
-  
+
 #pragma omp parallel for if (lhs_size >= 65535)
   // Performs bitwise AND operation on two arrays in 32-bit chunks.
   // We assume that the arrays are of the same size multiple of 32.
@@ -279,6 +291,9 @@ uint32_t uniform_random(uint32_t lower, uint32_t upper) {
     ocall_panic_and_flush(
         "Cannot perform uniform_random because upper < lower");
   }
+
+  ENCLAVE_LOG("[enclave] Generating a random number in [%u, %u]\n", lower,
+              upper);
 
   // @ref Chromium's base/rand_util.cc for the implementation.
   uint32_t range = upper - lower + 1;

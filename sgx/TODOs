@@ -15,3 +15,8 @@ SO2 settings:
   <=4 forever. The parameters are fine-tuned.
 * Do experiments of comparison between cache-enabled and cache-disabled.
 * Position Map is small and can be stored on the server side (enclave EPC size is enough).
+
+---- New TODO: 2022.6.7 ----
+1. We need to modify the eviction procedure -> reverse-lexicongraphically eviction.
+2. There are still bugs ? in the code.
+3. (Maybe) we need to implement the code of DPathOram.

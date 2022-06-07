@@ -599,7 +599,7 @@ void encrypt_slot_and_store(const uint8_t* const slot, size_t slot_size,
 sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
                                uint8_t* data, size_t data_len) {
   ENCLAVE_LOG("[enclave] Accessing data at address %d.\n", block_address);
-  // ocall_latency = 0;
+  ocall_latency = 0;
 
   const uint64_t begin = enclave_utils::get_current_time();
 

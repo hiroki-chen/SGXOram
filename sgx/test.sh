@@ -36,7 +36,7 @@ for ((i=6; i<=21; i++)); do
     printf "${MAGENTA}    Testing block number: ${block}...${NC}\n";
     
     # Start the server in the background.
-    ./build/bin/server.bin --port=5678 --seg_size=0 --cache_enabled=1 --log_level=2 --log_to_stderr > ./test/log-server.log &
+    ./build/bin/server.bin --port=5678 --seg_size=0 --cache_enabled=0 --log_level=2 --log_to_stderr > ./test/log-server.log &
 
     sleep 3;
     
@@ -69,6 +69,10 @@ for ((i=6; i<=21; i++)); do
     # Extract the storage.
     storage=$(grep "The size of the storage is" ./test/log-server.log | awk '{ for (i=1;i<=NF;i++) { if ($i == "MB.") { print $(i-1) } } }');
     echo "[+] Storage for block_num ${block}: ${storage} MB" >> "$file";
+
+    # Extract the intialization time.
+    initialization_time=$(grep "Initialization time:" ./test/log-server.log | awk '{ for (i=1;i<=NF;i++) { if ($i == "us.") { print $(i-1) } } }');
+    echo "[+] Initialization time for block_num ${block}: ${initialization_time} us" >> "$file";
     
     # Append an empty line.
     echo "" >> "$file";

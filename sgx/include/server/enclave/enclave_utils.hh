@@ -122,7 +122,7 @@ void sprintf(const std::string& str, bool hex = false);
  *
  * @param block
  */
-void print_block(sgx_oram::oram_block_t* const block);
+void print_block(const sgx_oram::oram_block_t* const block);
 
 /**
  * @brief Print the slot header.
@@ -130,6 +130,16 @@ void print_block(sgx_oram::oram_block_t* const block);
  * @param header
  */
 void print_slot_metadata(const sgx_oram::oram_slot_header_t* const header);
+
+/**
+ * @brief Print the slot.
+ *
+ * @param header
+ * @param slot
+ * @param size
+ */
+void print_slot_body(const sgx_oram::oram_slot_header_t* const header,
+                     const sgx_oram::oram_block_t* const slot, size_t size);
 
 /**
  * @brief Print the permutation.

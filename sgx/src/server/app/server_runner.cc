@@ -598,9 +598,16 @@ grpc::Status SGXORAMService::init_oram(
     logger->error("Cannot set the cache enabled flag!");
   }
 
+  auto begin = std::chrono::high_resolution_clock::now();
   status = ecall_init_oram_controller(
       *global_eid, &status, (uint8_t*)&oram_config, sizeof(oram_config),
       permutation, real_number * sizeof(uint32_t));
+  auto end = std::chrono::high_resolution_clock::now();
+
+  logger->info(
+      "Initialization time: {} us.",
+      std::chrono::duration_cast<std::chrono::microseconds>(end - begin)
+          .count());
 
   if (status != SGX_SUCCESS) {
     const std::string error_message = "Failed to initialize the ORAM!";

@@ -291,7 +291,7 @@ int Client::read_block(uint32_t address) {
   // Decrypt the data.
   std::string ciphertext = reply.data();
   std::string plaintext = decrypt(ciphertext);
-  logger->info("The content of the block is {}", (int)plaintext.data()[0]);
+  logger->info("The content of the block is {}", (uint8_t)plaintext.data()[0]);
   return 0;
 }
 
