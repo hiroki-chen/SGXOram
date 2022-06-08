@@ -233,16 +233,6 @@ static void assemble_slot(sgx_oram::oram_block_t* slot,
                           uint32_t bucket_size, uint32_t way, bool is_leaf,
                           const uint32_t* const permutation,
                           size_t permutation_size, uint32_t* const offset) {
-  // if (!is_leaf) {
-  //   sgx_status_t status = populate_internal_slot(header, slot);
-  //   enclave_utils::check_sgx_status(status, "populate_internal_slot()");
-  // } else {
-  //   // Intialize the content of the slot.
-  //   sgx_status_t status = populate_leaf_slot(header, slot, permutation,
-  //                                            permutation_size, *offset);
-  //   enclave_utils::check_sgx_status(status, "populate_leaf_slot()");
-  //   *offset += bucket_size >> 1;
-  // }
   sgx_status_t status =
       populate_slot(header, slot, permutation, permutation_size, *offset);
   enclave_utils::check_sgx_status(status, "populate_slot()");
@@ -392,6 +382,7 @@ static inline void assemble_slot_header(
   header->slot_size = header->dummy_number;
   header->range_begin = begin;
   header->range_end = end;
+  header->counter = 0ul;
 }
 
 static sgx_status_t init_so2_oram(uint32_t* const level_size_information) {
@@ -620,6 +611,7 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
   ENCLAVE_LOG("[enclave] block_level: %u, bid_cur: %u", block_level, bid_cur);
 
   // We start from 0.
+  std::vector<uint32_t> empty = {};
   for (uint32_t i = level - 1; i >= 1; i--) {
     ENCLAVE_LOG("[enclave] Traversing level %d...\n", i);
     // If the current level is the same as the block level, then we should
@@ -627,7 +619,7 @@ sgx_status_t ecall_access_data(int op_type, uint32_t block_address,
     bool condition_s1 = (i == block_level);
     bool condition_s2 = (i - 1 == block_level);
     data_access(static_cast<sgx_oram::oram_operation_t>(op_type), i - 1, data,
-                data_len, condition_s1, condition_s2, position);
+                data_len, condition_s1, condition_s2, position, 0, &empty);
   }
 
   // Encrypt the data.

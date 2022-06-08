@@ -50,9 +50,6 @@
 //   different. So it is hard for us to define the struct size in advance. To
 //   load and unload data, we need to allocate a buffer that is large enough to
 //   hold the largest slot, and then you can truncate the buffer.
-//
-// FIXME: We can first read the header and then allocate the buffer according to
-// the header, and then read the data into the buffer.
 #ifndef DEFAULT_SLOT_SIZE
 #define DEFAULT_SLOT_SIZE 32
 #endif
@@ -111,6 +108,8 @@ typedef struct _oram_slot_header_t {
   // predict the actual space.
   uint32_t dummy_number;
   uint32_t slot_size;
+  // A global counter for reverse-lexicongraphical-order eviction. 
+  uint32_t counter;
 } oram_slot_header_t;
 
 // @deprecated

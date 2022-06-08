@@ -16,12 +16,14 @@
  */
 #include <enclave/enclave_oram_access.hh>
 
+#include <algorithm>
 #include <cstring>
 #include <cmath>
 
 #include <enclave/enclave_crypto_manager.hh>
 #include <enclave/enclave_utils.hh>
 #include <enclave/enclave_oram.hh>
+#include <enclave/enclave_u.h>
 
 bool constant = true;
 
@@ -35,6 +37,25 @@ static inline bool is_in_range(uint32_t num,
   const uint32_t begin = slot->range_begin;
   const uint32_t end = slot->range_end;
   return num >= begin && num <= end;
+}
+
+static inline void calculate_evict_path(
+    uint32_t num, uint32_t current_level,
+    std::vector<uint32_t>* const evict_path) {
+  std::shared_ptr<EnclaveCryptoManager> crypto_manager =
+      EnclaveCryptoManager::get_instance();
+  const uint32_t total_level = crypto_manager->get_oram_config()->level;
+  const uint32_t way = crypto_manager->get_oram_config()->way;
+
+  num %= (unsigned)(std::pow(way, total_level - current_level - 1));
+  // Convert the number to p-nary representation.
+  for (uint32_t i = 0; i < total_level - current_level - 1; ++i) {
+    evict_path->emplace_back(num % way);
+    num /= way;
+  }
+
+  // Reverse the order of the path.
+  std::reverse(evict_path->begin(), evict_path->end());
 }
 
 void sub_access_s1(bool condition, sgx_oram::oram_slot_header_t* const header,
@@ -283,10 +304,10 @@ void sub_access_s2(sgx_oram::oram_operation_t op_type, bool condition,
   // Finally, we do the one-pass again and read the target data to the client.
   // This time, there is nothing for us to do, i.e., the only thing we need to
   // do is check whether the target block exists.
+#pragma omp parallel for if (slot_size > 65535)
   for (size_t i = 0; i < slot_size; i++) {
     // Get the block and prepare a buffer for the boolean variable.
     sgx_oram::oram_block_t* block = slot_storage + i;
-    // enclave_utils::print_block(block);
 
     // Check whether this is the target one.
     bool condition_existing =
@@ -429,10 +450,11 @@ void sub_access(sgx_oram::oram_operation_t op_type, bool condition_s1,
                                position_target);
 }
 
-void sub_evict_s2(sgx_oram::oram_slot_header_t* const header, uint8_t* const s2,
-                  sgx_oram::oram_block_t* const block_evict,
+void sub_evict_s2(sgx_oram::oram_slot_header_t* const s2_header,
+                  sgx_oram::oram_slot_header_t* const s3_header,
+                  uint8_t* const s2, sgx_oram::oram_block_t* const block_evict,
                   uint32_t current_level, uint32_t* const counter) {
-  const size_t slot_size = header->slot_size;
+  const size_t slot_size = s2_header->slot_size;
   sgx_oram::oram_block_t* slot_storage = (sgx_oram::oram_block_t*)s2;
 
 #pragma omp parallel for if (slot_size > 65535)
@@ -442,20 +464,20 @@ void sub_evict_s2(sgx_oram::oram_slot_header_t* const header, uint8_t* const s2,
     bool condition_normal =
         (block->header.type ==
          sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_NORMAL);
+
+    // We pick a block that can be evicted to slot s3.
     bool condition_epsilon =
-        !is_in_range(block->header.bid, header) && condition_normal;
+        is_in_range(block->header.bid, s3_header) && condition_normal;
     *counter += condition_epsilon;
     bool condition_counter = (*counter <= 1);
     enclave_utils::oblivious_assign((condition_counter && condition_epsilon),
                                     (uint8_t*)block_evict, (uint8_t*)block,
                                     ORAM_BLOCK_SIZE, ORAM_BLOCK_SIZE);
 
-    // block->header.type = static_cast<sgx_oram::oram_block_type_t>(
-    //     (condition_counter && condition_epsilon));
     enclave_utils::oblivious_assign((condition_counter && condition_epsilon),
                                     (bool*)&block->header.type, &constant);
     // Increment the dummy number of the current slot.
-    header->dummy_number += (condition_counter && condition_epsilon);
+    s2_header->dummy_number += (condition_counter && condition_epsilon);
   }
 }
 
@@ -507,33 +529,20 @@ void sub_evict_s3(sgx_oram::oram_slot_header_t* const header, uint8_t* const s3,
 // Similar to sub_access_s2_epilogue, this function performs some necessary
 // clean-ups and variables assignments for accessing the slot S3.
 // A random position will be sampled and the new bid will be assigned to the
-// slot read from S2. However, since sub_evict will evict a block to the next
-// level, to ensure obliviousness, we need to randomly sample a branch if there
-// is no block to evict.
-void sub_evict_s2_epilogue(uint32_t begin, uint32_t end, uint32_t current_level,
-                           sgx_oram::oram_block_t* block_evict,
-                           uint32_t* const counter, uint32_t* const position,
-                           uint32_t* const bid, std::string* const slot_hash,
-                           sgx_oram::oram_slot_header_t* const header) {
+// slot read from S2.
+void sub_evict_s2_epilogue(sgx_oram::oram_block_t* block_evict,
+                           uint32_t* const position, uint32_t* const counter,
+                           uint32_t dummy_number) {
   // Determines whether we should follow the bid of the valid block.
-  // Or we just choose a random branch.
-  ENCLAVE_LOG("The bid of the evicted block is %u.", *bid);
+  ENCLAVE_LOG("The bid of the evicted block is %u.", block_evict->header.bid);
   bool condition_evict =
       (*counter < 1) || (block_evict->header.type !=
                          sgx_oram::oram_block_type_t::ORAM_BLOCK_TYPE_NORMAL);
   block_evict->header.type =
       static_cast<sgx_oram::oram_block_type_t>(condition_evict);
 
-  const uint32_t random_branch = enclave_utils::uniform_random(begin, end);
-  enclave_utils::oblivious_assign(condition_evict, (uint8_t*)bid,
-                                  (uint8_t*)(&random_branch), WORD_SIZE,
-                                  WORD_SIZE);
-
-  // Fetch the header, and draw the value of the position randomly.
-  ENCLAVE_LOG("bid = %u\n", *bid);
-  const uint32_t offset = calculate_offset(*bid, current_level + 1);
-  *slot_hash = get_slot_header_and_decrypt(current_level + 1, offset, header);
-  *position = enclave_utils::uniform_random(1, header->dummy_number);
+  // Draw the value of the position randomly.
+  *position = enclave_utils::uniform_random(1, dummy_number);
 }
 
 // The main entry of the data access.
@@ -542,7 +551,9 @@ void sub_evict_s2_epilogue(uint32_t begin, uint32_t end, uint32_t current_level,
 // called by this function.
 void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
                  uint8_t* const data, size_t data_size, bool condition_s1,
-                 bool condition_s2, sgx_oram::oram_position_t* const position) {
+                 bool condition_s2, sgx_oram::oram_position_t* const position,
+                 bool should_follow,
+                 std::vector<uint32_t>* const path_eviction) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
   // - Read two slots S1 and S2 from the outside memory. Originally, in the
@@ -595,7 +606,8 @@ void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
   ENCLAVE_LOG("[enclave] Invoking sub_evict for level %d...", current_level);
 
   begin = enclave_utils::get_current_time();
-  sub_evict(s2_header, s2_storage, s2_size, current_level, position);
+  sub_evict(should_follow, s2_header, s2_storage, s2_size, current_level,
+            position, path_eviction);
   end = enclave_utils::get_current_time();
 
   eviction_time += (end - begin);
@@ -603,11 +615,45 @@ void data_access(sgx_oram::oram_operation_t op_type, uint32_t current_level,
   enclave_utils::safe_free_all(4, s1_storage, s2_storage, s1_header, s2_header);
 }
 
-void sub_evict(sgx_oram::oram_slot_header_t* const s2_header, uint8_t* const s2,
+void sub_evict_prelogue(bool should_follow,
+                        sgx_oram::oram_slot_header_t* const s2_header,
+                        sgx_oram::oram_slot_header_t* const s3_header,
+                        std::vector<uint32_t>* const path_eviction) {
+  if (!should_follow) {
+    // Get the counter in the slot.
+    const uint32_t counter = s2_header->counter++;
+    // Get the path to the slot.
+    calculate_evict_path(counter, s2_header->level, path_eviction);
+  }
+
+  if (path_eviction->empty()) {
+    // Report error if the path is empty.
+    ocall_panic_and_flush("[enclave] Logic error: the path is empty!");
+  }
+
+  // Access the first element of path_eviction.
+  const uint32_t bid = path_eviction->at(0);
+  // Pop the first element of path_eviction.
+  path_eviction->erase(path_eviction->begin());
+
+  // Get the header for s3.
+  const uint32_t offset_s3 = calculate_offset(bid, s2_header->level + 1);
+  const std::string slot_hash_s3 =
+      get_slot_header_and_decrypt(s2_header->level + 1, offset_s3, s3_header);
+}
+
+void sub_evict(bool should_follow,
+               sgx_oram::oram_slot_header_t* const s2_header, uint8_t* const s2,
                size_t s2_size, uint32_t current_level,
-               sgx_oram::oram_position_t* const position) {
+               sgx_oram::oram_position_t* const position,
+               std::vector<uint32_t>* const path_eviction) {
   std::shared_ptr<EnclaveCryptoManager> crypto_manager =
       EnclaveCryptoManager::get_instance();
+
+  // Prepare the buffer for s3 header.
+  sgx_oram::oram_slot_header_t* s3_header =
+      (sgx_oram::oram_slot_header_t*)malloc(ORAM_SLOT_HEADER_SIZE);
+  sub_evict_prelogue(should_follow, s2_header, s3_header, path_eviction);
 
   // Initialize all the needed objects.
   uint32_t counter = 0;
@@ -615,39 +661,27 @@ void sub_evict(sgx_oram::oram_slot_header_t* const s2_header, uint8_t* const s2,
       (sgx_oram::oram_block_t*)malloc(ORAM_BLOCK_SIZE);
   memset(block, 0, ORAM_BLOCK_SIZE);
 
-  // Access slot s2.
   ENCLAVE_LOG("[enclave] Before sub_evict_s2");
   enclave_utils::print_slot_body(s2_header, (sgx_oram::oram_block_t*)s2,
                                  s2_header->slot_size);
-  sub_evict_s2(s2_header, s2, block, current_level, &counter);
+  sub_evict_s2(s2_header, s3_header, s2, block, current_level, &counter);
   ENCLAVE_LOG("[enclave] After sub_evict_s2");
   enclave_utils::print_slot_body(s2_header, (sgx_oram::oram_block_t*)s2,
                                  s2_header->slot_size);
 
-  ENCLAVE_LOG(
-      "[enclave] Slot 2 is accessed!"
-      " Now storing it to the cache / memory...");
   // After access, we need store the modified slot to the external memory.
   const uint32_t s2_level = s2_header->level;
   const uint32_t s2_offset = s2_header->offset;
   encrypt_slot_and_store(s2, s2_size, s2_level, s2_offset);
 
-  // Do some preparations.
-  sgx_oram::oram_slot_header_t* s3_header =
-      (sgx_oram::oram_slot_header_t*)malloc(ORAM_SLOT_HEADER_SIZE);
-  memset(s3_header, 0, ORAM_SLOT_HEADER_SIZE);
-  std::string s3_hash;
-  uint32_t pos;
-  uint32_t bid = block->header.bid;
-
-  ENCLAVE_LOG("here... bid = %u", bid);
-  sub_evict_s2_epilogue(s2_header->range_begin, s2_header->range_end,
-                        current_level, block, &counter, &pos, &bid, &s3_hash,
-                        s3_header);
+  uint32_t pos = 0;
+  sub_evict_s2_epilogue(block, &pos, &counter, s3_header->dummy_number);
 
   // Then fetch the storage.
   const size_t s3_size = s3_header->slot_size * ORAM_BLOCK_SIZE;
   uint8_t* s3_storage = (uint8_t*)malloc(s3_size);
+  const std::string s3_hash =
+      calculate_slot_fingerprint(current_level + 1, s3_header->offset);
   get_slot_and_decrypt(s3_hash, s3_storage, s3_size);
 
   // Get the position of block_evict.
@@ -679,7 +713,8 @@ void sub_evict(sgx_oram::oram_slot_header_t* const s2_header, uint8_t* const s2,
   const uint32_t level = crypto_manager->get_oram_config()->level;
   for (uint32_t i = current_level + 1; i < level - 1; i++) {
     data_access(sgx_oram::oram_operation_t::ORAM_OPERATION_READ, i,
-                dummy_buffer, DEFAULT_ORAM_DATA_SIZE, 0, 0, position);
+                dummy_buffer, DEFAULT_ORAM_DATA_SIZE, 0, 0, position, 1,
+                path_eviction);
   }
 
   enclave_utils::safe_free(dummy_buffer);

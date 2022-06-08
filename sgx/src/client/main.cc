@@ -50,6 +50,7 @@ std::shared_ptr<spdlog::sinks::rotating_file_sink_mt> file_sink =
 std::vector<spdlog::sink_ptr> sinks;
 
 int main(int argc, char** argv) {
+  unsetenv("https_proxy");
   // Parse the command line arguments.
   gflags::SetUsageMessage(
       "The SGX-Based Doubly Oblibvious RAM by Nankai University.");
