@@ -20,3 +20,6 @@ SO2 settings:
 1. We need to modify the eviction procedure -> reverse-lexicongraphically eviction.
 2. There are still bugs ? in the code.
 3. (Maybe) we need to implement the code of DPathOram.
+
+Multiple bugs:
+* Since there could be dummy blocks that are selected as the target of eviction / write, we cannot modify the position map accidentally.

@@ -30,7 +30,7 @@ static const std::string log_pattern =
 static const std::string server_log_dir = "./log";
 static const std::string server_name = "server.bin";
 static constexpr uint32_t server_log_size = 1024 * 1024 * 10;
-static constexpr uint32_t server_log_num = 10;
+static constexpr uint32_t server_log_num = 50;
 
 static const std::string client_log_dir = "./log";
 static const std::string client_name = "client.bin";

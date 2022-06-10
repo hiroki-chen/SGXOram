@@ -28,7 +28,7 @@ COMMON_INCLUDE_PATH := ../../include
 SRC_PATH := $(CURDIR)
 BUILD_PATH := ../../build/server
 KEY_PATH := ../../key
-GRPC_PATH := /home/hiroki/.local
+GRPC_PATH := /usr/local
 
 # Must recompile the project if these parameters are changed.
 BUCKET_SIZE ?= 32

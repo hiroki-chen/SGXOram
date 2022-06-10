@@ -104,6 +104,7 @@ static sgx_status_t populate_slot(sgx_oram::oram_slot_header_t* const header,
       EnclaveCryptoManager::get_instance();
   const size_t slot_size = header->slot_size;
   const uint32_t slot_begin = header->range_begin;
+  const uint32_t slot_end = header->range_end;
   const uint32_t real_number = crypto_manager->get_oram_config()->number >> 1;
 
   size_t i = 0, limit = (slot_size >> 1);
@@ -112,11 +113,12 @@ static sgx_status_t populate_slot(sgx_oram::oram_slot_header_t* const header,
   // Note that blocks in the same bucket have the same block id. So the offset
   // is DEFAULT_BUCKET_SIZE times bigger than the actual offset; therefore, we
   // need to multiply slot_begin by the macro DEFAULT_BUCKET_SIZE.
-  for (; (i + offset) <= real_number && (i < limit); i++) {
+  for (; (i + offset) < real_number && (i < limit); i++) {
     sgx_oram::oram_block_t* const p_block = slot + i;
     // Fill in the block with metadata first.
+    const uint32_t bid = enclave_utils::uniform_random(slot_begin, slot_end);
     p_block->header.type = sgx_oram::ORAM_BLOCK_TYPE_NORMAL;
-    p_block->header.bid = slot_begin;
+    p_block->header.bid = bid;
     p_block->header.address = permutation[i + offset];
 
     ENCLAVE_LOG("[enclave] address = %u", permutation[i + offset]);
@@ -124,8 +126,7 @@ static sgx_status_t populate_slot(sgx_oram::oram_slot_header_t* const header,
     // Assemble the <k, v> pair.
     sgx_oram::oram_position_t* position =
         (sgx_oram::oram_position_t*)malloc(ORAM_POSITION_SIZE);
-    assemble_position(header->level, slot_begin, permutation[offset + i],
-                      position);
+    assemble_position(header->level, bid, permutation[offset + i], position);
     // Encrypt the position and the store it to the ouside.
     encrypt_position_and_store(position);
     // Then fill in the data.

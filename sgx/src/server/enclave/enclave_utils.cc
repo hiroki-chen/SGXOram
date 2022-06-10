@@ -121,6 +121,7 @@ void print_slot_metadata(const sgx_oram::oram_slot_header_t* const header) {
               header->range_end);
   ENCLAVE_LOG("[enclave]  - dummy_number: %u", header->dummy_number);
   ENCLAVE_LOG("[enclave]  - slot_size: %u", header->slot_size);
+  ENCLAVE_LOG("[enclave]  - counter: %u", header->counter);
   ENCLAVE_LOG("------------------------------");
 }
 
