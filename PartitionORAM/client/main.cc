@@ -42,7 +42,10 @@ ABSL_FLAG(int, log_level, spdlog::level::info, "The level of the log.");
 // Start experiment series.
 ABSL_FLAG(bool, start_experiment, false, "Start experiment series.");
 
+using std::chrono_literals::operator""us;
+
 std::shared_ptr<spdlog::logger> logger = spdlog::stdout_color_mt("oram_client");
+std::chrono::microseconds partition_oram::network_time = 0us;
 
 void Handler(int signal) {
   logger->info("Client stopped.");

@@ -17,6 +17,7 @@
 #ifndef PARTITION_ORAM_CLIENT_ORAM_CONTROLLER_H_
 #define PARTITION_ORAM_CLIENT_ORAM_CONTROLLER_H_
 
+#include <chrono>
 #include <memory>
 #include <unordered_map>
 #include <utility>
@@ -29,6 +30,9 @@
 #include "protos/messages.grpc.pb.h"
 
 namespace partition_oram {
+// End-to-end time minus the networking time is the client side computation
+// time.
+extern std::chrono::microseconds network_time;
 // This class is the implementation of the ORAM controller for Path ORAM.
 class PathOramController {
   friend class OramController;
@@ -99,6 +103,7 @@ class OramController {
   std::shared_ptr<oram_crypto::Cryptor> cryptor_;
   // Stub
   std::shared_ptr<server::Stub> stub_;
+
 
   OramController() {}
 

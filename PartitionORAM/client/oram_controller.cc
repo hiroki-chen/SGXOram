@@ -203,7 +203,13 @@ Status PathOramController::ReadBucket(uint32_t path, uint32_t level,
   request.set_id(id_);
   request.set_path(path);
   request.set_level(level);
+
+  auto begin = std::chrono::high_resolution_clock::now();
   grpc::Status status = stub_->ReadPath(&context, request, &response);
+  auto end = std::chrono::high_resolution_clock::now();
+
+  network_time +=
+      std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
 
   if (!status.ok()) {
     return Status::kServerError;
@@ -246,7 +252,12 @@ Status PathOramController::WriteBucket(uint32_t path, uint32_t level,
     request.add_bucket(block_str);
   }
 
+  auto begin = std::chrono::high_resolution_clock::now();
   grpc::Status status = stub_->WritePath(&context, request, &response);
+  auto end = std::chrono::high_resolution_clock::now();
+
+  network_time +=
+      std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
 
   if (!status.ok()) {
     return Status::kServerError;
@@ -696,11 +707,18 @@ Status OramController::TestPartitionOram(void) {
 
   // Report the storage.
   const double storage = ReportClientStorage();
+
+  auto end_to_end =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
+  auto client_time = (end_to_end - network_time) / 10;
+  end_to_end /= 10;
+
   logger->info("[-] The client storage is {} MB.", storage / 1024 / 1024);
   logger->info(
-      "[-] End testing Partition ORAM. Time elapsed per block: {} us.",
-      std::chrono::duration_cast<std::chrono::microseconds>((end - begin) / 10)
-          .count());
+      "[-] End testing Partition ORAM.\nEnd-to-end time elapsed per block: {} "
+      "us. \nClient computation time is: {} us.",
+      end_to_end.count(), client_time.count());
+
   return Status::kOK;
 }
 
