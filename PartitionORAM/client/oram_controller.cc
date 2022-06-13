@@ -42,7 +42,10 @@ size_t OramController::counter_ = 0;
 
 PathOramController::PathOramController(uint32_t id, uint32_t block_num,
                                        uint32_t bucket_size)
-    : id_(id), bucket_size_(bucket_size), network_time_(0us) {
+    : id_(id),
+      bucket_size_(bucket_size),
+      network_time_(0us),
+      network_communication_(0ul) {
   const size_t bucket_num = std::ceil(block_num * 1.0 / bucket_size);
   // Note that the level starts from 0.
   tree_level_ = std::ceil(LOG_BASE(bucket_num + 1, 2)) - 1;
@@ -60,6 +63,10 @@ size_t PathOramController::ReportClientStorage(void) const {
   // blocks in the client storage. We exclude the storage of position map for
   // a more straightforward comparison.
   return stash_.size() * ORAM_BLOCK_SIZE;
+}
+
+size_t PathOramController::ReportNetworkCommunication(void) const {
+  return network_communication_ * ORAM_BLOCK_SIZE;
 }
 
 Status PathOramController::PrintOramTree(void) {
@@ -230,6 +237,8 @@ Status PathOramController::ReadBucket(uint32_t path, uint32_t level,
     oram_utils::SafeFree(block);
   }
 
+  network_communication_ += response.bucket_size();
+
   return Status::kOK;
 }
 
@@ -253,6 +262,8 @@ Status PathOramController::WriteBucket(uint32_t path, uint32_t level,
     oram_utils::ConvertToString(&block, &block_str);
     request.add_bucket(block_str);
   }
+
+  network_communication_ += bucket.size();
 
   auto begin = std::chrono::high_resolution_clock::now();
   grpc::Status status = stub_->WritePath(&context, request, &response);
@@ -710,12 +721,17 @@ Status OramController::TestPartitionOram(void) {
   // Report the storage.
   const double storage = ReportClientStorage();
 
+  // Report the communication.
+  const double communication = ReportNetworkCommunication();
+
   auto end_to_end =
       std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
   const auto network_time = ReportNetworkingTime();
   const auto client_time = end_to_end - network_time;
 
   logger->info("[-] The client storage is {} MB.", storage / 1024 / 1024);
+  logger->info("[-] The client communication is {} MB.",
+               communication / 1024 / 1024 / 10);
   logger->info(
       "[-] End testing Partition ORAM.\nEnd-to-end time elapsed per block: {} "
       "us. \nClient computation time is: {} us.",
@@ -743,6 +759,16 @@ std::chrono::microseconds OramController::ReportNetworkingTime(void) const {
 
   for (const auto& controller : path_oram_controllers_) {
     ans += controller->ReportNetworkingTime();
+  }
+
+  return ans;
+}
+
+size_t OramController::ReportNetworkCommunication(void) const {
+  size_t ans = 0;
+
+  for (const auto& controller : path_oram_controllers_) {
+    ans += controller->ReportNetworkCommunication();
   }
 
   return ans;

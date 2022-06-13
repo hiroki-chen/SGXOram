@@ -50,6 +50,8 @@ class PathOramController {
   std::shared_ptr<oram_crypto::Cryptor> cryptor_;
   // Networking time.
   std::chrono::microseconds network_time_;
+  // Networking communication.
+  size_t network_communication_;
 
   // ==================== Begin private methods ==================== //
   Status ReadBucket(uint32_t path, uint32_t level,
@@ -77,6 +79,7 @@ class PathOramController {
 
   uint32_t GetTreeLevel(void) const { return tree_level_; }
   size_t ReportClientStorage(void) const;
+  size_t ReportNetworkCommunication(void) const;
   std::chrono::microseconds ReportNetworkingTime(void) const { return network_time_; }
 
   virtual ~PathOramController() {
@@ -131,6 +134,7 @@ class OramController {
   Status TestPartitionOram(void);
 
   size_t ReportClientStorage(void) const;
+  size_t ReportNetworkCommunication(void) const;
   std::chrono::microseconds ReportNetworkingTime(void) const;
 
   void Reset(uint32_t block_num) {
