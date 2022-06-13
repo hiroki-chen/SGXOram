@@ -28,6 +28,8 @@
 
 extern std::shared_ptr<spdlog::logger> logger;
 
+using std::chrono_literals::operator""us;
+
 namespace partition_oram {
 // The ownership of ORAM main controller cannot be multiple.
 // This cannot be shared.
@@ -40,7 +42,7 @@ size_t OramController::counter_ = 0;
 
 PathOramController::PathOramController(uint32_t id, uint32_t block_num,
                                        uint32_t bucket_size)
-    : id_(id), bucket_size_(bucket_size) {
+    : id_(id), bucket_size_(bucket_size), network_time_(0us) {
   const size_t bucket_num = std::ceil(block_num * 1.0 / bucket_size);
   // Note that the level starts from 0.
   tree_level_ = std::ceil(LOG_BASE(bucket_num + 1, 2)) - 1;
@@ -208,7 +210,7 @@ Status PathOramController::ReadBucket(uint32_t path, uint32_t level,
   grpc::Status status = stub_->ReadPath(&context, request, &response);
   auto end = std::chrono::high_resolution_clock::now();
 
-  network_time +=
+  network_time_ +=
       std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
 
   if (!status.ok()) {
@@ -256,7 +258,7 @@ Status PathOramController::WriteBucket(uint32_t path, uint32_t level,
   grpc::Status status = stub_->WritePath(&context, request, &response);
   auto end = std::chrono::high_resolution_clock::now();
 
-  network_time +=
+  network_time_ +=
       std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
 
   if (!status.ok()) {
@@ -710,14 +712,14 @@ Status OramController::TestPartitionOram(void) {
 
   auto end_to_end =
       std::chrono::duration_cast<std::chrono::microseconds>(end - begin);
-  auto client_time = (end_to_end - network_time) / 10;
-  end_to_end /= 10;
+  const auto network_time = ReportNetworkingTime();
+  const auto client_time = end_to_end - network_time;
 
   logger->info("[-] The client storage is {} MB.", storage / 1024 / 1024);
   logger->info(
       "[-] End testing Partition ORAM.\nEnd-to-end time elapsed per block: {} "
       "us. \nClient computation time is: {} us.",
-      end_to_end.count(), client_time.count());
+      (end_to_end / 10).count(), (client_time / 10).count());
 
   return Status::kOK;
 }
@@ -734,6 +736,16 @@ size_t OramController::ReportClientStorage(void) const {
 
   client_storage += slots_.size() * ORAM_BLOCK_SIZE;
   return client_storage;
+}
+
+std::chrono::microseconds OramController::ReportNetworkingTime(void) const {
+  std::chrono::microseconds ans = 0us;
+
+  for (const auto& controller : path_oram_controllers_) {
+    ans += controller->ReportNetworkingTime();
+  }
+
+  return ans;
 }
 
 }  // namespace partition_oram
