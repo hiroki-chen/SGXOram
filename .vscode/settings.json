@@ -1,0 +1,114 @@
+{
+  "makefile.extensionOutputFolder": "./.vscode",
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "keyword",
+        "settings": {
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "scope": "storage",
+        "settings": {
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "scope": "constant",
+        "settings": {
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "scope": "support.class.builtin",
+        "settings": {
+          "fontStyle": "bold"
+        }
+      },
+      {
+        "scope": "entity.name.function",
+        "settings": {
+          "fontStyle": "bold"
+        }
+      },
+    ]
+  },
+  "files.associations": {
+    "typeinfo": "cpp",
+    "*.S": "arm",
+    "*.sy": "c",
+    "*.WARNING": "log",
+    "*.INFO": "log",
+    "ostream": "cpp",
+    "iostream": "cpp",
+    "array": "cpp",
+    "atomic": "cpp",
+    "hash_map": "cpp",
+    "hash_set": "cpp",
+    "*.tcc": "cpp",
+    "bitset": "cpp",
+    "cctype": "cpp",
+    "chrono": "cpp",
+    "cinttypes": "cpp",
+    "clocale": "cpp",
+    "cmath": "cpp",
+    "codecvt": "cpp",
+    "complex": "cpp",
+    "condition_variable": "cpp",
+    "cstdarg": "cpp",
+    "cstddef": "cpp",
+    "cstdint": "cpp",
+    "cstdio": "cpp",
+    "cstdlib": "cpp",
+    "cstring": "cpp",
+    "ctime": "cpp",
+    "cwchar": "cpp",
+    "cwctype": "cpp",
+    "deque": "cpp",
+    "list": "cpp",
+    "unordered_map": "cpp",
+    "unordered_set": "cpp",
+    "vector": "cpp",
+    "exception": "cpp",
+    "algorithm": "cpp",
+    "functional": "cpp",
+    "iterator": "cpp",
+    "map": "cpp",
+    "memory": "cpp",
+    "memory_resource": "cpp",
+    "numeric": "cpp",
+    "optional": "cpp",
+    "random": "cpp",
+    "ratio": "cpp",
+    "regex": "cpp",
+    "set": "cpp",
+    "source_location": "cpp",
+    "string": "cpp",
+    "string_view": "cpp",
+    "system_error": "cpp",
+    "tuple": "cpp",
+    "type_traits": "cpp",
+    "utility": "cpp",
+    "fstream": "cpp",
+    "initializer_list": "cpp",
+    "iomanip": "cpp",
+    "iosfwd": "cpp",
+    "istream": "cpp",
+    "limits": "cpp",
+    "mutex": "cpp",
+    "new": "cpp",
+    "shared_mutex": "cpp",
+    "sstream": "cpp",
+    "stdexcept": "cpp",
+    "streambuf": "cpp",
+    "thread": "cpp",
+    "typeindex": "cpp",
+    "variant": "cpp",
+    "bit": "cpp",
+    "charconv": "cpp"
+  },
+  "C_Cpp.default.compilerArgs": [
+    "-std=c++17"
+  ],
+}
