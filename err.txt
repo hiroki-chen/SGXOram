@@ -1,0 +1,2 @@
+Error: ./build/Simulator -w 4 -n 10000 -r 1 -b 128 -t 0 -c 2
+Error: ./build/Simulator -w 8 -n 10000 -r 1 -b 128 -t 0 -c 2

@@ -1,0 +1,175 @@
+/*
+ Copyright (c) 2022 Haobin Chen and Siyi Lv
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+enclave {
+  // Some necessary function interfaces.
+  from "sgx_tkey_exchange.edl" import *;
+  from "sgx_pthread.edl" import *;
+  from "sgx_tstdc.edl" import *;
+
+  include "sgx_key_exchange.h"
+  include "sgx_trts.h"
+  include "sgx_tseal.h"
+  
+  /* std::xxx should be avoided because enclave's interfaces are written in C language. */
+  /* C++ style classes and structs can only be passed after serialization. */
+  /* To pass C++ style classes and structs to the enclave,
+     the untrusted application must first create a buffer and then specify its length. */
+
+  trusted {
+		// Invoked by the client to intialize the inner oram controller.
+		public sgx_status_t ecall_init_oram_controller([ in, size = config_size ] uint8_t* config, 
+                                                   size_t config_size,
+                                                   [ in, size = permutation_size ] uint32_t* permutation,
+                                                   size_t permutation_size);
+
+    // Data access interface provided by the SGX-based ORAM.
+    public sgx_status_t ecall_access_data(int op_type,
+                                          uint32_t block_address,
+                                          [ in, out, size = data_len ] uint8_t* data,
+                                          size_t data_len);
+
+    public sgx_status_t ecall_check_verification_message([ in, size = message_size ] uint8_t* message, size_t message_size);
+
+    // Interfaces for sealing and unsealing data on the disk (if needed).
+    public sgx_status_t ecall_seal([ in, size = plaintext_len ] const uint8_t *plaintext,
+                                   size_t plaintext_len,
+                                   [ out, size = sealed_size ] sgx_sealed_data_t *sealed_data,
+                                   size_t sealed_size);
+
+    public sgx_status_t ecall_unseal([ in, size = sealed_size ] const sgx_sealed_data_t *sealed_data,
+                                     size_t sealed_size,
+                                     [ out, size = plaintext_len ] uint8_t *plaintext,
+                                     size_t plaintext_len);
+
+    public sgx_status_t ecall_begin_DHKE();
+
+    public sgx_status_t ecall_sample_key_pair([ out, size = pubkey_size ] uint8_t* pub_key, size_t pubkey_size);
+
+    public sgx_status_t ecall_compute_shared_key([ in, size = pubkey_size ] const uint8_t* pub_key, size_t pubkey_size);
+
+    // Begin Remote Attestation Interfaces //
+
+    // This ecall is a wrapper of sgx_ra_init to create the trusted
+    // KE exchange key context needed for the remote attestation
+    // SIGMA API's. Input pointers aren't checked since the trusted stubs
+    // copy them into EPC memory.
+    //
+    // @param b_pse Indicates whether the ISV app is using the
+    //              platform services.
+    // @param p_context Pointer to the location where the returned
+    //                  key context is to be copied.
+    //
+    // @return Any error returned from the trusted key exchange API
+    //         for creating a key context.
+    public sgx_status_t enclave_init_ra(int b_pse, [ out ] sgx_ra_context_t *p_context);
+
+    // Closes the tKE key context used during the SIGMA key exchange.
+    //
+    // @param context The trusted KE library key context.
+    //
+    // @return Return value from the key context close API
+    public sgx_status_t enclave_ra_close(sgx_ra_context_t context);
+    public sgx_status_t verify_att_result_mac(sgx_ra_context_t context,
+                                              [ in,size = message_size ] uint8_t *message, 
+                                              size_t message_size, 
+                                              [ in,size = mac_size ] uint8_t *mac, 
+                                              size_t mac_size);
+
+    public sgx_status_t verify_secret_data(sgx_ra_context_t context,
+                                          [in,size=secret_size] uint8_t* p_secret,
+                                          uint32_t secret_size,
+                                          [in,count=16] uint8_t* gcm_mac,
+                                          uint32_t max_verification_length,
+                                          [out, count=16] uint8_t *p_ret);
+
+    public sgx_status_t put_secret_data(sgx_ra_context_t context,  
+                                        [ in,size = secret_size ] uint8_t *p_secret,
+                                        uint32_t secret_size,
+                                        [ in, count = 16 ] uint8_t *gcm_mac);
+    // End Remote Attestation Interfaces //
+
+    public sgx_status_t ecall_test_oram_cache();
+
+    public sgx_status_t ecall_should_enable_cache(int should_enable);
+  };
+
+  untrusted {
+    // These functions checks if the target slot is in the external memory.
+    int ocall_is_header_in_storage([ in, string] const char* slot_fingerprint);
+    int ocall_is_body_in_storage([ in, string] const char* slot_fingerprint);
+
+		// A function for printing the buffer inside the enclave to the console.
+		// Only invoked by the enclave.
+    void ocall_printf([ in, string ] const char *str);
+
+		// A slot is stored outside the enclave; thus we need to get the slot 
+		// from the outside by its HASHED fingerprint. The return value is the
+    // size of the slot in bytes.
+    //
+    // Note that the last parameter of this function is the size of the buffer
+    // which is predefined to be a fixed constant.
+    size_t ocall_read_slot([ in, string ] const char *slot_finderprint,
+                           [ out, size = slot_size ] uint8_t *slot,
+                           size_t slot_size);
+    size_t ocall_read_slot_seg([ in, string ] const char *slot_fingerprint,
+                               size_t offset,
+                               [ out, size = slot_size ] uint8_t *slot,
+                               size_t slot_size);
+
+    size_t ocall_read_slot_header([ in, string ]const char* slot_finger_print,
+                                  [ out, size = size ] uint8_t* header,
+                                  size_t size);
+
+    // Write to the slot.
+    void ocall_write_slot([ in, string ] const char *slot_finderprint,
+                          [ in, size = size ] const uint8_t* slot,
+                          size_t size);
+    void ocall_write_slot_seg([ in, string ] const char *slot_fingerprint,
+                              size_t offset,
+                              [ in, size = size] const uint8_t* slot,
+                              size_t size, int finished);
+
+    void ocall_write_slot_header([ in, string ] const char *slot_finderprint,
+                                 [ in, size = size ] const uint8_t* header,
+                                  size_t size);
+
+    // Exception handler.
+    void ocall_exception_handler([ in, string ] const char* err_msg);
+
+    // Read the position from the outside memory.
+    // The position map may be constructed in a recursive way.
+    size_t ocall_read_position([ in, string ] const char *position_finderprint,
+                             [ out, size = position_size ] uint8_t *position,
+                             size_t position_size);
+
+    // Write the position to the outside memory.
+    void ocall_write_position([ in, string ] const char *position_finderprint,
+                              [ in, size = position_size ] const uint8_t* position,
+                              size_t position_size);
+
+    // When something fatal happende in the enclave, the enclave will call abort() and then
+    // notify the outside application to flush all logs onto the disk and stop running.
+    void ocall_panic_and_flush([ in, string ] const char* reason);
+
+    void ocall_flush_log();
+
+    // Report time.
+    // Message should be a formatted string used for spdlog::fmt.
+    void ocall_report_time([ in, string ] const char* message, int64_t tick);
+  };
+};

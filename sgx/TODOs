@@ -1,0 +1,25 @@
+1. Add the timer for calculating the cost of access / evict.
+  * But how do we use chrono in the enclave? RDTSC will not give the correct time;
+  * Using OCall will cause delay which may give inaccurate time...
+  
+2. Calculate the cloud storage for the ORAM tree. OK
+3. Should do experiments across different block size?...
+4. Or fixing some invariants?..
+
+Partition ORAM settings:
+* We fix the bucket size of the underlying Path ORAM to be 4 with different block size from 512 Bytes to 4096 Bytes 512, 1024, 2048, 4096.
+* We initialize the Partition ORAM with half real block and dummy block such that the total number of the blocks fits the ORAM Tree.
+
+SO2 settings:
+* We initialize the SO2 ORAM with half real block and dummy block such that the total number of the blocks fits the ORAM Tree and level of the whole tree 
+  <=4 forever. The parameters are fine-tuned.
+* Do experiments of comparison between cache-enabled and cache-disabled.
+* Position Map is small and can be stored on the server side (enclave EPC size is enough).
+
+---- New TODO: 2022.6.7 ----
+1. We need to modify the eviction procedure -> reverse-lexicongraphically eviction.
+2. There are still bugs ? in the code.
+3. (Maybe) we need to implement the code of DPathOram.
+
+Multiple bugs:
+* Since there could be dummy blocks that are selected as the target of eviction / write, we cannot modify the position map accidentally.

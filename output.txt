@@ -1,0 +1,8 @@
+[Experiment setting] way: 4, number: 10000, bucket_size: 128, level: 5round: 1
+[Experiment setting] way: 8, number: 10000, bucket_size: 128, level: 4round: 1
+[Experiment setting] way: 8, number: 10000, bucket_size: 128, level: 4round: 1
+[Experiment setting] way: 3, number: 27, bucket_size: 2, level: 4round: 2
+Access finished, time elapsed: 0.0241255 s
+[Experiment setting] way: 8, number: 10000, bucket_size: 128, level: 4round: 1
+[Experiment setting] way: 8, number: 10000, bucket_size: 128, level: 4round: 1
+[Experiment setting] way: 8, number: 10000, bucket_size: 128, level: 4round: 1
